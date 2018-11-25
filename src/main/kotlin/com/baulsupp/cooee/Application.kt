@@ -1,13 +1,16 @@
 package com.baulsupp.cooee
 
+import com.baulsupp.cooee.api.Go
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.ryanharter.ktor.moshi.moshi
+import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.application.install
-import io.ktor.auth.*
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.features.auth.basic.BasicAuth
 import io.ktor.client.features.json.GsonSerializer
 import io.ktor.client.features.json.JsonFeature
@@ -21,10 +24,10 @@ import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readText
 import io.ktor.jackson.jackson
 import io.ktor.locations.KtorExperimentalLocationsAPI
-import io.ktor.locations.Location
 import io.ktor.locations.Locations
 import io.ktor.locations.get
 import io.ktor.response.respond
+import io.ktor.response.respondRedirect
 import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.routing
@@ -37,32 +40,21 @@ import kotlinx.css.*
 import kotlinx.html.*
 import java.time.Duration
 import java.time.ZoneId
+import java.util.*
 import kotlin.collections.set
 
+
+//fun main(args: Array<String>): Unit = io.ktor.server.jetty.EngineMain.main(args)
 fun main(args: Array<String>): Unit = io.ktor.server.cio.EngineMain.main(args)
 
 @KtorExperimentalLocationsAPI
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
-    val client = HttpClient(CIO) {
-        install(BasicAuth) {
-            username = "test"
-            password = "pass"
-        }
+    val client = HttpClient(OkHttp) {
         install(JsonFeature) {
             serializer = GsonSerializer()
         }
-    }
-    runBlocking {
-        // Sample for making a HTTP Client request
-        /*
-        val message = client.post<JsonSampleClass> {
-            url(URL("http://127.0.0.1:8080/path/to/endpoint"))
-            contentType(ContentType.Application.Json)
-            body = JsonSampleClass(hello = "world")
-        }
-        */
     }
 
     install(io.ktor.websocket.WebSockets) {
@@ -72,21 +64,13 @@ fun Application.module(testing: Boolean = false) {
         masking = false
     }
 
-    install(Authentication) {
-        basic("myBasicAuth") {
-            realm = "Ktor Server"
-            validate { if (it.name == "test" && it.password == "password") UserIdPrincipal(it.name) else null }
-        }
-    }
-
     install(ContentNegotiation) {
-        jackson {
-            enable(SerializationFeature.INDENT_OUTPUT)
-        }
+      moshi {
+        add(Date::class.java, Rfc3339DateJsonAdapter())
+      }
     }
 
-    install(Locations) {
-    }
+    install(Locations)
 
     install(Sessions) {
         cookie<MySession>("MY_SESSION") {
@@ -97,10 +81,6 @@ fun Application.module(testing: Boolean = false) {
     install(Compression) {
         gzip {
             priority = 1.0
-        }
-        deflate {
-            priority = 10.0
-            minimumSize(1024) // condition
         }
     }
 
@@ -115,27 +95,11 @@ fun Application.module(testing: Boolean = false) {
         anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
     }
 
-//    install(CachingHeaders) {
-//        options { outgoingContent ->
-//            when (outgoingContent.contentType?.withoutParameters()) {
-//                ContentType.Text.CSS -> CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 24 * 60 * 60), expires = null as? GMTDate?)
-//                else -> null
-//            }
-//        }
-//    }
-
     install(DataConversion)
 
     install(DefaultHeaders) {
         header("X-Engine", "Ktor") // will send this header with each response
     }
-
-    install(ForwardedHeaderSupport) // WARNING: for security, do not include this if not behind a reverse proxy
-    install(XForwardedHeaderSupport) // WARNING: for security, do not include this if not behind a reverse proxy
-
-//    install(HSTS) {
-//        includeSubDomains = true
-//    }
 
     install(Webjars) {
         path = "/webjars" //defaults to /webjars
@@ -150,6 +114,10 @@ fun Application.module(testing: Boolean = false) {
 //            // 301 Moved Permanently, or 302 Found redirect.
 //            permanentRedirect = true
 //        }
+//    }
+
+//    install(Authentication) {
+//
 //    }
 
     install(ShutDownUrl.ApplicationCallFeature) {
@@ -201,26 +169,21 @@ fun Application.module(testing: Boolean = false) {
             }
         }
 
-        authenticate("myBasicAuth") {
-            get("/protected/route/basic") {
-                val principal = call.principal<UserIdPrincipal>()!!
-                call.respondText("Hello ${principal.name}")
-            }
+//        authenticate("myBasicAuth") {
+//            get("/protected/route/basic") {
+//                val principal = call.principal<UserIdPrincipal>()!!
+//                call.respondText("Hello ${principal.name}")
+//            }
+//        }
+
+        get("/go1") {
+            println("1")
+            call.respondRedirect("https://google.com", permanent = false)
         }
 
-        get("/json/jackson") {
-            call.respond(mapOf("hello" to "world"))
-        }
-
-        get<MyLocation> {
-            call.respondText("Location: name=${it.name}, arg1=${it.arg1}, arg2=${it.arg2}")
-        }
-        // Register nested routes
-        get<Type.Edit> {
-            call.respondText("Inside $it")
-        }
-        get<Type.List> {
-            call.respondText("Inside $it")
+        get<Go> { location ->
+            println("2 " + location)
+            call.respondRedirect("https://google.com", permanent = false)
         }
 
         get("/session/increment") {
@@ -243,20 +206,6 @@ fun Application.module(testing: Boolean = false) {
             call.respondText("<script src='/webjars/jquery/jquery.js'></script>", ContentType.Text.Html)
         }
     }
-}
-
-data class JsonSampleClass(val hello: String)
-
-@Location("/location/{name}")
-class MyLocation(val name: String, val arg1: Int = 42, val arg2: String = "default")
-
-@Location("/type/{name}")
-data class Type(val name: String) {
-    @Location("/edit")
-    data class Edit(val type: Type)
-
-    @Location("/list/{page}")
-    data class List(val type: Type, val page: Int)
 }
 
 data class MySession(val count: Int = 0)

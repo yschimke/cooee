@@ -7,4 +7,3 @@
 *.iws
 buildSrc/build
 buildSrc/.gradle
-src/main/
