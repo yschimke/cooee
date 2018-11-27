@@ -51,7 +51,7 @@ dependencies {
   compile("io.ktor:ktor-jackson:${Versions.ktor}")
   compile("io.ktor:ktor-locations:${Versions.ktor}")
   compile("io.ktor:ktor-metrics:${Versions.ktor}")
-  compile("io.ktor:ktor-server-cio:${Versions.ktor}")
+  compile("io.ktor:ktor-server-netty:${Versions.ktor}")
   compile("io.ktor:ktor-server-core:${Versions.ktor}")
   compile("io.ktor:ktor-server-host-common:${Versions.ktor}")
   compile("io.ktor:ktor-server-sessions:${Versions.ktor}")

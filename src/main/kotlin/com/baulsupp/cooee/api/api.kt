@@ -4,5 +4,5 @@ import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Location
 
 @KtorExperimentalLocationsAPI
-@Location("/go2")
-data class Go(val query: String?)
+@Location("/go")
+data class Go(val q: String? = null)

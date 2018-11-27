@@ -32,6 +32,10 @@ import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.server.engine.ShutDownUrl
+import io.ktor.server.engine.applicationEngineEnvironment
+import io.ktor.server.engine.connector
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
 import io.ktor.sessions.*
 import io.ktor.webjars.Webjars
 import io.ktor.websocket.webSocket
@@ -43,9 +47,28 @@ import java.time.ZoneId
 import java.util.*
 import kotlin.collections.set
 
+@KtorExperimentalLocationsAPI
+fun main(args: Array<String>) {
+  val env = applicationEngineEnvironment {
+    module {
+      test()
+    }
+    // Private API
+    connector {
+      host = "127.0.0.1"
+      port = 9090
+    }
+    // Public API
+    connector {
+      host = "0.0.0.0"
+      port = 8080
+    }
+  }
+  embeddedServer(Netty, env).start(true)
+}
 
-//fun main(args: Array<String>): Unit = io.ktor.server.jetty.EngineMain.main(args)
-fun main(args: Array<String>): Unit = io.ktor.server.cio.EngineMain.main(args)
+fun Application.test() = module(true)
+fun Application.main() = module(false)
 
 @KtorExperimentalLocationsAPI
 @Suppress("unused") // Referenced in application.conf
@@ -84,112 +107,31 @@ fun Application.module(testing: Boolean = false) {
         }
     }
 
-    install(CORS) {
-        method(HttpMethod.Options)
-        method(HttpMethod.Put)
-        method(HttpMethod.Delete)
-        method(HttpMethod.Patch)
-        header(HttpHeaders.Authorization)
-        header("MyCustomHeader")
-        allowCredentials = true
-        anyHost() // @TODO: Don't do this in production if possible. Try to limit it.
-    }
+    install(CORS)
 
     install(DataConversion)
 
-    install(DefaultHeaders) {
-        header("X-Engine", "Ktor") // will send this header with each response
+    if (!testing) {
+        install(HttpsRedirect) {
+            // The port to redirect to. By default 443, the default HTTPS port.
+            sslPort = 443
+            // 301 Moved Permanently, or 302 Found redirect.
+            permanentRedirect = true
+        }
     }
-
-    install(Webjars) {
-        path = "/webjars" //defaults to /webjars
-        zone = ZoneId.systemDefault() //defaults to ZoneId.systemDefault()
-    }
-
-    // http://ktor.io/servers/features/https-redirect.html#testing
-//    if (!testing) {
-//        install(HttpsRedirect) {
-//            // The port to redirect to. By default 443, the default HTTPS port.
-//            sslPort = 443
-//            // 301 Moved Permanently, or 302 Found redirect.
-//            permanentRedirect = true
-//        }
-//    }
-
-//    install(Authentication) {
-//
-//    }
 
     install(ShutDownUrl.ApplicationCallFeature) {
-        // The URL that will be intercepted (you can also use the application.conf's ktor.deployment.shutdown.url key)
         shutDownUrl = "/ktor/application/shutdown"
-        // A function that will be executed to get the exit code of the process
-        exitCodeSupplier = { 0 } // ApplicationCall.() -> Int
+        exitCodeSupplier = { 0 }
     }
 
     routing {
         get("/") {
-            call.respondText("HELLO WORLD!", contentType = ContentType.Text.Plain)
-        }
-
-        webSocket("/myws/echo") {
-            send(Frame.Text("Hi from server"))
-            while (true) {
-                val frame = incoming.receive()
-                if (frame is Frame.Text) {
-                    send(Frame.Text("Client said: " + frame.readText()))
-                }
-            }
-        }
-
-        get("/html-dsl") {
-            call.respondHtml {
-                body {
-                    h1 { +"HTML" }
-                    ul {
-                        for (n in 1..10) {
-                            li { +"$n" }
-                        }
-                    }
-                }
-            }
-        }
-
-        get("/styles.css") {
-            call.respondCss {
-                body {
-                    backgroundColor = Color.red
-                }
-                p {
-                    fontSize = 2.em
-                }
-                rule("p.myclass") {
-                    color = Color.blue
-                }
-            }
-        }
-
-//        authenticate("myBasicAuth") {
-//            get("/protected/route/basic") {
-//                val principal = call.principal<UserIdPrincipal>()!!
-//                call.respondText("Hello ${principal.name}")
-//            }
-//        }
-
-        get("/go1") {
-            println("1")
-            call.respondRedirect("https://google.com", permanent = false)
+            call.respondText("Cooee!", contentType = ContentType.Text.Plain)
         }
 
         get<Go> { location ->
-            println("2 " + location)
-            call.respondRedirect("https://google.com", permanent = false)
-        }
-
-        get("/session/increment") {
-            val session = call.sessions.get<MySession>() ?: MySession()
-            call.sessions.set(session.copy(count = session.count + 1))
-            call.respondText("Counter is ${session.count}. Refresh to increment.")
+            call.respondRedirect("https://google.com?q=" + location.q, permanent = false)
         }
 
         install(StatusPages) {
@@ -200,10 +142,6 @@ fun Application.module(testing: Boolean = false) {
                 call.respond(HttpStatusCode.Forbidden)
             }
 
-        }
-
-        get("/webjars") {
-            call.respondText("<script src='/webjars/jquery/jquery.js'></script>", ContentType.Text.Html)
         }
     }
 }

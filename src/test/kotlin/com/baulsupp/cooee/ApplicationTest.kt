@@ -13,7 +13,7 @@ class ApplicationTest {
     withTestApplication({ module(testing = true) }) {
       handleRequest(HttpMethod.Get, "/").apply {
         assertEquals(HttpStatusCode.OK, response.status())
-        assertEquals("HELLO WORLD!", response.content)
+        assertEquals("Cooee!", response.content)
       }
     }
   }
@@ -21,9 +21,9 @@ class ApplicationTest {
   @Test
   fun testGo() {
     withTestApplication({ module(testing = true) }) {
-      handleRequest(HttpMethod.Get, "/go1").apply {
+      handleRequest(HttpMethod.Get, "/go?q=abc").apply {
         assertEquals(HttpStatusCode.Found, response.status())
-        assertEquals("https://google.com", response.headers["Location"])
+        assertEquals("https://google.com?q=abc", response.headers["Location"])
       }
     }
   }
