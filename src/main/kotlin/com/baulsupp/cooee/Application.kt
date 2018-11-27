@@ -1,7 +1,6 @@
 package com.baulsupp.cooee
 
 import com.baulsupp.cooee.api.Go
-import com.fasterxml.jackson.databind.SerializationFeature
 import com.ryanharter.ktor.moshi.moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import io.ktor.application.Application
@@ -9,20 +8,13 @@ import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.features.auth.basic.BasicAuth
 import io.ktor.client.features.json.GsonSerializer
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.features.*
-import io.ktor.html.respondHtml
 import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.cio.websocket.Frame
-import io.ktor.http.cio.websocket.readText
-import io.ktor.jackson.jackson
+import io.ktor.http.content.*
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
 import io.ktor.locations.get
@@ -36,14 +28,14 @@ import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.sessions.*
-import io.ktor.webjars.Webjars
-import io.ktor.websocket.webSocket
-import kotlinx.coroutines.runBlocking
-import kotlinx.css.*
-import kotlinx.html.*
+import io.ktor.sessions.Sessions
+import io.ktor.sessions.cookie
+import kotlinx.css.CSSBuilder
+import kotlinx.html.CommonAttributeGroupFacade
+import kotlinx.html.FlowOrMetaDataContent
+import kotlinx.html.style
+import io.ktor.application.log
 import java.time.Duration
-import java.time.ZoneId
 import java.util.*
 import kotlin.collections.set
 
@@ -74,76 +66,72 @@ fun Application.main() = module(false)
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
-    val client = HttpClient(OkHttp) {
-        install(JsonFeature) {
-            serializer = GsonSerializer()
-        }
+//  val client = HttpClient(OkHttp) {
+//    install(JsonFeature) {
+//      serializer = GsonSerializer()
+//    }
+//  }
+
+  install(ContentNegotiation) {
+    moshi {
+      add(Date::class.java, Rfc3339DateJsonAdapter())
+    }
+  }
+
+  install(Locations)
+
+  install(Compression) {
+    gzip {
+      priority = 1.0
+    }
+  }
+
+  install(CORS)
+  install(CallLogging)
+  install(DataConversion)
+  install(AutoHeadResponse)
+
+  if (!testing) {
+    install(HttpsRedirect) {
+      // The port to redirect to. By default 443, the default HTTPS port.
+      sslPort = 443
+      // 301 Moved Permanently, or 302 Found redirect.
+      permanentRedirect = true
+    }
+  }
+
+  install(ShutDownUrl.ApplicationCallFeature) {
+    shutDownUrl = "/ktor/application/shutdown"
+    exitCodeSupplier = { 0 }
+  }
+
+  routing {
+    if (testing) {
+      trace { application.log.trace(it.buildText()) }
     }
 
-    install(io.ktor.websocket.WebSockets) {
-        pingPeriod = Duration.ofSeconds(15)
-        timeout = Duration.ofSeconds(15)
-        maxFrameSize = Long.MAX_VALUE
-        masking = false
+//    get("/") {
+//      call.respondText("Cooee!", contentType = ContentType.Text.Plain)
+//    }
+
+    get<Go> { location ->
+      call.respondRedirect("https://google.com?q=" + location.q, permanent = false)
     }
 
-    install(ContentNegotiation) {
-      moshi {
-        add(Date::class.java, Rfc3339DateJsonAdapter())
+    install(StatusPages) {
+      exception<AuthenticationException> { cause ->
+        call.respond(HttpStatusCode.Unauthorized)
+      }
+      exception<AuthorizationException> { cause ->
+        call.respond(HttpStatusCode.Forbidden)
       }
     }
 
-    install(Locations)
-
-    install(Sessions) {
-        cookie<MySession>("MY_SESSION") {
-            cookie.extensions["SameSite"] = "lax"
-        }
+    static {
+      resources("static")
+      defaultResource("static/index.html")
     }
-
-    install(Compression) {
-        gzip {
-            priority = 1.0
-        }
-    }
-
-    install(CORS)
-
-    install(DataConversion)
-
-    if (!testing) {
-        install(HttpsRedirect) {
-            // The port to redirect to. By default 443, the default HTTPS port.
-            sslPort = 443
-            // 301 Moved Permanently, or 302 Found redirect.
-            permanentRedirect = true
-        }
-    }
-
-    install(ShutDownUrl.ApplicationCallFeature) {
-        shutDownUrl = "/ktor/application/shutdown"
-        exitCodeSupplier = { 0 }
-    }
-
-    routing {
-        get("/") {
-            call.respondText("Cooee!", contentType = ContentType.Text.Plain)
-        }
-
-        get<Go> { location ->
-            call.respondRedirect("https://google.com?q=" + location.q, permanent = false)
-        }
-
-        install(StatusPages) {
-            exception<AuthenticationException> { cause ->
-                call.respond(HttpStatusCode.Unauthorized)
-            }
-            exception<AuthorizationException> { cause ->
-                call.respond(HttpStatusCode.Forbidden)
-            }
-
-        }
-    }
+  }
 }
 
 data class MySession(val count: Int = 0)
@@ -152,15 +140,15 @@ class AuthenticationException : RuntimeException()
 class AuthorizationException : RuntimeException()
 
 fun FlowOrMetaDataContent.styleCss(builder: CSSBuilder.() -> Unit) {
-    style(type = ContentType.Text.CSS.toString()) {
-        +CSSBuilder().apply(builder).toString()
-    }
+  style(type = ContentType.Text.CSS.toString()) {
+    +CSSBuilder().apply(builder).toString()
+  }
 }
 
 fun CommonAttributeGroupFacade.style(builder: CSSBuilder.() -> Unit) {
-    this.style = CSSBuilder().apply(builder).toString().trim()
+  this.style = CSSBuilder().apply(builder).toString().trim()
 }
 
 suspend inline fun ApplicationCall.respondCss(builder: CSSBuilder.() -> Unit) {
-    this.respondText(CSSBuilder().apply(builder).toString(), ContentType.Text.CSS)
+  this.respondText(CSSBuilder().apply(builder).toString(), ContentType.Text.CSS)
 }

@@ -5,7 +5,4 @@
   <system-properties>
     <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
   </system-properties>
-  <static-error-handlers>
-    <handler file="default_error.html" />
-  </static-error-handlers>
 </appengine-web-app>
