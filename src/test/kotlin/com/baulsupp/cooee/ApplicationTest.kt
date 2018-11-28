@@ -6,6 +6,7 @@ import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class ApplicationTest {
   @Test
@@ -13,7 +14,7 @@ class ApplicationTest {
     withTestApplication({ module(testing = true) }) {
       handleRequest(HttpMethod.Get, "/").apply {
         assertEquals(HttpStatusCode.OK, response.status())
-        assertEquals("Cooee!", response.content)
+        assertTrue(response.content?.contains("<title>cooee") ?: false)
       }
     }
   }
@@ -21,9 +22,9 @@ class ApplicationTest {
   @Test
   fun testGo() {
     withTestApplication({ module(testing = true) }) {
-      handleRequest(HttpMethod.Get, "/go?q=abc").apply {
+      handleRequest(HttpMethod.Get, "/go?q=g abc").apply {
         assertEquals(HttpStatusCode.Found, response.status())
-        assertEquals("https://google.com?q=abc", response.headers["Location"])
+        assertEquals("https://google.com/?q=abc", response.headers["Location"])
       }
     }
   }

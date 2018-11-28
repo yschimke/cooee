@@ -1,43 +1,34 @@
 package com.baulsupp.cooee
 
 import com.baulsupp.cooee.api.Go
+import com.baulsupp.cooee.providers.RedirectResult
+import com.baulsupp.cooee.providers.RegistryProvider
 import com.ryanharter.ktor.moshi.moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
-import io.ktor.application.Application
-import io.ktor.application.ApplicationCall
-import io.ktor.application.call
-import io.ktor.application.install
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.features.json.GsonSerializer
-import io.ktor.client.features.json.JsonFeature
+import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.content.*
+import io.ktor.http.content.defaultResource
+import io.ktor.http.content.resources
+import io.ktor.http.content.static
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
 import io.ktor.locations.get
 import io.ktor.response.respond
 import io.ktor.response.respondRedirect
 import io.ktor.response.respondText
-import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.server.engine.ShutDownUrl
 import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.sessions.Sessions
-import io.ktor.sessions.cookie
 import kotlinx.css.CSSBuilder
 import kotlinx.html.CommonAttributeGroupFacade
 import kotlinx.html.FlowOrMetaDataContent
 import kotlinx.html.style
-import io.ktor.application.log
-import java.time.Duration
 import java.util.*
-import kotlin.collections.set
 
 @KtorExperimentalLocationsAPI
 fun main(args: Array<String>) {
@@ -110,12 +101,15 @@ fun Application.module(testing: Boolean = false) {
       trace { application.log.trace(it.buildText()) }
     }
 
-//    get("/") {
-//      call.respondText("Cooee!", contentType = ContentType.Text.Plain)
-//    }
-
     get<Go> { location ->
-      call.respondRedirect("https://google.com?q=" + location.q, permanent = false)
+      val r =
+        location.command?.let { RegistryProvider.url(location.command, location.args) } ?: RedirectResult.UNMATCHED
+
+      if (r.location != null) {
+          call.respondRedirect(r.location, permanent = false)
+      } else {
+          call.respond(HttpStatusCode.NotFound)
+      }
     }
 
     install(StatusPages) {
