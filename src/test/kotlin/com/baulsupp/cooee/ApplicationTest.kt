@@ -28,4 +28,34 @@ class ApplicationTest {
       }
     }
   }
+
+  @Test
+  fun testJira() {
+    withTestApplication({ module(testing = true) }) {
+      handleRequest(HttpMethod.Get, "/go?q=TRANS").apply {
+        assertEquals(HttpStatusCode.Found, response.status())
+        assertEquals("https://jira.atlassian.com/browse/TRANS", response.headers["Location"])
+      }
+
+      handleRequest(HttpMethod.Get, "/go?q=TRANS-2474").apply {
+        assertEquals(HttpStatusCode.Found, response.status())
+        assertEquals("https://jira.atlassian.com/browse/TRANS-2474", response.headers["Location"])
+      }
+    }
+  }
+
+  @Test
+  fun testGitHub() {
+    withTestApplication({ module(testing = true) }) {
+      handleRequest(HttpMethod.Get, "/go?q=yschimke/okurl").apply {
+        assertEquals(HttpStatusCode.Found, response.status())
+        assertEquals("https://github.com/yschimke/okurl", response.headers["Location"])
+      }
+
+      handleRequest(HttpMethod.Get, "/go?q=gh square/okhttp#4421").apply {
+        assertEquals(HttpStatusCode.Found, response.status())
+        assertEquals("https://github.com/square/okhttp/issues/4421", response.headers["Location"])
+      }
+    }
+  }
 }

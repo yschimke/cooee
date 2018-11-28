@@ -24,6 +24,19 @@ appengine {
   }
 }
 
+java {
+  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+tasks {
+  withType(KotlinCompile::class) {
+    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.apiVersion = "1.3"
+    kotlinOptions.languageVersion = "1.3"
+  }
+}
+
 repositories {
   mavenLocal()
   jcenter()
@@ -33,34 +46,36 @@ repositories {
 }
 
 dependencies {
-  compile("ch.qos.logback:logback-classic:${Versions.logback}")
-  compile("com.ryanharter.ktor:ktor-moshi:1.0.0")
-  compile("com.squareup.moshi:moshi-adapters:1.8.0")
-  compile("io.ktor:ktor-auth-jwt:${Versions.ktor}")
-  compile("io.ktor:ktor-auth-ldap:${Versions.ktor}")
-  compile("io.ktor:ktor-auth:${Versions.ktor}")
-  compile("io.ktor:ktor-client-auth-basic:${Versions.ktor}")
-  compile("io.ktor:ktor-client-cio:${Versions.ktor}")
-  compile("io.ktor:ktor-client-core-jvm:${Versions.ktor}")
-  compile("io.ktor:ktor-client-core:${Versions.ktor}")
-  compile("io.ktor:ktor-client-gson:${Versions.ktor}")
-  compile("io.ktor:ktor-client-json-jvm:${Versions.ktor}")
-  compile("io.ktor:ktor-client-okhttp:${Versions.ktor}")
-  compile("io.ktor:ktor-client-websocket:${Versions.ktor}")
-  compile("io.ktor:ktor-html-builder:${Versions.ktor}")
-  compile("io.ktor:ktor-jackson:${Versions.ktor}")
-  compile("io.ktor:ktor-locations:${Versions.ktor}")
-  compile("io.ktor:ktor-metrics:${Versions.ktor}")
-  compile("io.ktor:ktor-server-netty:${Versions.ktor}")
-  compile("io.ktor:ktor-server-core:${Versions.ktor}")
-  compile("io.ktor:ktor-server-host-common:${Versions.ktor}")
-  compile("io.ktor:ktor-server-sessions:${Versions.ktor}")
-  compile("io.ktor:ktor-server-servlet:${Versions.ktor}")
-  compile("io.ktor:ktor-webjars:${Versions.ktor}")
-  compile("io.ktor:ktor-websockets:${Versions.ktor}")
-  compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}")
-  compile("org.jetbrains:kotlin-css-jvm:1.0.0-pre.59-kotlin-1.3.0")
-  compile("org.webjars:jquery:3.2.1")
+  implementation("com.baulsupp:okurl:1.66.0")
+  implementation("com.squareup.okhttp3:okhttp:3.12.0")
+  implementation("ch.qos.logback:logback-classic:${Versions.logback}")
+  implementation("com.ryanharter.ktor:ktor-moshi:1.0.0")
+  implementation("com.squareup.moshi:moshi-adapters:1.8.0")
+  implementation("io.ktor:ktor-auth-jwt:${Versions.ktor}")
+  implementation("io.ktor:ktor-auth-ldap:${Versions.ktor}")
+  implementation("io.ktor:ktor-auth:${Versions.ktor}")
+  implementation("io.ktor:ktor-client-auth-basic:${Versions.ktor}")
+  implementation("io.ktor:ktor-client-cio:${Versions.ktor}")
+  implementation("io.ktor:ktor-client-core-jvm:${Versions.ktor}")
+  implementation("io.ktor:ktor-client-core:${Versions.ktor}")
+  implementation("io.ktor:ktor-client-gson:${Versions.ktor}")
+  implementation("io.ktor:ktor-client-json-jvm:${Versions.ktor}")
+  implementation("io.ktor:ktor-client-okhttp:${Versions.ktor}")
+  implementation("io.ktor:ktor-client-websocket:${Versions.ktor}")
+  implementation("io.ktor:ktor-html-builder:${Versions.ktor}")
+  implementation("io.ktor:ktor-jackson:${Versions.ktor}")
+  implementation("io.ktor:ktor-locations:${Versions.ktor}")
+  implementation("io.ktor:ktor-metrics:${Versions.ktor}")
+  implementation("io.ktor:ktor-server-netty:${Versions.ktor}")
+  implementation("io.ktor:ktor-server-core:${Versions.ktor}")
+  implementation("io.ktor:ktor-server-host-common:${Versions.ktor}")
+  implementation("io.ktor:ktor-server-sessions:${Versions.ktor}")
+  implementation("io.ktor:ktor-server-servlet:${Versions.ktor}")
+  implementation("io.ktor:ktor-webjars:${Versions.ktor}")
+  implementation("io.ktor:ktor-websockets:${Versions.ktor}")
+  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}")
+  implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.59-kotlin-1.3.0")
+  implementation("org.webjars:jquery:3.2.1")
   testCompile("io.ktor:ktor-server-tests:${Versions.ktor}")
 }
 
