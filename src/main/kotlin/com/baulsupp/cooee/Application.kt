@@ -50,7 +50,9 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
 import java.lang.management.ManagementFactory
 import java.net.InetAddress
+import java.time.Duration
 import java.util.*
+import kotlin.concurrent.timer
 
 
 @KtorExperimentalLocationsAPI
@@ -111,7 +113,10 @@ fun Application.module(testing: Boolean = false) {
 
   if (!testing) {
     createHoneyClient()
-    sendStartupInfo()
+
+    timer(name = "uptime", daemon = true, initialDelay = 0, period = Duration.ofMinutes(15).toMillis()) {
+      sendUptime()
+    }
   }
 
   if (testing) {
@@ -195,8 +200,8 @@ private fun Application.enforceHttps() {
   }
 }
 
-fun sendStartupInfo() {
-  honeyClient.createEvent().setDataset("startup").send()
+fun sendUptime() {
+  honeyClient.createEvent().setDataset("uptime").send()
 }
 
 lateinit var honeyClient: HoneyClient
