@@ -24,7 +24,12 @@ class ApplicationTest {
     withTestApplication({ module(testing = true) }) {
       handleRequest(HttpMethod.Get, "/go?q=g abc").apply {
         assertEquals(HttpStatusCode.Found, response.status())
-        assertEquals("https://google.com/?q=abc", response.headers["Location"])
+        assertEquals("https://www.google.com/search?q=abc", response.headers["Location"])
+      }
+
+      handleRequest(HttpMethod.Get, "/go?q=g+yriu").apply {
+        assertEquals(HttpStatusCode.Found, response.status())
+        assertEquals("https://www.google.com/search?q=yriu", response.headers["Location"])
       }
     }
   }
@@ -34,7 +39,7 @@ class ApplicationTest {
     withTestApplication({ module(testing = true) }) {
       handleRequest(HttpMethod.Get, "/api/v0/goinfo?q=g abc").apply {
         assertEquals(HttpStatusCode.OK, response.status())
-        assertEquals("{\"location\":\"https://google.com/?q=abc\"}", response.content)
+        assertEquals("{\"location\":\"https://www.google.com/search?q=abc\"}", response.content)
       }
     }
   }
