@@ -5,9 +5,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import okhttp3.OkHttpClient
-import okhttp3.logging.LoggingEventListener
 
-object RegistryProvider : Provider {
+class RegistryProvider(val client: OkHttpClient) : Provider {
   override suspend fun url(command: String, args: List<String>): RedirectResult = coroutineScope {
     provider(command)?.url(command, args) ?: RedirectResult.UNMATCHED
   }
@@ -27,8 +26,6 @@ object RegistryProvider : Provider {
       async { it.matches(command) }
     }
   }.awaitAll().any()
-
-  val client = OkHttpClient.Builder().eventListenerFactory(LoggingEventListener.Factory { s -> println(s) }).build()
 
   val providers = listOf(GoogleProvider(), JiraProvider("https://jira.atlassian.com/", client), GithubProvider)
 }
