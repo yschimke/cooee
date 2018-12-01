@@ -12,12 +12,12 @@ object GithubProvider : Provider {
       val result = r.matchEntire(link)
 
       if (result != null) {
-        val (org, project, link) = result.destructured
+        val (org, project, id) = result.destructured
 
-        if (link.isEmpty()) {
-          return RedirectResult("https://github.com/$org/$project")
+        return if (id.isEmpty()) {
+          RedirectResult("https://github.com/$org/$project")
         } else {
-          return RedirectResult("https://github.com/$org/$project/issues/$link")
+          RedirectResult("https://github.com/$org/$project/issues/$id")
         }
       }
     }

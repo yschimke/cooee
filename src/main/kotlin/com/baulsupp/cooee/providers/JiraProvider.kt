@@ -1,6 +1,6 @@
 package com.baulsupp.cooee.providers
 
-import com.baulsupp.oksocial.services.jira.model.Project
+import com.baulsupp.cooee.services.jira.model.Project
 import com.baulsupp.okurl.kotlin.queryList
 import okhttp3.OkHttpClient
 

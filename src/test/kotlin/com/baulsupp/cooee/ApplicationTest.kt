@@ -30,6 +30,16 @@ class ApplicationTest {
   }
 
   @Test
+  fun testGoInfo() {
+    withTestApplication({ module(testing = true) }) {
+      handleRequest(HttpMethod.Get, "/api/v0/goinfo?q=g abc").apply {
+        assertEquals(HttpStatusCode.OK, response.status())
+        assertEquals("{\"location\":\"https://google.com/?q=abc\"}", response.content)
+      }
+    }
+  }
+
+  @Test
   fun testJira() {
     withTestApplication({ module(testing = true) }) {
       handleRequest(HttpMethod.Get, "/go?q=TRANS").apply {

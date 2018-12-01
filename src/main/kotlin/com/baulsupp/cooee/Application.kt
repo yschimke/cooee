@@ -1,10 +1,12 @@
 package com.baulsupp.cooee
 
 import com.baulsupp.cooee.api.Go
+import com.baulsupp.cooee.api.GoInfo
 import com.baulsupp.cooee.providers.RedirectResult
 import com.baulsupp.cooee.providers.RegistryProvider
 import com.ryanharter.ktor.moshi.moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
+import io.honeycomb.libhoney.HoneyClient
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.ContentType
@@ -29,6 +31,12 @@ import kotlinx.html.CommonAttributeGroupFacade
 import kotlinx.html.FlowOrMetaDataContent
 import kotlinx.html.style
 import java.util.*
+import io.honeycomb.libhoney.LibHoney.create
+import io.honeycomb.libhoney.LibHoney.options
+import java.net.InetAddress
+import java.util.UUID.randomUUID
+
+
 
 @KtorExperimentalLocationsAPI
 fun main(args: Array<String>) {
@@ -91,9 +99,22 @@ fun Application.module(testing: Boolean = false) {
     }
   }
 
-  install(ShutDownUrl.ApplicationCallFeature) {
-    shutDownUrl = "/ktor/application/shutdown"
-    exitCodeSupplier = { 0 }
+  if (!testing) {
+    honeyClient = create(
+      options()
+        .setWriteKey("e74690c0b31c1a029944d107e825cff3")
+        .setDataset("java")
+        .build()
+    )
+
+    sendStartupInfo()
+  }
+
+  if (testing) {
+    install(ShutDownUrl.ApplicationCallFeature) {
+      shutDownUrl = "/ktor/application/shutdown"
+      exitCodeSupplier = { 0 }
+    }
   }
 
   routing {
@@ -112,6 +133,13 @@ fun Application.module(testing: Boolean = false) {
       }
     }
 
+    get<GoInfo> { location ->
+      val r =
+        location.command?.let { RegistryProvider.url(location.command, location.args) } ?: RedirectResult.UNMATCHED
+
+      call.respond(r)
+    }
+
     install(StatusPages) {
       exception<AuthenticationException> { cause ->
         call.respond(HttpStatusCode.Unauthorized)
@@ -127,6 +155,17 @@ fun Application.module(testing: Boolean = false) {
     }
   }
 }
+
+fun sendStartupInfo() {
+  val dataMap = mutableMapOf<String, Any>()
+  dataMap.put("randomString", UUID.randomUUID().toString())
+  dataMap.put("cpuCores", Runtime.getRuntime().availableProcessors())
+  dataMap.put("hostname", InetAddress.getLocalHost().hostName)
+
+  honeyClient.use { honeyClient -> honeyClient.send(dataMap) }
+}
+
+lateinit var honeyClient: HoneyClient
 
 data class MySession(val count: Int = 0)
 

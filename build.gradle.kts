@@ -46,10 +46,11 @@ repositories {
 }
 
 dependencies {
+  implementation("io.honeycomb.libhoney:libhoney-java:1.0.2")
   implementation("com.baulsupp:okurl:1.66.0")
   implementation("com.squareup.okhttp3:okhttp:3.12.0")
   implementation("ch.qos.logback:logback-classic:${Versions.logback}")
-  implementation("com.ryanharter.ktor:ktor-moshi:1.0.0")
+  implementation("com.ryanharter.ktor:ktor-moshi:1.0.1")
   implementation("com.squareup.moshi:moshi-adapters:1.8.0")
   implementation("io.ktor:ktor-auth-jwt:${Versions.ktor}")
   implementation("io.ktor:ktor-auth-ldap:${Versions.ktor}")
