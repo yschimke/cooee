@@ -1,7 +1,9 @@
 package com.baulsupp.cooee.providers
 
+import com.baulsupp.cooee.api.GoResult
+
 interface Provider {
-  suspend fun url(command: String, args: List<String>): RedirectResult
+  suspend fun url(command: String, args: List<String>): GoResult
 
   suspend fun targets(command: String, args: List<String>): List<Target>
 

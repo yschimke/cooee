@@ -15,3 +15,9 @@ data class GoInfo(val q: String? = null) {
   val command: String? = q?.split(" ")?.firstOrNull()
   val args: List<String> = q?.split(" ")?.drop(1).orEmpty()
 }
+
+sealed class GoResult
+
+data class RedirectResult(val location: String): GoResult()
+object Unmatched: GoResult()
+object Completed: GoResult()

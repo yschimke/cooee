@@ -1,9 +1,15 @@
-package com.baulsupp.cooee.providers
+package com.baulsupp.cooee.providers.github
+
+import com.baulsupp.cooee.api.GoResult
+import com.baulsupp.cooee.api.RedirectResult
+import com.baulsupp.cooee.api.Unmatched
+import com.baulsupp.cooee.providers.Provider
+import com.baulsupp.cooee.providers.Target
 
 object GithubProvider : Provider {
   override suspend fun targets(command: String, args: List<String>): List<Target> = listOf()
 
-  override suspend fun url(command: String, args: List<String>): RedirectResult {
+  override suspend fun url(command: String, args: List<String>): GoResult {
     val link = if (command == "gh") args.firstOrNull() else command
 
     if (link != null) {
@@ -22,7 +28,7 @@ object GithubProvider : Provider {
       }
     }
 
-    return RedirectResult.UNMATCHED
+    return Unmatched
   }
 
   override suspend fun matches(command: String): Boolean {

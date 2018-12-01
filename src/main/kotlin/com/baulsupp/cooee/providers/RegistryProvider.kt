@@ -1,14 +1,20 @@
 package com.baulsupp.cooee.providers
 
+import com.baulsupp.cooee.api.GoResult
+import com.baulsupp.cooee.api.Unmatched
+import com.baulsupp.cooee.providers.github.GithubProvider
+import com.baulsupp.cooee.providers.google.GoogleProvider
+import com.baulsupp.cooee.providers.jira.JiraProvider
+import com.baulsupp.cooee.providers.twitter.TwitterProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import okhttp3.OkHttpClient
 
-class RegistryProvider(val client: OkHttpClient) : Provider {
-  override suspend fun url(command: String, args: List<String>): RedirectResult = coroutineScope {
-    provider(command)?.url(command, args) ?: RedirectResult.UNMATCHED
+class RegistryProvider(client: OkHttpClient) : Provider {
+  override suspend fun url(command: String, args: List<String>): GoResult = coroutineScope {
+    provider(command)?.url(command, args) ?: Unmatched
   }
 
   override suspend fun targets(command: String, args: List<String>): List<Target> = coroutineScope {
@@ -27,5 +33,8 @@ class RegistryProvider(val client: OkHttpClient) : Provider {
     }
   }.awaitAll().any()
 
-  val providers = listOf(GoogleProvider(), JiraProvider("https://jira.atlassian.com/", client), GithubProvider)
+  val providers = listOf(
+    GoogleProvider(), JiraProvider("https://jira.atlassian.com/", client),
+    GithubProvider, TwitterProvider(client)
+  )
 }

@@ -1,9 +1,11 @@
 package com.baulsupp.cooee
 
+import com.baulsupp.cooee.api.Completed
 import com.baulsupp.cooee.api.Go
 import com.baulsupp.cooee.api.GoInfo
+import com.baulsupp.cooee.api.RedirectResult
+import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.okhttp.HoneycombEventListenerFactory
-import com.baulsupp.cooee.providers.RedirectResult
 import com.baulsupp.cooee.providers.RegistryProvider
 import com.ryanharter.ktor.moshi.moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
@@ -46,17 +48,21 @@ import kotlinx.css.CSSBuilder
 import kotlinx.html.CommonAttributeGroupFacade
 import kotlinx.html.FlowOrMetaDataContent
 import kotlinx.html.style
+import okhttp3.EventListener
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
+import org.conscrypt.Conscrypt
 import java.lang.management.ManagementFactory
 import java.net.InetAddress
+import java.security.Security
 import java.time.Duration
 import java.util.*
 import kotlin.concurrent.timer
 
-
 @KtorExperimentalLocationsAPI
 fun main(args: Array<String>) {
+  setupProvider()
+
   val env = applicationEngineEnvironment {
     module {
       test()
@@ -82,12 +88,6 @@ fun Application.main() = module(false)
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
 fun Application.module(testing: Boolean = false) {
-//  val client = HttpClient(OkHttp) {
-//    install(JsonFeature) {
-//      serializer = GsonSerializer()
-//    }
-//  }
-
   install(ContentNegotiation) {
     moshi {
       add(Date::class.java, Rfc3339DateJsonAdapter())
@@ -130,7 +130,7 @@ fun Application.module(testing: Boolean = false) {
     honeyClient
   )
 
-  val client = OkHttpClient.Builder().eventListenerFactory(httpListener).build()
+  val client = buildHttpClient(httpListener)
 
   val registryProvider = RegistryProvider(client)
 
@@ -141,18 +141,18 @@ fun Application.module(testing: Boolean = false) {
 
     get<Go> { location ->
       val r =
-        location.command?.let { registryProvider.url(location.command, location.args) } ?: RedirectResult.UNMATCHED
+        location.command?.let { registryProvider.url(location.command, location.args) } ?: Unmatched
 
-      if (r.location != null) {
-        call.respondRedirect(r.location, permanent = false)
-      } else {
-        call.respond(HttpStatusCode.NotFound)
+      when (r) {
+        is RedirectResult -> call.respondRedirect(r.location, permanent = false)
+        is Unmatched -> call.respond(HttpStatusCode.NotFound)
+        is Completed -> call.respond(HttpStatusCode.NoContent)
       }
     }
 
     get<GoInfo> { location ->
       val r =
-        location.command?.let { registryProvider.url(location.command, location.args) } ?: RedirectResult.UNMATCHED
+        location.command?.let { registryProvider.url(location.command, location.args) } ?: Unmatched
 
       call.respond(r)
     }
@@ -171,6 +171,10 @@ fun Application.module(testing: Boolean = false) {
       defaultResource("static/index.html")
     }
   }
+}
+
+private fun buildHttpClient(httpListener: EventListener.Factory): OkHttpClient {
+  return OkHttpClient.Builder().eventListenerFactory(httpListener).build()
 }
 
 private fun createHoneyClient() {
@@ -223,4 +227,14 @@ fun CommonAttributeGroupFacade.style(builder: CSSBuilder.() -> Unit) {
 
 suspend inline fun ApplicationCall.respondCss(builder: CSSBuilder.() -> Unit) {
   this.respondText(CSSBuilder().apply(builder).toString(), ContentType.Text.CSS)
+}
+
+private fun setupProvider() {
+  println("Installing conscrypt")
+  try {
+    Security.insertProviderAt(Conscrypt.newProviderBuilder().provideTrustManager().build(), 1)
+    println("Installed conscrypt")
+  } catch (e: NoClassDefFoundError) {
+    // Drop back to JDK
+  }
 }

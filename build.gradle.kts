@@ -46,6 +46,7 @@ repositories {
 }
 
 dependencies {
+  implementation("org.conscrypt:conscrypt-openjdk-uber:1.4.1")
   implementation("io.honeycomb.libhoney:libhoney-java:1.0.2")
   implementation("com.baulsupp:okurl:1.66.0")
   implementation("com.squareup.okhttp3:okhttp:3.12.0")

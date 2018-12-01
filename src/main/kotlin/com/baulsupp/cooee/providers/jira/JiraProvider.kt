@@ -1,5 +1,9 @@
-package com.baulsupp.cooee.providers
+package com.baulsupp.cooee.providers.jira
 
+import com.baulsupp.cooee.api.GoResult
+import com.baulsupp.cooee.api.RedirectResult
+import com.baulsupp.cooee.providers.Provider
+import com.baulsupp.cooee.providers.Target
 import com.baulsupp.cooee.services.jira.model.Project
 import com.baulsupp.okurl.kotlin.queryList
 import okhttp3.OkHttpClient
@@ -7,7 +11,7 @@ import okhttp3.OkHttpClient
 class JiraProvider(val url: String, val client: OkHttpClient) : Provider {
   override suspend fun targets(command: String, args: List<String>): List<Target> = listOf()
 
-  override suspend fun url(command: String, args: List<String>): RedirectResult {
+  override suspend fun url(command: String, args: List<String>): GoResult {
     val link = if (command == "jira") args.firstOrNull() else command
 
     return RedirectResult("${url}browse/${command}")
