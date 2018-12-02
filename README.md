@@ -1,6 +1,8 @@
 # cooee
 
-Main website deployment
+[![CircleCI](https://circleci.com/gh/yschimke/cooee.svg?style=svg)](https://circleci.com/gh/yschimke/cooee)
+
+API website deployment (currently WWW also)
 
 To test locally, run Application in Intellij and head to http://localhost:8080
 
