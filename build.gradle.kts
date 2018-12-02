@@ -45,6 +45,18 @@ repositories {
   maven { url = uri("https://kotlin.bintray.com/kotlin-js-wrappers") }
 }
 
+tasks.create("downloadDependencies") {
+  description = "Downloads dependencies"
+
+  doLast {
+    configurations.forEach {
+      if (it.isCanBeResolved) {
+        it.resolve()
+      }
+    }
+  }
+}
+
 dependencies {
   implementation("org.conscrypt:conscrypt-openjdk-uber:1.4.1")
   implementation("io.honeycomb.libhoney:libhoney-java:1.0.2")
