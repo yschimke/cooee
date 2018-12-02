@@ -43,7 +43,7 @@ repositories {
   maven { url = uri("https://kotlin.bintray.com/ktor") }
   maven { url = uri("https://kotlin.bintray.com/kotlinx") }
   maven { url = uri("https://kotlin.bintray.com/kotlin-js-wrappers") }
-  maven(url = "https://dl.bintray.com/yschimke/baulsupp.com/")
+  maven { url = uri("https://dl.bintray.com/yschimke/baulsupp.com/") }
 }
 
 tasks.create("downloadDependencies") {
