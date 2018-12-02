@@ -1,6 +1,6 @@
 # cooee
 
-[![CircleCI](https://circleci.com/gh/yschimke/cooee.svg?style=svg)](https://circleci.com/gh/yschimke/cooee)
+[![CircleCI](https://circleci.com/gh/yschimke/cooee.svg?style=svg&circle-token=3c8cea878ad9569c6702cb5f336e05f645ac256b)](https://circleci.com/gh/yschimke/cooee)
 
 API website deployment (currently WWW also)
 
