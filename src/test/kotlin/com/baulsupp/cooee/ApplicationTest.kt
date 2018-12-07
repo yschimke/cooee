@@ -73,4 +73,17 @@ class ApplicationTest {
       }
     }
   }
+
+  @Test
+  fun testTwitter() {
+    withTestApplication({ module(testing = true) }) {
+      handleRequest(HttpMethod.Get, "/go?q=@shoutcooee Cooee").apply {
+        assertEquals(HttpStatusCode.Found, response.status())
+        assertEquals(
+          "https://m.twitter.com/messages/compose?recipient_id=735627895645691905&text=Cooee",
+          response.headers["Location"]
+        )
+      }
+    }
+  }
 }
