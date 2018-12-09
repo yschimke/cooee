@@ -16,6 +16,17 @@ data class GoInfo(val q: String? = null) {
   val args: List<String> = q?.split(" ")?.drop(1).orEmpty()
 }
 
+@Location("/api/v0/command-completion")
+data class CommandCompletion(val q: String? = null)
+
+@Location("/api/v0/argument-completion")
+data class ArgumentCompletion(val q: String? = null) {
+  val command: String? = q?.split(" ")?.firstOrNull()
+  val args: List<String> = q?.split(" ")?.drop(1).orEmpty()
+}
+
+data class Completions(val completions: List<String>)
+
 sealed class GoResult
 
 data class RedirectResult(val location: String): GoResult()

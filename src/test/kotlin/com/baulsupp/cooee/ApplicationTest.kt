@@ -45,6 +45,26 @@ class ApplicationTest {
   }
 
   @Test
+  fun testCommandCompletion() {
+    withTestApplication({ module(testing = true) }) {
+      handleRequest(HttpMethod.Get, "/api/v0/command-completion?q=TR").apply {
+        assertEquals(HttpStatusCode.OK, response.status())
+        assertEquals("{\"completions\":[\"TRANS\",\"TRANS-1234\",\"TRANS-1234\"]}", response.content)
+      }
+    }
+  }
+
+  @Test
+  fun testArgumentCompletion() {
+    withTestApplication({ module(testing = true) }) {
+      handleRequest(HttpMethod.Get, "/api/v0/argument-completion?q=TRANS-1234 ").apply {
+        assertEquals(HttpStatusCode.OK, response.status())
+        assertEquals("{\"completions\":[\"close\",\"comment\"]}", response.content)
+      }
+    }
+  }
+
+  @Test
   fun testJira() {
     withTestApplication({ module(testing = true) }) {
       handleRequest(HttpMethod.Get, "/go?q=TRANS").apply {
