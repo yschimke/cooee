@@ -1,6 +1,9 @@
 package com.baulsupp.cooee
 
+import com.baulsupp.cooee.api.ArgumentCompletion
+import com.baulsupp.cooee.api.CommandCompletion
 import com.baulsupp.cooee.api.Completed
+import com.baulsupp.cooee.api.Completions
 import com.baulsupp.cooee.api.Go
 import com.baulsupp.cooee.api.GoInfo
 import com.baulsupp.cooee.api.RedirectResult
@@ -44,6 +47,7 @@ import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.util.pipeline.PipelineContext
 import kotlinx.css.CSSBuilder
 import kotlinx.html.CommonAttributeGroupFacade
 import kotlinx.html.FlowOrMetaDataContent
@@ -139,23 +143,10 @@ fun Application.module(testing: Boolean = false) {
       trace { application.log.trace(it.buildText()) }
     }
 
-    get<Go> { location ->
-      val r =
-        location.command?.let { registryProvider.url(location.command, location.args) } ?: Unmatched
-
-      when (r) {
-        is RedirectResult -> call.respondRedirect(r.location, permanent = false)
-        is Unmatched -> call.respond(HttpStatusCode.NotFound)
-        is Completed -> call.respond(HttpStatusCode.NoContent)
-      }
-    }
-
-    get<GoInfo> { location ->
-      val r =
-        location.command?.let { registryProvider.url(location.command, location.args) } ?: Unmatched
-
-      call.respond(r)
-    }
+    get<Go> { bounceWeb(it, registryProvider) }
+    get<GoInfo> { bounceApi(it, registryProvider) }
+    get<CommandCompletion> { commandCompletionApi(it, registryProvider) }
+    get<ArgumentCompletion> { argumentCompletionApi(it, registryProvider) }
 
     install(StatusPages) {
       exception<AuthenticationException> { cause ->
@@ -171,6 +162,44 @@ fun Application.module(testing: Boolean = false) {
       defaultResource("static/index.html")
     }
   }
+}
+
+private suspend fun PipelineContext<Unit, ApplicationCall>.bounceApi(
+  goInfo: GoInfo,
+  registryProvider: RegistryProvider
+) {
+  val r =
+    goInfo.command?.let { registryProvider.url(it, goInfo.args) } ?: Unmatched
+
+  call.respond(r)
+}
+
+private suspend fun PipelineContext<Unit, ApplicationCall>.bounceWeb(
+  go: Go,
+  registryProvider: RegistryProvider
+) {
+  val r =
+    go.command?.let { registryProvider.url(it, go.args) } ?: Unmatched
+
+  when (r) {
+    is RedirectResult -> call.respondRedirect(r.location, permanent = false)
+    is Unmatched -> call.respond(HttpStatusCode.NotFound)
+    is Completed -> call.respond(HttpStatusCode.NoContent)
+  }
+}
+
+private suspend fun PipelineContext<Unit, ApplicationCall>.commandCompletionApi(
+  commandQuery: CommandCompletion,
+  registryProvider: RegistryProvider
+) {
+  call.respond(Completions(listOf("TRANS", "TRANS-1234", "TRANS-1234")))
+}
+
+private suspend fun PipelineContext<Unit, ApplicationCall>.argumentCompletionApi(
+  argumentQuery: ArgumentCompletion,
+  registryProvider: RegistryProvider
+) {
+  call.respond(Completions(listOf("close", "comment")))
 }
 
 private fun buildHttpClient(httpListener: EventListener.Factory): OkHttpClient {
