@@ -8,6 +8,7 @@ import com.baulsupp.cooee.api.Go
 import com.baulsupp.cooee.api.GoInfo
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
+import com.baulsupp.cooee.ktor.AccessLogs
 import com.baulsupp.cooee.okhttp.HoneycombEventListenerFactory
 import com.baulsupp.cooee.providers.RegistryProvider
 import com.ryanharter.ktor.moshi.moshi
@@ -30,7 +31,6 @@ import io.ktor.features.DataConversion
 import io.ktor.features.HttpsRedirect
 import io.ktor.features.StatusPages
 import io.ktor.features.gzip
-import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.defaultResource
 import io.ktor.http.content.resources
@@ -40,7 +40,6 @@ import io.ktor.locations.Locations
 import io.ktor.locations.get
 import io.ktor.response.respond
 import io.ktor.response.respondRedirect
-import io.ktor.response.respondText
 import io.ktor.routing.routing
 import io.ktor.server.engine.ShutDownUrl
 import io.ktor.server.engine.applicationEngineEnvironment
@@ -48,10 +47,6 @@ import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.util.pipeline.PipelineContext
-import kotlinx.css.CSSBuilder
-import kotlinx.html.CommonAttributeGroupFacade
-import kotlinx.html.FlowOrMetaDataContent
-import kotlinx.html.style
 import okhttp3.EventListener
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
@@ -108,6 +103,7 @@ fun Application.module(testing: Boolean = false) {
 
   install(CORS)
   install(CallLogging)
+  install(AccessLogs)
   install(DataConversion)
   install(AutoHeadResponse)
 
@@ -130,8 +126,10 @@ fun Application.module(testing: Boolean = false) {
     }
   }
 
-  val httpListener = if (testing) LoggingEventListener.Factory { s -> println(s) } else HoneycombEventListenerFactory(
-    honeyClient
+  val httpListener = if (testing) {
+    LoggingEventListener.Factory { s -> println(s) }
+  } else HoneycombEventListenerFactory(
+    honeyClient!!
   )
 
   val client = buildHttpClient(httpListener)
@@ -234,29 +232,13 @@ private fun Application.enforceHttps() {
 }
 
 fun sendUptime() {
-  honeyClient.createEvent().setDataset("uptime").send()
+  honeyClient?.createEvent()?.setDataset("uptime")?.send()
 }
 
-lateinit var honeyClient: HoneyClient
-
-data class MySession(val count: Int = 0)
+var honeyClient: HoneyClient? = null
 
 class AuthenticationException : RuntimeException()
 class AuthorizationException : RuntimeException()
-
-fun FlowOrMetaDataContent.styleCss(builder: CSSBuilder.() -> Unit) {
-  style(type = ContentType.Text.CSS.toString()) {
-    +CSSBuilder().apply(builder).toString()
-  }
-}
-
-fun CommonAttributeGroupFacade.style(builder: CSSBuilder.() -> Unit) {
-  this.style = CSSBuilder().apply(builder).toString().trim()
-}
-
-suspend inline fun ApplicationCall.respondCss(builder: CSSBuilder.() -> Unit) {
-  this.respondText(CSSBuilder().apply(builder).toString(), ContentType.Text.CSS)
-}
 
 private fun setupProvider() {
   println("Installing conscrypt")
