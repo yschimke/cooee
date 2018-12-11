@@ -190,7 +190,14 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.commandCompletionApi(
   commandQuery: CommandCompletion,
   registryProvider: RegistryProvider
 ) {
-  call.respond(Completions(listOf("TRANS", "TRANS-1234", "TRANS-1234")))
+  val command = commandQuery.q ?: ""
+
+  val completions = registryProvider.commandCompleter().suggestCommands(command)
+
+  // TODO not needed
+  val filtered = completions.filter { it.startsWith(command) }
+
+  call.respond(Completions(filtered))
 }
 
 private suspend fun PipelineContext<Unit, ApplicationCall>.argumentCompletionApi(
