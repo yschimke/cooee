@@ -53,7 +53,7 @@ class ApplicationTest {
       }.apply {
         assertEquals(HttpStatusCode.OK, response.status())
         assertEquals("{\"location\":\"https://www.google.com/search?q=abc\"}", response.content)
-        assertEquals(mapOf(), response.headers.allValues().toMap())
+        assertEquals("*", response.headers["Access-Control-Allow-Origin"])
       }
     }
   }
