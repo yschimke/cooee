@@ -3,12 +3,10 @@ package com.baulsupp.cooee.providers.github
 import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
+import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.providers.Provider
-import com.baulsupp.cooee.providers.Target
 
 object GithubProvider : Provider {
-  override suspend fun targets(command: String, args: List<String>): List<Target> = listOf()
-
   override suspend fun url(command: String, args: List<String>): GoResult {
     val link = if (command == "gh") args.firstOrNull() else command
 
@@ -31,7 +29,14 @@ object GithubProvider : Provider {
     return Unmatched
   }
 
-  override suspend fun matches(command: String): Boolean {
-    return command == "gh" || command.matches("\\w+/\\w+(?:#\\d+)?".toRegex())
+  // TODO
+  override fun commandCompleter(): CommandCompleter = object : CommandCompleter {
+    override suspend fun suggestCommands(command: String): List<String> {
+      return listOf("gh", "yschimke/cooee", "yschimke/cooee-cli", "square/okhttp", "tgmcclen/cooee-web")
+    }
+
+    override suspend fun matches(command: String): Boolean {
+      return command == "gh" || command.matches("\\w+/\\w+(?:#\\d+)?".toRegex())
+    }
   }
 }

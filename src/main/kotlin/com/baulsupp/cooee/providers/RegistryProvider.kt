@@ -2,6 +2,8 @@ package com.baulsupp.cooee.providers
 
 import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.Unmatched
+import com.baulsupp.cooee.completion.ArgumentCompleter
+import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.providers.github.GithubProvider
 import com.baulsupp.cooee.providers.google.GoogleProvider
 import com.baulsupp.cooee.providers.jira.JiraProvider
@@ -13,17 +15,51 @@ import kotlinx.coroutines.coroutineScope
 import okhttp3.OkHttpClient
 
 class RegistryProvider(client: OkHttpClient) : Provider {
+  override fun argumentCompleter(): ArgumentCompleter {
+    return object : ArgumentCompleter {
+      override suspend fun suggestArguments(command: String): List<String>? {
+        return coroutineScope {
+          providers.map {
+            async {
+              it.argumentCompleter().suggestArguments(command).orEmpty()
+            }
+          }.awaitAll().flatten()
+        }
+      }
+    }
+  }
+
+  override fun commandCompleter(): CommandCompleter {
+    return object : CommandCompleter {
+      override suspend fun suggestCommands(command: String): List<String> {
+        return coroutineScope {
+          providers.map {
+            async {
+              it.commandCompleter().suggestCommands(command)
+            }
+          }.awaitAll().flatten()
+        }
+      }
+
+      override suspend fun matches(command: String): Boolean {
+        return coroutineScope {
+          providers.map {
+            async {
+              it.commandCompleter().matches(command)
+            }
+          }.awaitAll().any()
+        }
+      }
+    }
+  }
+
   override suspend fun url(command: String, args: List<String>): GoResult = coroutineScope {
     provider(command)?.url(command, args) ?: Unmatched
   }
 
-  override suspend fun targets(command: String, args: List<String>): List<Target> = coroutineScope {
-    provider(command)?.targets(command, args).orEmpty()
-  }
-
   private suspend fun CoroutineScope.provider(command: String): Provider? {
     return providers.map {
-      async { if (it.matches(command)) it else null }
+      async { if (it.commandCompleter().matches(command)) it else null }
     }.awaitAll().filterNotNull().firstOrNull()
   }
 

@@ -2,27 +2,11 @@ package com.baulsupp.cooee.providers.twitter
 
 import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
+import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.providers.Provider
-import com.baulsupp.cooee.providers.Target
 import okhttp3.OkHttpClient
 
 class TwitterProvider(client: OkHttpClient) : Provider {
-//  val client: OkHttpClient by lazy {
-//    // TODO make this work well from Okurl
-//    val twitterInterceptor = TwitterAuthInterceptor()
-//    val credentials =
-//      TwitterServiceDefinition().parseCredentialsString("xxxx")
-//    val authenticator = Interceptor { chain ->
-//      if (chain.request().url().host() == "api.twitter.com") {
-//        runBlocking { twitterInterceptor.intercept(chain, credentials) }
-//      } else {
-//        chain.proceed(chain.request())
-//      }
-//    }
-//
-//    client.newBuilder().addNetworkInterceptor(authenticator).build()
-//  }
-
   override suspend fun url(command: String, args: List<String>): GoResult {
     val text = if (args.isNotEmpty()) "&text=" + args.joinToString(" ") else ""
 
@@ -32,9 +16,15 @@ class TwitterProvider(client: OkHttpClient) : Provider {
     return RedirectResult("https://m.twitter.com/messages/compose?recipient_id=$userid$text")
   }
 
-  override suspend fun targets(command: String, args: List<String>): List<Target> = listOf()
+  override fun commandCompleter(): CommandCompleter = object : CommandCompleter {
+    override suspend fun suggestCommands(command: String): List<String> {
+      // TODO
+      return listOf("@tgmcclen", "@yschimke", "@dmorentin", "@shoutcooee").filter { it.startsWith(command) }
+    }
 
-  override suspend fun matches(command: String): Boolean {
-    return command.startsWith("@")
+    override suspend fun matches(command: String): Boolean {
+      // TODO exact match twitter username pattern
+      return command.startsWith("@") && command.length > 1
+    }
   }
 }

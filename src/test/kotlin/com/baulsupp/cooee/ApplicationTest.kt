@@ -49,7 +49,7 @@ class ApplicationTest {
     withTestApplication({ module(testing = true) }) {
       handleRequest(HttpMethod.Get, "/api/v0/command-completion?q=TR").apply {
         assertEquals(HttpStatusCode.OK, response.status())
-        assertEquals("{\"completions\":[\"TRANS\",\"TRANS-1234\",\"TRANS-1234\"]}", response.content)
+        assertEquals("{\"completions\":[\"TRANS\",\"TRANS-1234\",\"TRANS-123\",\"TRANS-1235\"]}", response.content)
       }
     }
   }
