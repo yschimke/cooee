@@ -101,7 +101,9 @@ fun Application.module(testing: Boolean = false) {
     }
   }
 
-  install(CORS)
+  install(CORS) {
+    anyHost()
+  }
   install(CallLogging)
   install(AccessLogs)
   install(DataConversion)

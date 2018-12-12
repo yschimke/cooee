@@ -4,6 +4,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
+import io.ktor.util.toMap
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -40,6 +41,19 @@ class ApplicationTest {
       handleRequest(HttpMethod.Get, "/api/v0/goinfo?q=g abc").apply {
         assertEquals(HttpStatusCode.OK, response.status())
         assertEquals("{\"location\":\"https://www.google.com/search?q=abc\"}", response.content)
+      }
+    }
+  }
+
+  @Test
+  fun testCors() {
+    withTestApplication({ module(testing = true) }) {
+      handleRequest(HttpMethod.Get, "/api/v0/goinfo?q=g abc") {
+        addHeader("Origin", "https://google.com")
+      }.apply {
+        assertEquals(HttpStatusCode.OK, response.status())
+        assertEquals("{\"location\":\"https://www.google.com/search?q=abc\"}", response.content)
+        assertEquals(mapOf(), response.headers.allValues().toMap())
       }
     }
   }
