@@ -1,12 +1,17 @@
 package com.baulsupp.cooee
 
+import com.baulsupp.oksocial.output.systemOut
+import com.baulsupp.okurl.kotlin.mapAdapter
+import com.baulsupp.okurl.kotlin.moshi
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
 import io.ktor.util.toMap
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ApplicationTest {
@@ -63,8 +68,44 @@ class ApplicationTest {
     withTestApplication({ module(testing = true) }) {
       handleRequest(HttpMethod.Get, "/api/v0/command-completion?q=TR").apply {
         assertEquals(HttpStatusCode.OK, response.status())
-        assertEquals("{\"completions\":[\"TRANS\",\"TRANS-1234\",\"TRANS-123\",\"TRANS-1235\"]}", response.content)
+        assertEquals("{\"completions\":[\"TRANS\",\"TRANS-\"]}", response.content)
       }
+    }
+  }
+
+  @Test
+  fun testJiraCommandCompletion() {
+    withTestApplication({ module(testing = true) }) {
+      testCompletion("") {
+        // no default project completion for now
+        assertFalse { it.contains("TRANS") }
+      }
+      testCompletion("T") {
+        assertTrue { it == listOf("TRANS", "TRANS-") }
+      }
+      testCompletion("TRANS") {
+        assertTrue { it == listOf("TRANS", "TRANS-") }
+      }
+      testCompletion("TRANS-") {
+        assertTrue { it == listOf("TRANS", "TRANS-") }
+      }
+      testCompletion("TRANS-123") {
+        assertTrue { it == listOf("TRANS", "TRANS-") }
+      }
+      testCompletion("TRANS-1234") {
+        assertTrue { it == listOf("TRANS-1234") }
+      }
+    }
+  }
+
+  private inline fun TestApplicationEngine.testCompletion(prefix: String, check: (List<String>) -> Unit = {}) {
+    handleRequest(HttpMethod.Get, "/api/v0/command-completion?q=$prefix").apply {
+      assertEquals(HttpStatusCode.OK, response.status())
+      val completions = moshi.mapAdapter<List<String>>().fromJson(response.content!!)
+
+      println(completions)
+
+      check(completions!!.getValue("completions"))
     }
   }
 
