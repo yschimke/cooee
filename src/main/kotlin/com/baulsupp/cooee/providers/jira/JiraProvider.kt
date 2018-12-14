@@ -37,7 +37,7 @@ class JiraProvider(val url: String, val client: OkHttpClient) : Provider {
         }
         command.isProjectIssueStart() -> mostLikelyProjectIssues(command.projectCode()!!)
         command.isIssueOrPartialIssue() -> mostLikelyIssueCompletions(command)
-        else -> listOf() // consider returning all projects
+        else -> listOf("X") // consider returning all projects
       }
     }
 
@@ -51,10 +51,13 @@ class JiraProvider(val url: String, val client: OkHttpClient) : Provider {
   }
 
   private fun mostLikelyProjectIssues(project: String): List<String> =
-    listOf("123", "1234", "1235").map { project + it }
+    listOf("$project-123", "$project-1234", "$project-1235")
 
   private fun mostLikelyIssueCompletions(issue: String): List<String> =
-    if (issue.issueNumber()!!.length < 4) listOf(issue) else listOf(issue) + (0..9).map { issue + it }
+    when {
+        issue.issueNumber()!!.length > 4 -> listOf(issue)
+        else -> listOf(issue) + (0..9).map { issue + it }
+    }
 
   // TODO introduce sealed type for JIRA issues to avoid double parsing and null hacks
   private fun String.isProjectOrPartialIssue() = matches("[A-Z]+(?:-\\d*)?".toRegex())

@@ -8,12 +8,10 @@ import com.baulsupp.cooee.providers.Provider
 
 object GithubProvider : Provider {
   override suspend fun url(command: String, args: List<String>): GoResult {
-    val link = if (command == "gh") args.firstOrNull() else command
-
-    if (link != null) {
+    if (command != null) {
       val r = "(\\w+)/(\\w+)(?:#(\\d+))?".toRegex()
 
-      val result = r.matchEntire(link)
+      val result = r.matchEntire(command)
 
       if (result != null) {
         val (org, project, id) = result.destructured
@@ -32,11 +30,11 @@ object GithubProvider : Provider {
   // TODO
   override fun commandCompleter(): CommandCompleter = object : CommandCompleter {
     override suspend fun suggestCommands(command: String): List<String> {
-      return listOf("gh", "yschimke/cooee", "yschimke/cooee-cli", "square/okhttp", "tgmcclen/cooee-web")
+      return listOf("yschimke/cooee", "yschimke/cooee-cli", "square/okhttp", "tgmcclen/cooee-web")
     }
 
     override suspend fun matches(command: String): Boolean {
-      return command == "gh" || command.matches("\\w+/\\w+(?:#\\d+)?".toRegex())
+      return command.matches("\\w+/\\w+(?:#\\d+)?".toRegex())
     }
   }
 }
