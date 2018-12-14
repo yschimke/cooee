@@ -129,7 +129,6 @@ class ApplicationTest {
   @Test
   fun testJiraProject() {
     testRequest("/go?q=TRANS", expectedCode = Found).apply {
-      assertEquals(HttpStatusCode.Found, response.status())
       assertEquals("https://jira.atlassian.com/browse/TRANS", response.headers["Location"])
     }
   }
@@ -137,7 +136,6 @@ class ApplicationTest {
   @Test
   fun testJiraIssue() {
     testRequest("/go?q=TRANS-2474", expectedCode = Found).apply {
-      assertEquals(HttpStatusCode.Found, response.status())
       assertEquals("https://jira.atlassian.com/browse/TRANS-2474", response.headers["Location"])
     }
   }
@@ -145,7 +143,6 @@ class ApplicationTest {
   @Test
   fun testGitHubProject() {
     testRequest("/go?q=yschimke/okurl", expectedCode = Found).apply {
-      assertEquals(HttpStatusCode.Found, response.status())
       assertEquals("https://github.com/yschimke/okurl", response.headers["Location"])
     }
   }
@@ -153,17 +150,22 @@ class ApplicationTest {
   @Test
   fun testGitHubIssue() {
     testRequest("/go?q=square/okhttp#4421", expectedCode = Found).apply {
-      assertEquals(HttpStatusCode.Found, response.status())
       assertEquals("https://github.com/square/okhttp/issues/4421", response.headers["Location"])
     }
   }
 
   @Test
-  fun testTwitter() {
-    testRequest("/go?q=@shoutcooee Cooee", expectedCode = Found).apply {
-      assertEquals(HttpStatusCode.Found, response.status())
+  fun testBookmarkCompletion() {
+    testCompletion("m") {
+      assertEquals(listOf("man"), it)
+    }
+  }
+
+  @Test
+  fun testManBookmark() {
+    testRequest("/go?q=man", expectedCode = Found).apply {
       assertEquals(
-        "https://m.twitter.com/messages/compose?recipient_id=735627895645691905&text=Cooee",
+        "https://man.com",
         response.headers["Location"]
       )
     }

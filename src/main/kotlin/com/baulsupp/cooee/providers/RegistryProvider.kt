@@ -4,6 +4,7 @@ import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.ArgumentCompleter
 import com.baulsupp.cooee.completion.CommandCompleter
+import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
 import com.baulsupp.cooee.providers.github.GithubProvider
 import com.baulsupp.cooee.providers.google.GoogleProvider
 import com.baulsupp.cooee.providers.jira.JiraProvider
@@ -71,6 +72,6 @@ class RegistryProvider(client: OkHttpClient) : Provider {
 
   val providers = listOf(
     GoogleProvider(), JiraProvider("https://jira.atlassian.com/", client),
-    GithubProvider, TwitterProvider(client)
+    GithubProvider, TwitterProvider(client), BookmarksProvider()
   )
 }
