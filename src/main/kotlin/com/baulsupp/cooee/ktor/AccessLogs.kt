@@ -6,6 +6,8 @@ import io.ktor.application.ApplicationCall
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.ApplicationFeature
 import io.ktor.application.call
+import io.ktor.request.contentType
+import io.ktor.request.host
 import io.ktor.request.httpMethod
 import io.ktor.request.httpVersion
 import io.ktor.request.path
@@ -41,7 +43,9 @@ class AccessLogs {
       "method" to call.request.httpMethod.value,
       "result" to call.response.status()?.value,
       "useragent" to call.request.userAgent(),
-      "httpversion" to call.request.httpVersion
+      "httpversion" to call.request.httpVersion,
+      "host" to call.request.host(),
+      "request-contenttype" to call.request.contentType().toString()
     )
 
     if (honeyClient != null) {
