@@ -44,6 +44,7 @@ repositories {
   maven { url = uri("https://kotlin.bintray.com/kotlinx") }
   maven { url = uri("https://kotlin.bintray.com/kotlin-js-wrappers") }
   maven { url = uri("https://dl.bintray.com/yschimke/baulsupp.com/") }
+  maven { url = uri("https://dl.bintray.com/konrad-kaminski/maven") }
 }
 
 tasks.create("downloadDependencies") {
@@ -92,6 +93,11 @@ dependencies {
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}")
   implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.59-kotlin-1.3.0")
   implementation("org.webjars:jquery:3.2.1")
+  implementation("org.mongodb:mongodb-driver-reactivestreams:1.10.0")
+  implementation("io.projectreactor:reactor-core:3.2.3.RELEASE")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.0.1")
+//  implementation("org.springframework.kotlin:spring-kotlin-coroutine:0.3.6")
+//  implementation("org.springframework.kotlin:spring-data-mongodb-kotlin-coroutine:0.3.6")
   testCompile("io.ktor:ktor-server-tests:${Versions.ktor}")
 }
 

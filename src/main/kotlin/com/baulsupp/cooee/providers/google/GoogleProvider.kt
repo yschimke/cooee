@@ -7,6 +7,8 @@ import com.baulsupp.cooee.completion.SimpleCommandCompleter
 import com.baulsupp.cooee.providers.Provider
 
 class GoogleProvider : Provider {
+  override val name = "google"
+
   override suspend fun url(command: String, args: List<String>): GoResult =
     RedirectResult("https://www.google.com/search?q=${args.joinToString("+")}${if (command == "gl") "&btnI" else ""}")
 

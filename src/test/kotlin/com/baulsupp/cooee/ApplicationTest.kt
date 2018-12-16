@@ -46,7 +46,7 @@ class ApplicationTest {
 
   @Test
   fun testCors() {
-    withTestApplication({ module(testing = true) }) {
+    withTestApplication({ test() }) {
       handleRequest(HttpMethod.Get, "/api/v0/goinfo?q=g abc") {
         addHeader("Origin", "https://google.com")
       }.apply {
@@ -108,7 +108,7 @@ class ApplicationTest {
   }
 
   private fun testCompletion(prefix: String, check: (List<String>) -> Unit = {}) {
-    withTestApplication({ module(testing = true) }) {
+    withTestApplication({ test() }) {
       handleRequest(HttpMethod.Get, "/api/v0/command-completion?q=$prefix").apply {
         assertEquals(HttpStatusCode.OK, response.status())
         val completions = moshi.mapAdapter<List<String>>().fromJson(response.content!!)
@@ -176,7 +176,7 @@ class ApplicationTest {
     method: HttpMethod = Get,
     expectedCode: HttpStatusCode = OK,
     fn: TestApplicationCall.() -> Unit = {}
-  ) = withTestApplication({ module(testing = true) }) {
+  ) = withTestApplication({ test() }) {
     handleRequest(method, path).apply {
       assertEquals(expectedCode, response.status())
       fn(this)

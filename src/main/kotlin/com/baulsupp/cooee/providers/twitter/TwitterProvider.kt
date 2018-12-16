@@ -7,6 +7,8 @@ import com.baulsupp.cooee.providers.Provider
 import okhttp3.OkHttpClient
 
 class TwitterProvider(client: OkHttpClient) : Provider {
+  override val name = "twitter"
+
   override suspend fun url(command: String, args: List<String>): GoResult {
     val text = if (args.isNotEmpty()) "&text=" + args.joinToString(" ") else ""
 

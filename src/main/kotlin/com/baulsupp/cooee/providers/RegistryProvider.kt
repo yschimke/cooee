@@ -15,7 +15,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import okhttp3.OkHttpClient
 
-class RegistryProvider(client: OkHttpClient) : Provider {
+class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
   override fun argumentCompleter(): ArgumentCompleter {
     return object : ArgumentCompleter {
       override suspend fun suggestArguments(command: String): List<String>? {
@@ -69,9 +69,9 @@ class RegistryProvider(client: OkHttpClient) : Provider {
       async { it.matches(command) }
     }
   }.awaitAll().any()
-
-  val providers = listOf(
-    GoogleProvider(), JiraProvider("https://jira.atlassian.com/", client),
-    GithubProvider, TwitterProvider(client), BookmarksProvider()
-  )
 }
+
+fun defaultProviders(client: OkHttpClient) = listOf(
+  GoogleProvider(), JiraProvider("https://jira.atlassian.com/", client),
+  GithubProvider, TwitterProvider(client), BookmarksProvider()
+)
