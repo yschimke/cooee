@@ -7,6 +7,8 @@ import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.providers.Provider
 
 object GithubProvider : Provider {
+  override val name = "github"
+
   override suspend fun url(command: String, args: List<String>): GoResult {
     if (command != null) {
       val r = "(\\w+)/(\\w+)(?:#(\\d+))?".toRegex()

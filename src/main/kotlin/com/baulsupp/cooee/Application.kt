@@ -9,8 +9,12 @@ import com.baulsupp.cooee.api.GoInfo
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.ktor.AccessLogs
+import com.baulsupp.cooee.mongo.MongoFactory
 import com.baulsupp.cooee.okhttp.HoneycombEventListenerFactory
+import com.baulsupp.cooee.providers.MongoProviderStore
 import com.baulsupp.cooee.providers.RegistryProvider
+import com.baulsupp.cooee.providers.TestProviderStore
+import com.baulsupp.cooee.providers.defaultProviders
 import com.ryanharter.ktor.moshi.moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import io.honeycomb.libhoney.HoneyClient
@@ -19,6 +23,7 @@ import io.honeycomb.libhoney.LibHoney.options
 import io.honeycomb.libhoney.ValueSupplier
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
+import io.ktor.application.ApplicationStopped
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.application.log
@@ -38,6 +43,7 @@ import io.ktor.http.content.static
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
 import io.ktor.locations.get
+import io.ktor.request.header
 import io.ktor.response.respond
 import io.ktor.response.respondRedirect
 import io.ktor.routing.routing
@@ -64,7 +70,7 @@ fun main(args: Array<String>) {
 
   val env = applicationEngineEnvironment {
     module {
-      test()
+      local()
     }
     // Private API
     connector {
@@ -80,13 +86,20 @@ fun main(args: Array<String>) {
   embeddedServer(Netty, env).start(true)
 }
 
-fun Application.test() = module(true)
-fun Application.main() = module(false)
+fun Application.test() = module(true, true)
+fun Application.local() = module(false, true)
+fun Application.cloud() = module(false, false)
 
 @KtorExperimentalLocationsAPI
 @Suppress("unused") // Referenced in application.conf
 @kotlin.jvm.JvmOverloads
-fun Application.module(testing: Boolean = false) {
+fun Application.module(testing: Boolean = false, local: Boolean = false) {
+  MongoFactory.local = local
+
+  this.environment.monitor.subscribe(ApplicationStopped) {
+    MongoFactory.close()
+  }
+
   install(ContentNegotiation) {
     moshi {
       add(Date::class.java, Rfc3339DateJsonAdapter())
@@ -109,11 +122,11 @@ fun Application.module(testing: Boolean = false) {
   install(DataConversion)
   install(AutoHeadResponse)
 
-  if (!testing) {
+  if (!local) {
     enforceHttps()
   }
 
-  if (!testing) {
+  if (!local) {
     createHoneyClient()
 
     timer(name = "uptime", daemon = true, initialDelay = 0, period = Duration.ofMinutes(15).toMillis()) {
@@ -121,14 +134,14 @@ fun Application.module(testing: Boolean = false) {
     }
   }
 
-  if (testing) {
+  if (local) {
     install(ShutDownUrl.ApplicationCallFeature) {
       shutDownUrl = "/ktor/application/shutdown"
       exitCodeSupplier = { 0 }
     }
   }
 
-  val httpListener = if (testing) {
+  val httpListener = if (local) {
     LoggingEventListener.Factory { s -> println(s) }
   } else HoneycombEventListenerFactory(
     honeyClient!!
@@ -136,17 +149,31 @@ fun Application.module(testing: Boolean = false) {
 
   val client = buildHttpClient(httpListener)
 
-  val registryProvider = RegistryProvider(client)
+  val defaultProvider = RegistryProvider(defaultProviders(client))
+
+  val bearerRegex = "Bearer (.*)".toRegex()
+
+  fun ApplicationCall.user(): String? = request.header("Authorization")?.let {
+    bearerRegex.matchEntire(it)?.groupValues?.get(1)
+  }
+
+  val providerStore = when {
+      testing -> TestProviderStore()
+      else -> MongoProviderStore(defaultProvider)
+  }
+
+  suspend fun providersFor(call: ApplicationCall): RegistryProvider =
+    call.user()?.let { providerStore.forUser(it) } ?: defaultProvider
 
   routing {
-    if (testing) {
+    if (local) {
       trace { application.log.trace(it.buildText()) }
     }
 
-    get<Go> { bounceWeb(it, registryProvider) }
-    get<GoInfo> { bounceApi(it, registryProvider) }
-    get<CommandCompletion> { commandCompletionApi(it, registryProvider) }
-    get<ArgumentCompletion> { argumentCompletionApi(it, registryProvider) }
+    get<Go> { bounceWeb(it, providersFor(call)) }
+    get<GoInfo> { bounceApi(it, providersFor(call)) }
+    get<CommandCompletion> { commandCompletionApi(it, providersFor(call)) }
+    get<ArgumentCompletion> { argumentCompletionApi(it, providersFor(call)) }
 
     install(StatusPages) {
       exception<AuthenticationException> { cause ->
@@ -250,10 +277,8 @@ class AuthenticationException : RuntimeException()
 class AuthorizationException : RuntimeException()
 
 private fun setupProvider() {
-  println("Installing conscrypt")
   try {
     Security.insertProviderAt(Conscrypt.newProviderBuilder().provideTrustManager().build(), 1)
-    println("Installed conscrypt")
   } catch (e: NoClassDefFoundError) {
     // Drop back to JDK
   }

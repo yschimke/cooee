@@ -7,6 +7,8 @@ import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.providers.Provider
 
 class BookmarksProvider : Provider {
+  override val name = "bookmarks"
+
   val bookmarks =
     mutableMapOf("man" to "https://man.com", "facebook" to "https://facebook.com", "twitter" to "https://m.twitter.com")
 
@@ -19,7 +21,6 @@ class BookmarksProvider : Provider {
     }
   }
 
-  // TODO
   override fun commandCompleter(): CommandCompleter = object : CommandCompleter {
     override suspend fun suggestCommands(command: String): List<String> {
       return bookmarks.keys.filter { it.startsWith(command) }

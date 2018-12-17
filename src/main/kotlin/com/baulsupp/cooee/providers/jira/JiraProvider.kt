@@ -11,6 +11,8 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 
 class JiraProvider(val url: String, val client: OkHttpClient) : Provider {
+  override val name = "jira"
+
   override suspend fun url(command: String, args: List<String>): GoResult = if (command.isProjectOrIssue()) {
     RedirectResult("${url}browse/$command")
   } else {
