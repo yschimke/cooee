@@ -18,6 +18,9 @@ version = "0.0.1-SNAPSHOT"
 //}
 
 appengine {
+  stage {
+    enableJarClasses = true
+  }
   deploy {
     version = "1"
     projectId = "coo-ee"

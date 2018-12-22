@@ -188,6 +188,7 @@ fun Application.module(testing: Boolean = false, local: Boolean = false) {
       }
       exception<AuthenticationException> { call.respond(HttpStatusCode.Unauthorized) }
       exception<AuthorizationException> { call.respond(HttpStatusCode.Forbidden) }
+      exception<Exception> { x -> call.respond(HttpStatusCode.InternalServerError, x.toString()) }
     }
 
     static {
