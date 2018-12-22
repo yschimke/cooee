@@ -4,9 +4,10 @@ import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.CommandCompleter
+import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.providers.Provider
 
-object GithubProvider : Provider {
+object GithubProvider : BaseProvider() {
   override val name = "github"
 
   override suspend fun url(command: String, args: List<String>): GoResult {

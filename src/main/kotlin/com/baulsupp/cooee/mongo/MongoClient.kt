@@ -8,6 +8,8 @@ import com.mongodb.reactivestreams.client.MongoClients
 import com.mongodb.reactivestreams.client.MongoDatabase
 import io.netty.channel.EventLoopGroup
 import io.netty.channel.nio.NioEventLoopGroup
+import org.bson.codecs.configuration.CodecRegistries
+import org.bson.codecs.configuration.CodecRegistry
 
 object MongoFactory {
   var local = true
@@ -17,7 +19,11 @@ object MongoFactory {
   lateinit var eventLoopGroup: EventLoopGroup
 
   fun localhostMongo(): MongoClient {
-    return MongoClients.create()
+    val settings = MongoClientSettings.builder()
+      .codecRegistry(codecRegistry())
+      .build()
+
+    return MongoClients.create(settings)
   }
 
   fun cloudMongo(): MongoClient {
@@ -28,9 +34,17 @@ object MongoFactory {
     val settings = MongoClientSettings.builder()
       .streamFactoryFactory(NettyStreamFactoryFactory.builder().eventLoopGroup(eventLoopGroup).build())
       .applyConnectionString(ConnectionString("mongodb+srv://cooee:78512WuwCeuvzrru@cooee0-bnhzn.gcp.mongodb.net/test?retryWrites=true"))
+      .codecRegistry(codecRegistry())
       .build()
 
     return MongoClients.create(settings)
+  }
+
+  private fun codecRegistry(): CodecRegistry {
+    return CodecRegistries.fromRegistries(
+      CodecRegistries.fromCodecs(UserEntryCodec(), ProviderInstanceCodec()),
+      MongoClientSettings.getDefaultCodecRegistry()
+    )
   }
 
   fun mongo(): MongoClient {

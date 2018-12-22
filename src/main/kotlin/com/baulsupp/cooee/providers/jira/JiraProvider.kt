@@ -4,13 +4,14 @@ import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.CommandCompleter
+import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.providers.Provider
 import com.baulsupp.cooee.services.jira.model.Project
 import com.baulsupp.okurl.kotlin.queryList
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 
-class JiraProvider(val url: String, val client: OkHttpClient) : Provider {
+class JiraProvider(val url: String, val client: OkHttpClient) : BaseProvider() {
   override val name = "jira"
 
   override suspend fun url(command: String, args: List<String>): GoResult = if (command.isProjectOrIssue()) {
@@ -57,8 +58,8 @@ class JiraProvider(val url: String, val client: OkHttpClient) : Provider {
 
   private fun mostLikelyIssueCompletions(issue: String): List<String> =
     when {
-        issue.issueNumber()!!.length > 4 -> listOf(issue)
-        else -> listOf(issue) + (0..9).map { issue + it }
+      issue.issueNumber()!!.length > 4 -> listOf(issue)
+      else -> listOf(issue) + (0..9).map { issue + it }
     }
 
   // TODO introduce sealed type for JIRA issues to avoid double parsing and null hacks

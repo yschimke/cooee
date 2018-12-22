@@ -4,9 +4,10 @@ import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.CommandCompleter
+import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.providers.Provider
 
-class BookmarksProvider : Provider {
+class BookmarksProvider : BaseProvider() {
   override val name = "bookmarks"
 
   val bookmarks =

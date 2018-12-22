@@ -1,29 +1,30 @@
 package com.baulsupp.cooee
 
-import com.baulsupp.cooee.api.ArgumentCompletion
-import com.baulsupp.cooee.api.CommandCompletion
-import com.baulsupp.cooee.api.Completed
-import com.baulsupp.cooee.api.Completions
-import com.baulsupp.cooee.api.Go
-import com.baulsupp.cooee.api.GoInfo
-import com.baulsupp.cooee.api.RedirectResult
-import com.baulsupp.cooee.api.Unmatched
+import com.baulsupp.cooee.api.*
 import com.baulsupp.cooee.ktor.AccessLogs
 import com.baulsupp.cooee.mongo.MongoFactory
+import com.baulsupp.cooee.mongo.MongoProviderStore
+import com.baulsupp.cooee.mongo.MongoUserStore
 import com.baulsupp.cooee.okhttp.HoneycombEventListenerFactory
-import com.baulsupp.cooee.providers.MongoProviderStore
 import com.baulsupp.cooee.providers.RegistryProvider
 import com.baulsupp.cooee.providers.TestProviderStore
 import com.baulsupp.cooee.providers.defaultProviders
+import com.baulsupp.cooee.users.JwtUserAuthenticator
+import com.baulsupp.cooee.users.TestUserAuthenticator
+import com.baulsupp.cooee.users.TestUserStore
+import com.baulsupp.cooee.users.UserEntry
+import com.baulsupp.cooee.users.UserStore
 import com.ryanharter.ktor.moshi.moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import io.honeycomb.libhoney.HoneyClient
 import io.honeycomb.libhoney.LibHoney.create
 import io.honeycomb.libhoney.LibHoney.options
 import io.honeycomb.libhoney.ValueSupplier
+import io.jsonwebtoken.JwtException
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.application.ApplicationStopped
+import io.ktor.application.application
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.application.log
@@ -43,7 +44,6 @@ import io.ktor.http.content.static
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
 import io.ktor.locations.get
-import io.ktor.request.header
 import io.ktor.response.respond
 import io.ktor.response.respondRedirect
 import io.ktor.routing.routing
@@ -151,37 +151,43 @@ fun Application.module(testing: Boolean = false, local: Boolean = false) {
 
   val defaultProvider = RegistryProvider(defaultProviders(client))
 
-  val bearerRegex = "Bearer (.*)".toRegex()
-
-  fun ApplicationCall.user(): String? = request.header("Authorization")?.let {
-    bearerRegex.matchEntire(it)?.groupValues?.get(1)
+  val providerStore = when {
+    testing -> TestProviderStore()
+    else -> MongoProviderStore(defaultProvider)
   }
 
-  val providerStore = when {
-      testing -> TestProviderStore()
-      else -> MongoProviderStore(defaultProvider)
+  val userStore = when {
+    testing -> TestUserStore()
+    else -> MongoUserStore()
+  }
+
+  val userAuthenticator = when {
+    testing -> TestUserAuthenticator()
+    else -> JwtUserAuthenticator(userStore)
   }
 
   suspend fun providersFor(call: ApplicationCall): RegistryProvider =
-    call.user()?.let { providerStore.forUser(it) } ?: defaultProvider
+    userAuthenticator.userForRequest(call)?.let { providerStore.forUser(it) } ?: defaultProvider
 
   routing {
     if (local) {
       trace { application.log.trace(it.buildText()) }
     }
 
+    get<Login> { loginWeb(it, userStore) }
     get<Go> { bounceWeb(it, providersFor(call)) }
     get<GoInfo> { bounceApi(it, providersFor(call)) }
+    get<UserInfo> { userApi(userAuthenticator.userForRequest(call), userStore) }
     get<CommandCompletion> { commandCompletionApi(it, providersFor(call)) }
     get<ArgumentCompletion> { argumentCompletionApi(it, providersFor(call)) }
 
     install(StatusPages) {
-      exception<AuthenticationException> { cause ->
-        call.respond(HttpStatusCode.Unauthorized)
+      exception<JwtException> { cause ->
+        application.log.warn("jwt error", cause)
+        call.respond(HttpStatusCode.BadRequest)
       }
-      exception<AuthorizationException> { cause ->
-        call.respond(HttpStatusCode.Forbidden)
-      }
+      exception<AuthenticationException> { call.respond(HttpStatusCode.Unauthorized) }
+      exception<AuthorizationException> { call.respond(HttpStatusCode.Forbidden) }
     }
 
     static {
@@ -199,6 +205,38 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.bounceApi(
     goInfo.command?.let { registryProvider.url(it, goInfo.args) } ?: Unmatched
 
   call.respond(r)
+}
+
+private suspend fun PipelineContext<Unit, ApplicationCall>.userApi(
+  userToken: String?,
+  userStore: UserStore
+) {
+  if (userToken != null) {
+    val userResult = userStore.userInfo(userToken)
+
+    if (userResult != null) {
+      call.respond(userResult)
+    }
+  }
+
+  call.respond(HttpStatusCode.Unauthorized)
+}
+
+@KtorExperimentalLocationsAPI
+private suspend fun PipelineContext<Unit, ApplicationCall>.loginWeb(
+  login: Login,
+  userStore: UserStore
+) {
+  if (login.callback != null && login.user != null) {
+    val token = JwtUserAuthenticator.tokenForLogin(login)
+
+    if (token != null) {
+      userStore.storeUser(UserEntry(token, login.user, login.email))
+      call.respondRedirect(login.callback + "?code=" + token, permanent = false)
+    }
+  }
+
+  call.respond(HttpStatusCode.Unauthorized)
 }
 
 private suspend fun PipelineContext<Unit, ApplicationCall>.bounceWeb(

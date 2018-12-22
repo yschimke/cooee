@@ -2,11 +2,14 @@ package com.baulsupp.cooee
 
 import com.baulsupp.okurl.kotlin.mapAdapter
 import com.baulsupp.okurl.kotlin.moshi
+import io.jsonwebtoken.Jwt
+import io.jsonwebtoken.impl.DefaultJwtBuilder
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpMethod.Companion.Get
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.HttpStatusCode.Companion.Found
 import io.ktor.http.HttpStatusCode.Companion.OK
+import io.ktor.request.header
 import io.ktor.server.testing.TestApplicationCall
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
@@ -171,13 +174,36 @@ class ApplicationTest {
     }
   }
 
+  @Test
+  fun testUser() {
+    testRequest("/api/v0/user", user = "yuri").apply {
+      assertEquals("{\"email\":\"yuri@coo.ee\",\"token\":\"yuri\",\"user\":\"yuri\"}", response.content)
+    }
+  }
+
+  @Test
+  fun testLogin() {
+    testRequest("/login?user=yuri&callback=http://localhost:3000/callback", expectedCode = Found).apply {
+      assertEquals(
+        "http://localhost:3000/callback?code=eyJhbGciOiJub25lIn0.eyJ1c2VyIjoieXVyaSJ9.",
+        response.headers["Location"]
+      )
+    }
+  }
+
   private fun testRequest(
     path: String,
     method: HttpMethod = Get,
+    user: String? = null,
     expectedCode: HttpStatusCode = OK,
     fn: TestApplicationCall.() -> Unit = {}
   ) = withTestApplication({ test() }) {
-    handleRequest(method, path).apply {
+    handleRequest(method, path) {
+      if (user != null) {
+        val token = DefaultJwtBuilder().claim("user", user).compact()
+        addHeader("Authorization", "Bearer $token")
+      }
+    }.apply {
       assertEquals(expectedCode, response.status())
       fn(this)
     }

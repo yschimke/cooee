@@ -10,13 +10,13 @@ import java.io.IOException
 import java.time.Duration
 import java.time.Instant
 
-class HoneycombEventListenerFactory(val honeyClient: HoneyClient): EventListener.Factory {
+class HoneycombEventListenerFactory(val honeyClient: HoneyClient) : EventListener.Factory {
   override fun create(call: Call): EventListener {
     return HoneycombEventListener(call, honeyClient)
   }
 }
 
-class HoneycombEventListener(val call: Call, val honeyClient: HoneyClient): EventListener() {
+class HoneycombEventListener(val call: Call, val honeyClient: HoneyClient) : EventListener() {
   private lateinit var start: Instant
   private var status: Int? = null
 
