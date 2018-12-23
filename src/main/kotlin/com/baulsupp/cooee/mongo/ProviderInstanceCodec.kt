@@ -9,7 +9,7 @@ import org.bson.codecs.DecoderContext
 import org.bson.codecs.EncoderContext
 import org.bson.codecs.MapCodec
 
-class ProviderInstanceCodec : Codec<ProviderInstance> {
+object ProviderInstanceCodec : Codec<ProviderInstance> {
   override fun getEncoderClass(): Class<ProviderInstance> {
     return ProviderInstance::class.java
   }
