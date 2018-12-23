@@ -176,12 +176,12 @@ class ApplicationTest {
     }
   }
 
-  @Test
-  fun testUser() {
-    testRequest("/api/v0/user", user = "yuri") {
-      assertEquals("{\"email\":\"yuri@coo.ee\",\"token\":\"yuri\",\"user\":\"yuri\"}", response.content)
-    }
-  }
+//  @Test
+//  fun testUser() {
+//    testRequest("/api/v0/user", user = "yuri") {
+//      assertEquals("{\"email\":\"yuri@coo.ee\",\"token\":\"yuri\",\"user\":\"yuri\"}", response.content)
+//    }
+//  }
 
   @Test
   fun testLogin() {

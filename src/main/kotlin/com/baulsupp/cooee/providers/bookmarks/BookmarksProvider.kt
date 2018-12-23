@@ -64,7 +64,7 @@ class BookmarksProvider : BaseProvider() {
         "google" to "https://google.com",
         "facebook" to "https://facebook.com",
         "twitter" to "https://m.twitter.com",
-        "gmail" to "https://mai.google.com"
+        "gmail" to "https://mail.google.com"
       )
   }
 }
