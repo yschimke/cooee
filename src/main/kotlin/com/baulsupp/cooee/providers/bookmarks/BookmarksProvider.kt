@@ -5,6 +5,7 @@ import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.providers.BaseProvider
+import com.baulsupp.cooee.providers.ProviderInstance
 
 class BookmarksProvider : BaseProvider() {
   override val name = "bookmarks"
@@ -27,15 +28,19 @@ class BookmarksProvider : BaseProvider() {
     }
   }
 
-  private fun bookmarksCommand(args: List<String>): GoResult {
-    if (db != null) {
-      if (args.firstOrNull() == "add") {
+  private suspend fun bookmarksCommand(args: List<String>): GoResult {
+    if (db != null && instance != null) {
+      val previousBookmarks = configuredBookmarks().orEmpty()
+      val newBookmarks = if (args.firstOrNull() == "add") {
         // TODO error checking
-        val newBookmarks = configuredBookmarks().orEmpty() + (args[1] to args[2])
-//        instance?.config?.plus("bookmarks")
+        previousBookmarks + (args[1] to args[2])
       } else if (args.firstOrNull() == "remove") {
-
+        previousBookmarks - args[1]
+      } else {
+        previousBookmarks
       }
+
+      db!!.store(instance!!.copy(config = instance!!.config.plus("bookmarks" to newBookmarks)))
     }
 
     return Unmatched
