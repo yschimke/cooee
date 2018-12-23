@@ -14,6 +14,6 @@ class GoogleProvider : BaseProvider() {
     RedirectResult("https://www.google.com/search?q=${args.joinToString("+")}${if (command == "gl") "&btnI" else ""}")
 
   override fun commandCompleter(): CommandCompleter {
-    return SimpleCommandCompleter("g", "gl", "google")
+    return SimpleCommandCompleter("g", "gl")
   }
 }
