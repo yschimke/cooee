@@ -7,11 +7,11 @@ import com.baulsupp.cooee.mongo.MongoProviderStore
 import com.baulsupp.cooee.mongo.MongoUserStore
 import com.baulsupp.cooee.okhttp.HoneycombEventListenerFactory
 import com.baulsupp.cooee.providers.RegistryProvider
-import com.baulsupp.cooee.providers.TestProviderStore
+import com.baulsupp.cooee.test.TestProviderStore
 import com.baulsupp.cooee.providers.defaultProviders
 import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.cooee.users.TestUserAuthenticator
-import com.baulsupp.cooee.users.TestUserStore
+import com.baulsupp.cooee.test.TestUserStore
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.cooee.users.UserStore
 import com.ryanharter.ktor.moshi.moshi
@@ -86,7 +86,6 @@ fun main(args: Array<String>) {
   embeddedServer(Netty, env).start(true)
 }
 
-fun Application.test() = module(true, true)
 fun Application.local() = module(false, true)
 fun Application.cloud() = module(false, false)
 
@@ -152,7 +151,7 @@ fun Application.module(testing: Boolean = false, local: Boolean = false) {
   val defaultProvider = RegistryProvider(defaultProviders(client))
 
   val providerStore = when {
-    testing -> TestProviderStore()
+    testing -> TestProviderStore { defaultProviders(client) }
     else -> MongoProviderStore(defaultProvider)
   }
 
