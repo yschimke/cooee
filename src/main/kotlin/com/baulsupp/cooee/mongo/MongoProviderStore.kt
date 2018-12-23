@@ -50,6 +50,6 @@ class MongoProviderStore(val registry: RegistryProvider) : ProviderStore {
   }
 
   override suspend fun remove(user: String, name: String) {
-    providerDb.deleteMany(and(eq("user", user), eq("name", name)))
+    providerDb.deleteMany(and(eq("user", user), eq("name", name))).awaitFirst()
   }
 }

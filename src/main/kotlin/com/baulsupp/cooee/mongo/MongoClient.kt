@@ -42,7 +42,7 @@ object MongoFactory {
 
   private fun codecRegistry(): CodecRegistry {
     return CodecRegistries.fromRegistries(
-      CodecRegistries.fromCodecs(UserEntryCodec(), ProviderInstanceCodec()),
+      CodecRegistries.fromCodecs(UserEntryCodec, ProviderInstanceCodec, UserCredentialsCodec),
       MongoClientSettings.getDefaultCodecRegistry()
     )
   }
