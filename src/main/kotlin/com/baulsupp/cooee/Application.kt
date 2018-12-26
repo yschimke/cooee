@@ -50,6 +50,7 @@ import io.ktor.http.content.static
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
 import io.ktor.locations.get
+import io.ktor.locations.post
 import io.ktor.response.respond
 import io.ktor.response.respondRedirect
 import io.ktor.routing.routing
@@ -190,7 +191,7 @@ fun Application.module(testing: Boolean = false, local: Boolean = false) {
     get<UserInfo> { userApi(userAuthenticator.userForRequest(call), userStore) }
     get<CommandCompletion> { commandCompletionApi(it, providersFor(call)) }
     get<ArgumentCompletion> { argumentCompletionApi(it, providersFor(call)) }
-    get<Authorize> {
+    post<Authorize> {
       val user = userAuthenticator.userForRequest(call) ?: throw AuthenticationException()
       authorize(it, user, credentialsStore(user))
     }
@@ -227,8 +228,6 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.userApi(
   userToken: String?,
   userStore: UserStore
 ) {
-  println("userToken " + userToken)
-
   if (userToken != null) {
     val userResult = userStore.userInfo(userToken)
 
