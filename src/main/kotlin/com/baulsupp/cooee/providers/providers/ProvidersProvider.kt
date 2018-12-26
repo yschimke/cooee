@@ -19,7 +19,7 @@ class ProvidersProvider : BaseProvider() {
           // TODO validate known and one arg
           db!!.store(ProviderInstance(instance!!.user, name, mapOf()))
 
-          Completed
+          Completed("Added provider $name")
         }
         "remove" -> {
           // TODO validate known and one arg
@@ -27,7 +27,7 @@ class ProvidersProvider : BaseProvider() {
 
           db!!.remove(instance!!.user, name)
 
-          Completed
+          Completed("Removed provider $name")
         }
         else -> Unmatched
     }

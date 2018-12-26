@@ -64,7 +64,7 @@ tasks.create("downloadDependencies") {
 
 dependencies {
   implementation("ch.qos.logback:logback-classic:${Versions.logback}")
-  implementation("com.baulsupp:okurl:1.67.0")
+  implementation("com.baulsupp:okurl:1.68.0")
   implementation("com.ryanharter.ktor:ktor-moshi:1.0.1")
   implementation("com.squareup.moshi:moshi-adapters:1.8.0")
   implementation("com.squareup.okhttp3:logging-interceptor:3.12.1")

@@ -1,5 +1,6 @@
 package com.baulsupp.cooee.api
 
+import com.baulsupp.okurl.credentials.DefaultToken
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Location
 
@@ -17,7 +18,7 @@ data class GoInfo(val q: String? = null) {
 }
 
 @Location("/api/v0/user")
-class UserInfo {}
+class UserInfo
 
 @Location("/api/v0/command-completion")
 data class CommandCompletion(val q: String? = null)
@@ -37,12 +38,20 @@ data class Login(
   val callback: String? = null
 )
 
+@KtorExperimentalLocationsAPI
+@Location("/api/v0/authorize")
+data class Authorize(
+  val serviceName: String? = null,
+  val token: String? = null,
+  val tokenSet: String? = null
+)
+
 data class Completions(val completions: List<String>)
 
 sealed class GoResult
 
 data class RedirectResult(val location: String) : GoResult()
 object Unmatched : GoResult()
-object Completed : GoResult()
+data class Completed(val message: String) : GoResult()
 
 data class UserResult(val user: String, val name: String)
