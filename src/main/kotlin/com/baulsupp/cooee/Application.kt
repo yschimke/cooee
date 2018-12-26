@@ -1,17 +1,20 @@
 package com.baulsupp.cooee
 
 import com.baulsupp.cooee.api.*
+import io.ktor.application.install
+import io.ktor.application.application
+import io.ktor.util.pipeline.PipelineContext
 import com.baulsupp.cooee.ktor.AccessLogs
 import com.baulsupp.cooee.mongo.MongoFactory
 import com.baulsupp.cooee.mongo.MongoProviderStore
 import com.baulsupp.cooee.mongo.MongoUserStore
 import com.baulsupp.cooee.okhttp.HoneycombEventListenerFactory
 import com.baulsupp.cooee.providers.RegistryProvider
-import com.baulsupp.cooee.test.TestProviderStore
 import com.baulsupp.cooee.providers.defaultProviders
+import com.baulsupp.cooee.test.TestProviderStore
+import com.baulsupp.cooee.test.TestUserStore
 import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.cooee.users.TestUserAuthenticator
-import com.baulsupp.cooee.test.TestUserStore
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.cooee.users.UserStore
 import com.ryanharter.ktor.moshi.moshi
@@ -24,9 +27,7 @@ import io.jsonwebtoken.JwtException
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.application.ApplicationStopped
-import io.ktor.application.application
 import io.ktor.application.call
-import io.ktor.application.install
 import io.ktor.application.log
 import io.ktor.features.AutoHeadResponse
 import io.ktor.features.CORS
@@ -52,7 +53,6 @@ import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.util.pipeline.PipelineContext
 import okhttp3.EventListener
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
