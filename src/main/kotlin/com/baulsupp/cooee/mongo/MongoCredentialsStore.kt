@@ -2,6 +2,7 @@ package com.baulsupp.cooee.mongo
 
 import com.baulsupp.okurl.credentials.CredentialsStore
 import com.baulsupp.okurl.credentials.ServiceDefinition
+import com.baulsupp.okurl.services.AbstractServiceDefinition
 import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.ReplaceOptions
@@ -50,4 +51,9 @@ class MongoCredentialsStore(val user: String) : CredentialsStore {
       ), doc, ReplaceOptions().upsert(true)
     ).awaitFirst()
   }
+}
+
+class StringService(name: String): AbstractServiceDefinition<String>("test.com", name, name) {
+  override fun formatCredentialsString(credentials: String): String = credentials
+  override fun parseCredentialsString(s: String): String = s
 }

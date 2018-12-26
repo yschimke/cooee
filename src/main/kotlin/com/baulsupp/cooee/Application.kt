@@ -2,18 +2,23 @@ package com.baulsupp.cooee
 
 import com.baulsupp.cooee.api.*
 import com.baulsupp.cooee.ktor.AccessLogs
+import com.baulsupp.cooee.mongo.MongoCredentialsStore
 import com.baulsupp.cooee.mongo.MongoFactory
 import com.baulsupp.cooee.mongo.MongoProviderStore
 import com.baulsupp.cooee.mongo.MongoUserStore
+import com.baulsupp.cooee.mongo.StringService
 import com.baulsupp.cooee.okhttp.HoneycombEventListenerFactory
 import com.baulsupp.cooee.providers.RegistryProvider
-import com.baulsupp.cooee.test.TestProviderStore
 import com.baulsupp.cooee.providers.defaultProviders
+import com.baulsupp.cooee.test.TestProviderStore
+import com.baulsupp.cooee.test.TestUserStore
 import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.cooee.users.TestUserAuthenticator
-import com.baulsupp.cooee.test.TestUserStore
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.cooee.users.UserStore
+import com.baulsupp.okurl.credentials.CredentialsStore
+import com.baulsupp.okurl.credentials.DefaultToken
+import com.baulsupp.okurl.credentials.InMemoryCredentialsStore
 import com.ryanharter.ktor.moshi.moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import io.honeycomb.libhoney.HoneyClient
@@ -165,6 +170,12 @@ fun Application.module(testing: Boolean = false, local: Boolean = false) {
     else -> JwtUserAuthenticator(userStore)
   }
 
+  // TODO test services held somewhere
+  fun credentialsStore(user: String) = when {
+    testing -> InMemoryCredentialsStore()
+    else -> MongoCredentialsStore(user)
+  }
+
   suspend fun providersFor(call: ApplicationCall): RegistryProvider =
     userAuthenticator.userForRequest(call)?.let { providerStore.forUser(it) } ?: defaultProvider
 
@@ -179,6 +190,10 @@ fun Application.module(testing: Boolean = false, local: Boolean = false) {
     get<UserInfo> { userApi(userAuthenticator.userForRequest(call), userStore) }
     get<CommandCompletion> { commandCompletionApi(it, providersFor(call)) }
     get<ArgumentCompletion> { argumentCompletionApi(it, providersFor(call)) }
+    get<Authorize> {
+      val user = userAuthenticator.userForRequest(call) ?: throw AuthenticationException()
+      authorize(it, user, credentialsStore(user))
+    }
 
     install(StatusPages) {
       exception<JwtException> { cause ->
@@ -187,6 +202,7 @@ fun Application.module(testing: Boolean = false, local: Boolean = false) {
       }
       exception<AuthenticationException> { call.respond(HttpStatusCode.Unauthorized) }
       exception<AuthorizationException> { call.respond(HttpStatusCode.Forbidden) }
+      exception<BadRequestException> { call.respond(HttpStatusCode.BadRequest) }
       exception<Exception> { x -> call.respond(HttpStatusCode.InternalServerError, x.toString()) }
     }
 
@@ -211,6 +227,8 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.userApi(
   userToken: String?,
   userStore: UserStore
 ) {
+  println("userToken " + userToken)
+
   if (userToken != null) {
     val userResult = userStore.userInfo(userToken)
 
@@ -274,6 +292,20 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.argumentCompletionApi
   call.respond(Completions(listOf("close", "comment")))
 }
 
+@KtorExperimentalLocationsAPI
+private suspend fun PipelineContext<Unit, ApplicationCall>.authorize(
+  authorize: Authorize,
+  userToken: String?,
+  credentialsStore: CredentialsStore
+) {
+  if (authorize.serviceName == null || authorize.token == null || userToken == null) {
+    throw BadRequestException()
+  }
+
+  credentialsStore.set(StringService(authorize.serviceName), DefaultToken.name, authorize.token)
+  call.respond(HttpStatusCode.Created)
+}
+
 private fun buildHttpClient(httpListener: EventListener.Factory): OkHttpClient {
   return OkHttpClient.Builder().eventListenerFactory(httpListener).build()
 }
@@ -313,6 +345,7 @@ var honeyClient: HoneyClient? = null
 
 class AuthenticationException : RuntimeException()
 class AuthorizationException : RuntimeException()
+class BadRequestException : RuntimeException()
 
 private fun setupProvider() {
   try {

@@ -37,12 +37,19 @@ data class Login(
   val callback: String? = null
 )
 
+@KtorExperimentalLocationsAPI
+@Location("/authorise")
+data class Authorize(
+  val serviceName: String? = null,
+  val token: String? = null
+)
+
 data class Completions(val completions: List<String>)
 
 sealed class GoResult
 
 data class RedirectResult(val location: String) : GoResult()
 object Unmatched : GoResult()
-object Completed : GoResult()
+data class Completed(val message: String) : GoResult()
 
 data class UserResult(val user: String, val name: String)
