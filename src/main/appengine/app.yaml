@@ -1,6 +1,10 @@
 runtime: java
 env: flex
 
+network:
+  instance_tag: https-server
+  name: app
+
 handlers:
   - url: /.*
     script: this field is required, but ignored

@@ -1,8 +1,8 @@
 object Versions {
-  val kotlin = "1.3.11"
-  val kotlinCoroutines = "1.1.0"
+  val kotlin = "1.3.10"
+  val kotlinCoroutines = "1.0.1"
   val logback = "1.2.3"
-  val ktor = "1.1.0"
+  val ktor = "1.0.1"
 }
 
 object Deps {
