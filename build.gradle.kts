@@ -89,6 +89,16 @@ dependencies {
   implementation("io.ktor:ktor-locations:${Versions.ktor}")
   implementation("io.ktor:ktor-metrics:${Versions.ktor}")
   implementation("io.ktor:ktor-server-core:${Versions.ktor}")
+  implementation("io.netty:netty-buffer:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-codec:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-codec-dns:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-codec-http2:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-codec-http:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-common:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-handler:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-resolver:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-resolver-dns:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-transport:${Versions.netty}") { setForce(true) }
   implementation("io.ktor:ktor-server-host-common:${Versions.ktor}")
   implementation("io.ktor:ktor-server-netty:${Versions.ktor}")
   implementation("io.ktor:ktor-server-servlet:${Versions.ktor}")
@@ -100,9 +110,8 @@ dependencies {
   implementation("io.projectreactor:reactor-core:${Versions.reactor}")
   implementation("io.projectreactor:reactor-core:3.2.3.RELEASE")
   implementation("org.conscrypt:conscrypt-openjdk-uber:${Versions.conscrypt}")
-  implementation("org.conscrypt:conscrypt-openjdk-uber:1.4.1")
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:${Versions.kotlin}")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:${Versions.kotlinCoroutines}")
   implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.59-kotlin-1.3.0")
   implementation("org.mongodb:mongodb-driver-reactivestreams:1.10.0")
   implementation("org.webjars:jquery:3.2.1")
