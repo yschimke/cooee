@@ -13,6 +13,7 @@ import com.baulsupp.cooee.mongo.StringService
 import com.baulsupp.cooee.okhttp.HoneycombEventListenerFactory
 import com.baulsupp.cooee.providers.RegistryProvider
 import com.baulsupp.cooee.providers.defaultProviders
+import com.baulsupp.cooee.reactor.awaitList
 import com.baulsupp.cooee.test.TestProviderStore
 import com.baulsupp.cooee.test.TestUserStore
 import com.baulsupp.cooee.users.JwtUserAuthenticator
@@ -59,6 +60,7 @@ import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import kotlinx.coroutines.runBlocking
 import okhttp3.EventListener
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
@@ -72,6 +74,13 @@ import kotlin.concurrent.timer
 
 @KtorExperimentalLocationsAPI
 fun main(args: Array<String>) {
+  MongoFactory.local = false
+
+  runBlocking {
+    println(MongoFactory.mongo().listDatabaseNames().awaitList())
+    println(MongoFactory.mongo().getDatabase("cooee").getCollection("users").find().awaitList())
+  }
+
   setupProvider()
 
   val env = applicationEngineEnvironment {

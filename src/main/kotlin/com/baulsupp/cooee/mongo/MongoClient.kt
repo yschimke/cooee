@@ -33,7 +33,7 @@ object MongoFactory {
 
     val settings = MongoClientSettings.builder()
       .streamFactoryFactory(NettyStreamFactoryFactory.builder().eventLoopGroup(eventLoopGroup).build())
-      .applyConnectionString(ConnectionString("mongodb://cooee:78512WuwCeuvzrru@cooee0-shard-00-00-bnhzn.gcp.mongodb.net:27017,cooee0-shard-00-01-bnhzn.gcp.mongodb.net:27017,cooee0-shard-00-02-bnhzn.gcp.mongodb.net:27017/test?ssl=true&replicaSet=Cooee0-shard-0&authSource=admin&retryWrites=true"))
+      .applyConnectionString(ConnectionString("mongodb://cooee:br4PA4HyGabAkN0c@cooeedb-shard-00-00-bnhzn.gcp.mongodb.net:27017,cooeedb-shard-00-01-bnhzn.gcp.mongodb.net:27017,cooeedb-shard-00-02-bnhzn.gcp.mongodb.net:27017/test?ssl=true&replicaSet=CooeeDB-shard-0&authSource=admin&retryWrites=true"))
       .codecRegistry(codecRegistry())
       .build()
 

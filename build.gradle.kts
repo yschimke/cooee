@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
 //  application
-  kotlin("jvm") version "1.3.11"
+  kotlin("jvm") version Versions.kotlin
   war
   id("com.github.ben-manes.versions") version "0.20.0"
   id ("com.google.cloud.tools.appengine") version "2.0.0-rc4"
@@ -64,11 +64,12 @@ tasks.create("downloadDependencies") {
 
 dependencies {
   implementation("ch.qos.logback:logback-classic:${Versions.logback}")
-  implementation("com.baulsupp:okurl:1.68.0")
+  implementation("com.baulsupp:okurl:${Versions.okurl}")
   implementation("com.ryanharter.ktor:ktor-moshi:1.0.1")
   implementation("com.squareup.moshi:moshi-adapters:1.8.0")
-  implementation("com.squareup.okhttp3:logging-interceptor:3.12.1")
-  implementation("com.squareup.okhttp3:okhttp:3.12.1")
+  implementation("com.squareup.okhttp3:logging-interceptor:${Versions.okhttp}")
+  implementation("com.squareup.okhttp3:okhttp:${Versions.okhttp}")
+  implementation("com.squareup.okio:okio:${Versions.okio}")
   implementation("io.honeycomb.libhoney:libhoney-java:1.0.2")
   implementation("io.ktor:ktor-auth-jwt:${Versions.ktor}")
   implementation("io.ktor:ktor-auth-ldap:${Versions.ktor}")
@@ -82,28 +83,41 @@ dependencies {
   implementation("io.ktor:ktor-client-okhttp:${Versions.ktor}")
   implementation("io.ktor:ktor-client-websocket:${Versions.ktor}")
   implementation("io.ktor:ktor-html-builder:${Versions.ktor}")
-  implementation("io.ktor:ktor-http:${Versions.ktor}")
   implementation("io.ktor:ktor-http-jvm:${Versions.ktor}")
+  implementation("io.ktor:ktor-http:${Versions.ktor}")
   implementation("io.ktor:ktor-jackson:${Versions.ktor}")
   implementation("io.ktor:ktor-locations:${Versions.ktor}")
   implementation("io.ktor:ktor-metrics:${Versions.ktor}")
   implementation("io.ktor:ktor-server-core:${Versions.ktor}")
+  implementation("io.netty:netty-buffer:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-codec:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-codec-dns:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-codec-http2:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-codec-http:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-common:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-handler:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-resolver:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-resolver-dns:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-transport:${Versions.netty}") { setForce(true) }
   implementation("io.ktor:ktor-server-host-common:${Versions.ktor}")
   implementation("io.ktor:ktor-server-netty:${Versions.ktor}")
   implementation("io.ktor:ktor-server-servlet:${Versions.ktor}")
   implementation("io.ktor:ktor-server-sessions:${Versions.ktor}")
+  implementation("io.ktor:ktor-utils-jvm:${Versions.ktor}")
+  implementation("io.ktor:ktor-utils:${Versions.ktor}")
   implementation("io.ktor:ktor-webjars:${Versions.ktor}")
   implementation("io.ktor:ktor-websockets:${Versions.ktor}")
-  implementation("io.ktor:ktor-utils:${Versions.ktor}")
-  implementation("io.ktor:ktor-utils-jvm:${Versions.ktor}")
+  implementation("io.projectreactor:reactor-core:${Versions.reactor}")
   implementation("io.projectreactor:reactor-core:3.2.3.RELEASE")
-  implementation("org.conscrypt:conscrypt-openjdk-uber:1.4.1")
+  implementation("org.conscrypt:conscrypt-openjdk-uber:${Versions.conscrypt}")
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.1.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:${Versions.kotlinCoroutines}")
   implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.59-kotlin-1.3.0")
   implementation("org.mongodb:mongodb-driver-reactivestreams:1.10.0")
   implementation("org.webjars:jquery:3.2.1")
   testCompile("io.ktor:ktor-server-tests:${Versions.ktor}")
+//  implementation("org.springframework.kotlin:spring-data-mongodb-kotlin-coroutine:0.3.6")
+//  implementation("org.springframework.kotlin:spring-kotlin-coroutine:0.3.6")
 }
 
 gretty {
