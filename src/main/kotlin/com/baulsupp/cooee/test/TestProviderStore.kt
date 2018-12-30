@@ -4,11 +4,15 @@ import com.baulsupp.cooee.providers.Provider
 import com.baulsupp.cooee.providers.ProviderInstance
 import com.baulsupp.cooee.providers.ProviderStore
 import com.baulsupp.cooee.providers.RegistryProvider
+import com.baulsupp.cooee.providers.providers.ProvidersProvider
 
 class TestProviderStore(private val providers: () -> List<Provider>) : ProviderStore {
-  private val providerInstances = mutableSetOf<ProviderInstance>()
+  val providerInstances = mutableSetOf<ProviderInstance>()
 
   override suspend fun forUser(user: String): RegistryProvider? {
+    val providersProvider = ProvidersProvider()
+    providersProvider.configure(ProviderInstance(user, "providers", mapOf()), this)
+
     val userProviders = providers().mapNotNull { p ->
       val config = providerInstances.find { pi ->
         p.name == pi.name && pi.user == user
@@ -19,7 +23,7 @@ class TestProviderStore(private val providers: () -> List<Provider>) : ProviderS
       } else {
         null
       }
-    }
+    } + providersProvider
 
     return RegistryProvider(userProviders)
   }

@@ -27,18 +27,16 @@ suspend fun PipelineContext<Unit, ApplicationCall>.bounceApi(
 }
 
 suspend fun PipelineContext<Unit, ApplicationCall>.userApi(
-  userToken: String?,
+  user: String?,
   userStore: UserStore
 ) {
-  if (userToken != null) {
-    val userResult = userStore.userInfo(userToken)
-
-    if (userResult != null) {
-      call.respond(userResult)
-    }
+  if (user == null) {
+    throw AuthenticationException()
   }
 
-  call.respond(HttpStatusCode.Unauthorized)
+  val userResult = userStore.userInfo(user) ?: throw AuthorizationException()
+
+  call.respond(userResult)
 }
 
 @KtorExperimentalLocationsAPI
@@ -68,7 +66,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.bounceWeb(
   when (r) {
     is RedirectResult -> call.respondRedirect(r.location, permanent = false)
     is Unmatched -> call.respond(HttpStatusCode.NotFound)
-    is Completed -> call.respond(HttpStatusCode.NoContent)
+    is Completed -> call.respond(HttpStatusCode.OK)
   }
 }
 

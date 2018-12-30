@@ -1,5 +1,6 @@
 package com.baulsupp.cooee.providers.bookmarks
 
+import com.baulsupp.cooee.api.Completed
 import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
@@ -36,10 +37,11 @@ class BookmarksProvider : BaseProvider() {
       } else if (args.firstOrNull() == "remove") {
         previousBookmarks - args[1]
       } else {
-        previousBookmarks
+        return Unmatched
       }
 
       db!!.store(instance!!.copy(config = instance!!.config.plus("bookmarks" to newBookmarks)))
+      return Completed("bookmarks updated")
     }
 
     return Unmatched

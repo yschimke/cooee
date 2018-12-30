@@ -10,5 +10,5 @@ class TestUserStore : UserStore {
     users += userEntry
   }
 
-  override suspend fun userInfo(userToken: String): UserEntry? = users.find { it.token == userToken }
+  override suspend fun userInfo(user: String): UserEntry? = users.find { it.user == user }
 }
