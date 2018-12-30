@@ -1,6 +1,5 @@
 package com.baulsupp.cooee.ktor
 
-import com.baulsupp.cooee.honeyClient
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.application.ApplicationCallPipeline
@@ -48,8 +47,9 @@ class AccessLogs {
       "request-contenttype" to call.request.contentType().toString()
     )
 
-    if (honeyClient != null) {
-      honeyClient!!.createEvent().addFields(dataMap).setDataset("accesslogs").send()
-    }
+    // TODO readd
+//    if (honeyClient != null) {
+//      honeyClient!!.createEvent().addFields(dataMap).setDataset("accesslogs").send()
+//    }
   }
 }

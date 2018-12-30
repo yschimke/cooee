@@ -2,7 +2,6 @@ package com.baulsupp.cooee.okhttp
 
 import com.baulsupp.okurl.credentials.NoToken
 import com.baulsupp.okurl.credentials.Token
-import io.honeycomb.libhoney.HoneyClient
 import okhttp3.Call
 import okhttp3.EventListener
 import okhttp3.Response
@@ -10,13 +9,13 @@ import java.io.IOException
 import java.time.Duration
 import java.time.Instant
 
-class HoneycombEventListenerFactory(val honeyClient: HoneyClient) : EventListener.Factory {
+class HoneycombEventListenerFactory() : EventListener.Factory {
   override fun create(call: Call): EventListener {
-    return HoneycombEventListener(call, honeyClient)
+    return HoneycombEventListener(call)
   }
 }
 
-class HoneycombEventListener(val call: Call, val honeyClient: HoneyClient) : EventListener() {
+class HoneycombEventListener(val call: Call) : EventListener() {
   private lateinit var start: Instant
   private var status: Int? = null
 
@@ -41,7 +40,7 @@ class HoneycombEventListener(val call: Call, val honeyClient: HoneyClient) : Eve
       "response" to status
     )
 
-    honeyClient.createEvent().addFields(dataMap).setDataset("httpcall").send()
+//    honeyClient.createEvent().addFields(dataMap).setDataset("httpcall").send()
   }
 
   override fun callFailed(call: Call, ioe: IOException) {
@@ -57,6 +56,6 @@ class HoneycombEventListener(val call: Call, val honeyClient: HoneyClient) : Eve
       "exception" to ioe.toString()
     )
 
-    honeyClient.createEvent().addFields(dataMap).setDataset("httpcall").send()
+//    honeyClient.createEvent().addFields(dataMap).setDataset("httpcall").send()
   }
 }

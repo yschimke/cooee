@@ -1,12 +1,15 @@
 <configuration>
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
-    <root level="trace">
-        <appender-ref ref="STDOUT"/>
-    </root>
-    <logger name="org.eclipse.jetty" level="INFO"/>
-    <logger name="io.netty" level="INFO"/>
+  <appender name="CLOUD" class="com.google.cloud.logging.logback.LoggingAppender">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
+    <log>application.log</log>
+    <resourceType>gae_app</resourceType>
+    <enhancer>com.google.cloud.logging.TraceLoggingEnhancer</enhancer>
+    <flushLevel>WARN</flushLevel>
+  </appender>
+
+  <root level="info">
+    <appender-ref ref="CLOUD" />
+  </root>
 </configuration>
