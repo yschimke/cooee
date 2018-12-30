@@ -1,5 +1,6 @@
 package com.baulsupp.cooee.mongo
 
+import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.providers.ProviderInstance
 import com.baulsupp.cooee.providers.ProviderStore
 import com.baulsupp.cooee.providers.RegistryProvider
@@ -12,7 +13,7 @@ import com.mongodb.reactivestreams.client.MongoCollection
 import kotlinx.coroutines.reactive.awaitFirst
 import org.bson.Document
 
-class MongoProviderStore(val registry: RegistryProvider) : ProviderStore {
+class MongoProviderStore(private val providers: () -> List<BaseProvider>) : ProviderStore {
   private val providerDb: MongoCollection<Document> by lazy { MongoFactory.mongoDb().getCollection("providers") }
 
   override suspend fun forUser(user: String): RegistryProvider? {
@@ -22,7 +23,7 @@ class MongoProviderStore(val registry: RegistryProvider) : ProviderStore {
     val providersProvider = ProvidersProvider()
     providersProvider.configure(ProviderInstance(user, "providers", mapOf()), this)
 
-    val providers = registry.providers.mapNotNull {
+    val providers = providers().mapNotNull {
       val possibleName = it.name
       val providerConfig = providerInstances.find { config -> config.name == possibleName }
 

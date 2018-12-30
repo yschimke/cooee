@@ -18,7 +18,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-fun Application.test() = module(true, true)
+fun Application.test() = module(TestAppServices())
 
 class ApplicationTest {
   @Test

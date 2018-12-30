@@ -65,12 +65,12 @@ tasks.create("downloadDependencies") {
 dependencies {
   implementation("ch.qos.logback:logback-classic:${Versions.logback}")
   implementation("com.baulsupp:okurl:${Versions.okurl}")
+  implementation("com.google.cloud:google-cloud-logging-logback:0.73.0-alpha")
   implementation("com.ryanharter.ktor:ktor-moshi:1.0.1")
   implementation("com.squareup.moshi:moshi-adapters:1.8.0")
   implementation("com.squareup.okhttp3:logging-interceptor:${Versions.okhttp}")
   implementation("com.squareup.okhttp3:okhttp:${Versions.okhttp}")
   implementation("com.squareup.okio:okio:${Versions.okio}")
-  implementation("io.honeycomb.libhoney:libhoney-java:1.0.2")
   implementation("io.ktor:ktor-auth-jwt:${Versions.ktor}")
   implementation("io.ktor:ktor-auth-ldap:${Versions.ktor}")
   implementation("io.ktor:ktor-auth:${Versions.ktor}")
@@ -89,16 +89,6 @@ dependencies {
   implementation("io.ktor:ktor-locations:${Versions.ktor}")
   implementation("io.ktor:ktor-metrics:${Versions.ktor}")
   implementation("io.ktor:ktor-server-core:${Versions.ktor}")
-  implementation("io.netty:netty-buffer:${Versions.netty}") { setForce(true) }
-  implementation("io.netty:netty-codec:${Versions.netty}") { setForce(true) }
-  implementation("io.netty:netty-codec-dns:${Versions.netty}") { setForce(true) }
-  implementation("io.netty:netty-codec-http2:${Versions.netty}") { setForce(true) }
-  implementation("io.netty:netty-codec-http:${Versions.netty}") { setForce(true) }
-  implementation("io.netty:netty-common:${Versions.netty}") { setForce(true) }
-  implementation("io.netty:netty-handler:${Versions.netty}") { setForce(true) }
-  implementation("io.netty:netty-resolver:${Versions.netty}") { setForce(true) }
-  implementation("io.netty:netty-resolver-dns:${Versions.netty}") { setForce(true) }
-  implementation("io.netty:netty-transport:${Versions.netty}") { setForce(true) }
   implementation("io.ktor:ktor-server-host-common:${Versions.ktor}")
   implementation("io.ktor:ktor-server-netty:${Versions.ktor}")
   implementation("io.ktor:ktor-server-servlet:${Versions.ktor}")
@@ -107,6 +97,16 @@ dependencies {
   implementation("io.ktor:ktor-utils:${Versions.ktor}")
   implementation("io.ktor:ktor-webjars:${Versions.ktor}")
   implementation("io.ktor:ktor-websockets:${Versions.ktor}")
+  implementation("io.netty:netty-buffer:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-codec-dns:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-codec-http2:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-codec-http:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-codec:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-common:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-handler:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-resolver-dns:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-resolver:${Versions.netty}") { setForce(true) }
+  implementation("io.netty:netty-transport:${Versions.netty}") { setForce(true) }
   implementation("io.projectreactor:reactor-core:${Versions.reactor}")
   implementation("io.projectreactor:reactor-core:3.2.3.RELEASE")
   implementation("org.conscrypt:conscrypt-openjdk-uber:${Versions.conscrypt}")
@@ -116,8 +116,6 @@ dependencies {
   implementation("org.mongodb:mongodb-driver-reactivestreams:1.10.0")
   implementation("org.webjars:jquery:3.2.1")
   testCompile("io.ktor:ktor-server-tests:${Versions.ktor}")
-//  implementation("org.springframework.kotlin:spring-data-mongodb-kotlin-coroutine:0.3.6")
-//  implementation("org.springframework.kotlin:spring-kotlin-coroutine:0.3.6")
 }
 
 gretty {
