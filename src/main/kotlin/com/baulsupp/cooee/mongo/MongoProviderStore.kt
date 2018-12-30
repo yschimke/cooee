@@ -9,7 +9,6 @@ import com.baulsupp.cooee.reactor.awaitList
 import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.ReplaceOptions
-import com.mongodb.reactivestreams.client.MongoClient
 import com.mongodb.reactivestreams.client.MongoCollection
 import com.mongodb.reactivestreams.client.MongoDatabase
 import kotlinx.coroutines.reactive.awaitFirst

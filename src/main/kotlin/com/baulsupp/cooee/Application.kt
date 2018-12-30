@@ -1,8 +1,5 @@
 package com.baulsupp.cooee
 
-import com.baulsupp.cooee.ktor.AccessLogs
-import com.baulsupp.cooee.mongo.MongoFactory
-import com.baulsupp.cooee.reactor.awaitList
 import com.ryanharter.ktor.moshi.moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import io.ktor.application.Application
@@ -25,8 +22,6 @@ import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.netty.channel.nio.NioEventLoopGroup
-import kotlinx.coroutines.runBlocking
 import org.conscrypt.Conscrypt
 import java.security.Security
 import java.util.*
@@ -82,7 +77,6 @@ fun Application.module(appServices: AppServices, local: Boolean = true) {
     anyHost()
   }
   install(CallLogging)
-  install(AccessLogs)
   install(DataConversion)
   install(AutoHeadResponse)
 

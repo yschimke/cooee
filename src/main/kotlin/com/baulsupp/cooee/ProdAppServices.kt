@@ -11,13 +11,14 @@ import com.baulsupp.cooee.providers.google.GoogleProvider
 import com.baulsupp.cooee.providers.jira.JiraProvider
 import com.baulsupp.cooee.providers.twitter.TwitterProvider
 import com.baulsupp.cooee.users.JwtUserAuthenticator
+import com.mongodb.reactivestreams.client.MongoDatabase
 import io.ktor.application.ApplicationCall
 import io.netty.channel.nio.NioEventLoopGroup
 import okhttp3.EventListener
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
 
-class ProdAppServices(val local: Boolean) : AppServices {
+class ProdAppServices(private val local: Boolean) : AppServices {
   override fun close() {
     client.connectionPool().evictAll()
     client.dispatcher().executorService().shutdown()
@@ -27,7 +28,7 @@ class ProdAppServices(val local: Boolean) : AppServices {
     eventLoop.shutdownGracefully()
   }
 
-  override val client = run {
+  override val client: OkHttpClient = run {
     val httpListener = if (local) {
       LoggingEventListener.Factory { s -> println(s) }
     } else {
@@ -36,12 +37,12 @@ class ProdAppServices(val local: Boolean) : AppServices {
     OkHttpClient.Builder().eventListenerFactory(httpListener).build()
   }
 
-  val eventLoop = NioEventLoopGroup()
+  private val eventLoop = NioEventLoopGroup()
 
   // TODO allow local
   val mongo = MongoFactory.mongo(false, eventLoop)
 
-  val mongoDb = mongo.getDatabase("cooee")
+  val mongoDb: MongoDatabase = mongo.getDatabase("cooee")
 
   override val providerStore = MongoProviderStore(this::defaultProviders, mongoDb)
 

@@ -11,7 +11,7 @@ import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.bson.Document
 
 class MongoUserStore(private val mongoDb: MongoDatabase) : UserStore {
-  val userDb: MongoCollection<Document> by lazy { mongoDb.getCollection("users") }
+  private val userDb: MongoCollection<Document> by lazy { mongoDb.getCollection("users") }
 
   override suspend fun userInfo(userToken: String): UserEntry? {
     return userDb.find(eq("token", userToken), UserEntry::class.java).awaitFirstOrNull()
