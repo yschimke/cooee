@@ -19,12 +19,15 @@ class JwtUserAuthenticator(private val userStore: UserStore) : UserAuthenticator
       if (token != null) {
         val jwt = Jwts.parser().parseClaimsJwt(token)
 
-        val entry = userStore.userInfo(token)
+        // TODO use token and validate signature
+        val user = jwt.body["user"] as? String
 
-        // TODO debug
+        if (user != null) {
+          val entry = userStore.userInfo(user)
 
-        if (entry != null) {
-          return entry.user
+          if (entry != null) {
+            return entry.user
+          }
         }
       }
 
