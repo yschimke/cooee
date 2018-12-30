@@ -5,7 +5,6 @@ import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.completion.SimpleCommandCompleter
 import com.baulsupp.cooee.providers.BaseProvider
-import com.baulsupp.cooee.providers.Provider
 
 class GoogleProvider : BaseProvider() {
   override val name = "google"

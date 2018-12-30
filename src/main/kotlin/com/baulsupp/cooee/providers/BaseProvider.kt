@@ -1,6 +1,6 @@
 package com.baulsupp.cooee.providers
 
-abstract class BaseProvider: Provider {
+abstract class BaseProvider : Provider {
   var instance: ProviderInstance? = null
   var db: ProviderStore? = null
 

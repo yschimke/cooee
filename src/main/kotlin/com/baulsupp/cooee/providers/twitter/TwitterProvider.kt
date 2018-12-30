@@ -4,7 +4,6 @@ import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.providers.BaseProvider
-import com.baulsupp.cooee.providers.Provider
 import okhttp3.OkHttpClient
 
 class TwitterProvider(client: OkHttpClient) : BaseProvider() {

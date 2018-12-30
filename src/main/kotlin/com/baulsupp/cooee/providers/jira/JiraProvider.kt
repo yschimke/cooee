@@ -5,7 +5,6 @@ import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.providers.BaseProvider
-import com.baulsupp.cooee.providers.Provider
 import com.baulsupp.cooee.services.jira.model.Project
 import com.baulsupp.okurl.kotlin.queryList
 import kotlinx.coroutines.runBlocking

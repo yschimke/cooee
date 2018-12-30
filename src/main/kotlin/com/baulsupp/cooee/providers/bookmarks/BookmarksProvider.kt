@@ -5,7 +5,6 @@ import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.providers.BaseProvider
-import com.baulsupp.cooee.providers.ProviderInstance
 
 class BookmarksProvider : BaseProvider() {
   override val name = "bookmarks"

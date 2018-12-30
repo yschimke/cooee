@@ -5,12 +5,13 @@ import com.baulsupp.cooee.users.UserStore
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.ReplaceOptions
 import com.mongodb.reactivestreams.client.MongoCollection
+import com.mongodb.reactivestreams.client.MongoDatabase
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.bson.Document
 
-class MongoUserStore : UserStore {
-  val userDb: MongoCollection<Document> by lazy { MongoFactory.mongoDb().getCollection("users") }
+class MongoUserStore(private val mongoDb: MongoDatabase) : UserStore {
+  val userDb: MongoCollection<Document> by lazy { mongoDb.getCollection("users") }
 
   override suspend fun userInfo(userToken: String): UserEntry? {
     return userDb.find(eq("token", userToken), UserEntry::class.java).awaitFirstOrNull()

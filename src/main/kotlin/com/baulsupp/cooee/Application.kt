@@ -2,6 +2,7 @@ package com.baulsupp.cooee
 
 import com.baulsupp.cooee.ktor.AccessLogs
 import com.baulsupp.cooee.mongo.MongoFactory
+import com.baulsupp.cooee.reactor.awaitList
 import com.ryanharter.ktor.moshi.moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import io.ktor.application.Application
@@ -24,15 +25,16 @@ import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.netty.channel.nio.NioEventLoopGroup
+import kotlinx.coroutines.runBlocking
 import org.conscrypt.Conscrypt
 import java.security.Security
 import java.util.*
 
 @KtorExperimentalLocationsAPI
 fun main(args: Array<String>) {
-  MongoFactory.local = false
-
-  setupProvider()
+  // TODO breaks Mongo
+//  setupProvider()
 
   val env = applicationEngineEnvironment {
     module {
@@ -59,7 +61,6 @@ fun Application.cloud() = module(ProdAppServices(false), false)
 @kotlin.jvm.JvmOverloads
 fun Application.module(appServices: AppServices, local: Boolean = true) {
   this.environment.monitor.subscribe(ApplicationStopped) {
-    MongoFactory.close()
     appServices.close()
   }
 
@@ -87,8 +88,8 @@ fun Application.module(appServices: AppServices, local: Boolean = true) {
 
   if (!local) {
     install(HttpsRedirect) {
-        sslPort = 443
-        permanentRedirect = true
+      sslPort = 443
+      permanentRedirect = true
     }
   }
 

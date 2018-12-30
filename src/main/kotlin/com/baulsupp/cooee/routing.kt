@@ -7,8 +7,6 @@ import com.baulsupp.cooee.api.Go
 import com.baulsupp.cooee.api.GoInfo
 import com.baulsupp.cooee.api.Login
 import com.baulsupp.cooee.api.UserInfo
-import com.baulsupp.cooee.users.UserAuthenticator
-import com.baulsupp.cooee.users.UserStore
 import io.jsonwebtoken.JwtException
 import io.ktor.application.application
 import io.ktor.application.call
