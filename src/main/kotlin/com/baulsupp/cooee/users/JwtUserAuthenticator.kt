@@ -6,10 +6,11 @@ import io.jsonwebtoken.impl.DefaultJwtBuilder
 import io.ktor.application.ApplicationCall
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.request.header
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class JwtUserAuthenticator(val userStore: UserStore) : UserAuthenticator {
-  val bearerRegex = "Bearer (.*)".toRegex()
+class JwtUserAuthenticator(private val userStore: UserStore) : UserAuthenticator {
+  private val bearerRegex = "Bearer (.*)".toRegex()
 
   override suspend fun userForRequest(call: ApplicationCall): String? {
     return call.request.header("Authorization")?.let {
@@ -33,7 +34,7 @@ class JwtUserAuthenticator(val userStore: UserStore) : UserAuthenticator {
 
   @KtorExperimentalLocationsAPI
   companion object {
-    val logger = LoggerFactory.getLogger(JwtUserAuthenticator::class.java)
+    val logger: Logger = LoggerFactory.getLogger(JwtUserAuthenticator::class.java)
 
     fun tokenForLogin(login: Login): String? {
       if (login.user == null) {

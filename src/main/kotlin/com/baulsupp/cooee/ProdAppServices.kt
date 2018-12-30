@@ -12,6 +12,7 @@ import com.baulsupp.cooee.providers.jira.JiraProvider
 import com.baulsupp.cooee.providers.twitter.TwitterProvider
 import com.baulsupp.cooee.users.JwtUserAuthenticator
 import io.ktor.application.Application
+import com.mongodb.reactivestreams.client.MongoDatabase
 import io.ktor.application.ApplicationCall
 import io.ktor.application.log
 import io.netty.channel.nio.NioEventLoopGroup
@@ -32,12 +33,12 @@ class ProdAppServices(application: Application) : AppServices {
     eventListenerFactory(LoggingEventListener.Factory { s -> application.log.debug(s) })
   }.build()
 
-  val eventLoop = NioEventLoopGroup()
+  private val eventLoop = NioEventLoopGroup()
 
   // TODO allow local
   val mongo = MongoFactory.mongo(false, eventLoop)
 
-  val mongoDb = mongo.getDatabase("cooee")
+  val mongoDb: MongoDatabase = mongo.getDatabase("cooee")
 
   override val providerStore = MongoProviderStore(this::defaultProviders, mongoDb)
 

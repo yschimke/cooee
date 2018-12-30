@@ -10,7 +10,7 @@ import com.baulsupp.cooee.providers.BaseProvider
 class BookmarksProvider : BaseProvider() {
   override val name = "bookmarks"
 
-  val bookmarks: Map<String, String>
+  private val bookmarks: Map<String, String>
     get() = configuredBookmarks() ?: defaultBookmarks
 
   private fun configuredBookmarks() = instance?.config?.get("bookmarks") as? Map<String, String>?
@@ -31,13 +31,11 @@ class BookmarksProvider : BaseProvider() {
   private suspend fun bookmarksCommand(args: List<String>): GoResult {
     if (db != null && instance != null) {
       val previousBookmarks = configuredBookmarks().orEmpty()
-      val newBookmarks = if (args.firstOrNull() == "add") {
-        // TODO error checking
-        previousBookmarks + (args[1] to args[2])
-      } else if (args.firstOrNull() == "remove") {
-        previousBookmarks - args[1]
-      } else {
-        return Unmatched
+      val newBookmarks = when {
+        args.firstOrNull() == "add" -> // TODO error checking
+          previousBookmarks + (args[1] to args[2])
+        args.firstOrNull() == "remove" -> previousBookmarks - args[1]
+        else -> return Unmatched
       }
 
       db!!.store(instance!!.copy(config = instance!!.config.plus("bookmarks" to newBookmarks)))

@@ -1,6 +1,5 @@
 package com.baulsupp.cooee
 
-import com.baulsupp.cooee.ktor.AccessLogs
 import com.ryanharter.ktor.moshi.moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import io.ktor.application.Application
@@ -76,7 +75,6 @@ fun Application.module(appServices: AppServices, cloud: Boolean) {
     anyHost()
   }
   install(CallLogging)
-  install(AccessLogs)
   install(DataConversion)
   install(AutoHeadResponse)
 

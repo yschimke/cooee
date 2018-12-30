@@ -1,6 +1,6 @@
 package com.baulsupp.cooee.completion
 
-class SimpleCommandCompleter(val commands: List<String>) : CommandCompleter {
+class SimpleCommandCompleter(private val commands: List<String>) : CommandCompleter {
   constructor(vararg commands: String) : this(listOf(*commands))
 
   override suspend fun matches(command: String): Boolean = commands.contains(command)

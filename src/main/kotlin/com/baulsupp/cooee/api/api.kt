@@ -10,18 +10,22 @@ data class Go(val q: String? = null) {
   val args: List<String> = q?.split(" ")?.drop(1).orEmpty()
 }
 
+@KtorExperimentalLocationsAPI
 @Location("/api/v0/goinfo")
 data class GoInfo(val q: String? = null) {
   val command: String? = q?.split(" ")?.firstOrNull()
   val args: List<String> = q?.split(" ")?.drop(1).orEmpty()
 }
 
+@KtorExperimentalLocationsAPI
 @Location("/api/v0/user")
 class UserInfo
 
+@KtorExperimentalLocationsAPI
 @Location("/api/v0/command-completion")
 data class CommandCompletion(val q: String? = null)
 
+@KtorExperimentalLocationsAPI
 @Location("/api/v0/argument-completion")
 data class ArgumentCompletion(val q: String? = null) {
   val command: String? = q?.split(" ")?.firstOrNull()

@@ -16,6 +16,7 @@ import io.ktor.response.respond
 import io.ktor.response.respondRedirect
 import io.ktor.util.pipeline.PipelineContext
 
+@KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.bounceApi(
   goInfo: GoInfo,
   registryProvider: RegistryProvider
@@ -56,6 +57,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.loginWeb(
   call.respond(HttpStatusCode.Unauthorized)
 }
 
+@KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.bounceWeb(
   go: Go,
   registryProvider: RegistryProvider
@@ -70,6 +72,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.bounceWeb(
   }
 }
 
+@KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.commandCompletionApi(
   commandQuery: CommandCompletion,
   registryProvider: RegistryProvider
@@ -84,6 +87,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.commandCompletionApi(
   call.respond(Completions(filtered))
 }
 
+@KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.argumentCompletionApi(
   argumentQuery: ArgumentCompletion,
   registryProvider: RegistryProvider
