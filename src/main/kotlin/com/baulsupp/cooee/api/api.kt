@@ -1,6 +1,5 @@
 package com.baulsupp.cooee.api
 
-import com.baulsupp.okurl.credentials.DefaultToken
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Location
 

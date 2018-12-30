@@ -13,10 +13,6 @@ plugins {
 group = "cooee"
 version = "0.0.1-SNAPSHOT"
 
-//application {
-//  mainClassName = "io.ktor.server.cio.EngineMain"
-//}
-
 appengine {
   stage {
     enableJarClasses = true

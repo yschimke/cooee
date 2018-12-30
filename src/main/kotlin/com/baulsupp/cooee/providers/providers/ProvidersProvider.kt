@@ -13,23 +13,23 @@ class ProvidersProvider : BaseProvider() {
 
   override suspend fun url(command: String, args: List<String>): GoResult {
     return when (command) {
-        "add" -> {
-          val name = args.first()
+      "add" -> {
+        val name = args.first()
 
-          // TODO validate known and one arg
-          db!!.store(ProviderInstance(instance!!.user, name, mapOf()))
+        // TODO validate known and one arg
+        db!!.store(ProviderInstance(instance!!.user, name, mapOf()))
 
-          Completed("Added provider $name")
-        }
-        "remove" -> {
-          // TODO validate known and one arg
-          val name = args.first()
+        Completed("Added provider $name")
+      }
+      "remove" -> {
+        // TODO validate known and one arg
+        val name = args.first()
 
-          db!!.remove(instance!!.user, name)
+        db!!.remove(instance!!.user, name)
 
-          Completed("Removed provider $name")
-        }
-        else -> Unmatched
+        Completed("Removed provider $name")
+      }
+      else -> Unmatched
     }
   }
 

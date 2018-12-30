@@ -7,12 +7,13 @@ import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.ReplaceOptions
 import com.mongodb.reactivestreams.client.MongoCollection
+import com.mongodb.reactivestreams.client.MongoDatabase
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.bson.Document
 
-class MongoCredentialsStore(val user: String) : CredentialsStore {
-  private val credentialsDb: MongoCollection<Document> by lazy { MongoFactory.mongoDb().getCollection("credentials") }
+class MongoCredentialsStore(val user: String, private val mongoDb: MongoDatabase) : CredentialsStore {
+  private val credentialsDb: MongoCollection<Document> by lazy { mongoDb.getCollection("credentials") }
 
   override suspend fun <T> get(serviceDefinition: ServiceDefinition<T>, tokenSet: String): T? {
     val token = credentialsDb.find(
@@ -53,7 +54,7 @@ class MongoCredentialsStore(val user: String) : CredentialsStore {
   }
 }
 
-class StringService(name: String): AbstractServiceDefinition<String>("test.com", name, name) {
+class StringService(name: String) : AbstractServiceDefinition<String>("test.com", name, name) {
   override fun formatCredentialsString(credentials: String): String = credentials
   override fun parseCredentialsString(s: String): String = s
 }
