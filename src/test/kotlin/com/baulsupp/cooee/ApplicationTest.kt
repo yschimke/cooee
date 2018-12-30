@@ -1,8 +1,9 @@
 package com.baulsupp.cooee
 
+import com.baulsupp.cooee.providers.ProviderInstance
+import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.kotlin.mapAdapter
 import com.baulsupp.okurl.kotlin.moshi
-import io.jsonwebtoken.impl.DefaultJwtBuilder
 import io.ktor.application.Application
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpMethod.Companion.Get
@@ -13,14 +14,17 @@ import io.ktor.server.testing.TestApplicationCall
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
+import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-fun Application.test() = module(TestAppServices())
-
 class ApplicationTest {
+  val services = TestAppServices()
+
+  fun Application.test() = module(services, false)
+
   @Test
   fun testRoot() {
     testRequest("/") {
@@ -176,12 +180,27 @@ class ApplicationTest {
     }
   }
 
-//  @Test
-//  fun testUser() {
-//    testRequest("/api/v0/user", user = "yuri") {
-//      assertEquals("{\"email\":\"yuri@coo.ee\",\"token\":\"yuri\",\"user\":\"yuri\"}", response.content)
-//    }
-//  }
+  @Test
+  fun testUser() {
+    val token = services.userAuthenticator.tokenFor("yuri")
+    registerUser("yuri")
+
+    testRequest("/api/v0/user", user = "yuri") {
+      assertEquals("{\"email\":\"yuri@schimke.ee\",\"token\":\"$token\",\"user\":\"yuri\"}", response.content)
+    }
+  }
+
+  private fun registerUser(name: String, token: String? = null) {
+    runBlocking {
+      services.userStore.storeUser(
+        UserEntry(
+          token ?: services.userAuthenticator.tokenFor("yuri"),
+          name,
+          "$name@schimke.ee"
+        )
+      )
+    }
+  }
 
   @Test
   fun testLogin() {
@@ -193,15 +212,27 @@ class ApplicationTest {
     }
   }
 
-//  @Test
-//  fun testAddBookmark() {
-//    withTestApplication({
-//      test()
-//    }) {
-//      testSingleRequest("/go?q=add bookmarks", user = "yuri")
-//      testSingleRequest("/go?q=bookmarks add nb https://newbookmark", user = "yuri")
-//    }
-//  }
+  @Test
+  fun testAddBookmarkProvider() {
+    registerUser("yuri")
+
+    testRequest("/go?q=add bookmarks", user = "yuri")
+
+    assertEquals(1, services.providerStore.providerInstances.size)
+  }
+
+  @Test
+  fun testAddBookmarkName() {
+    registerUser("yuri")
+
+    runBlocking {
+      services.providerStore.store(ProviderInstance("yuri", "bookmarks", mapOf()))
+    }
+
+    testRequest("/go?q=bookmarks add nb https://newbookmark", user = "yuri")
+
+    println(services.providerStore.providerInstances)
+  }
 
   private fun testRequest(
     path: String,
@@ -225,7 +256,7 @@ class ApplicationTest {
   ) {
     handleRequest(method, path) {
       if (user != null) {
-        val token = DefaultJwtBuilder().claim("user", user).compact()
+        val token = services.userAuthenticator.tokenFor(user)
         addHeader("Authorization", "Bearer $token")
       }
     }.apply {

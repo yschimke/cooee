@@ -13,8 +13,8 @@ import org.bson.Document
 class MongoUserStore(private val mongoDb: MongoDatabase) : UserStore {
   private val userDb: MongoCollection<Document> by lazy { mongoDb.getCollection("users") }
 
-  override suspend fun userInfo(userToken: String): UserEntry? {
-    return userDb.find(eq("token", userToken), UserEntry::class.java).awaitFirstOrNull()
+  override suspend fun userInfo(user: String): UserEntry? {
+    return userDb.find(eq("user", user), UserEntry::class.java).awaitFirstOrNull()
   }
 
   override suspend fun storeUser(userEntry: UserEntry) {

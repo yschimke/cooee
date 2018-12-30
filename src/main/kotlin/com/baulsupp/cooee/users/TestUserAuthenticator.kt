@@ -1,6 +1,7 @@
 package com.baulsupp.cooee.users
 
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.impl.DefaultJwtBuilder
 import io.ktor.application.ApplicationCall
 import io.ktor.request.header
 
@@ -15,5 +16,9 @@ class TestUserAuthenticator : UserAuthenticator {
 
       jwt.body["user"] as? String
     }
+  }
+
+  fun tokenFor(user: String): String {
+    return DefaultJwtBuilder().claim("user", user).compact()
   }
 }

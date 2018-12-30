@@ -3,8 +3,6 @@
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>INFO</level>
     </filter>
-    <log>application.log</log>
-    <resourceType>gae_app</resourceType>
     <enhancer>com.google.cloud.logging.TraceLoggingEnhancer</enhancer>
     <flushLevel>WARN</flushLevel>
   </appender>
