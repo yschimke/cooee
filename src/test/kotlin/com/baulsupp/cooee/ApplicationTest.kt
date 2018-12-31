@@ -231,8 +231,6 @@ class ApplicationTest {
     }
 
     testRequest("/go?q=bookmarks add nb https://newbookmark", user = "yuri")
-
-    println(services.providerStore.providerInstances)
   }
 
   private fun testRequest(
