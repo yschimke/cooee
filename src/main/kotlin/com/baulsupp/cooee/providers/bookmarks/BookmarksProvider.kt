@@ -37,7 +37,7 @@ class BookmarksProvider : BaseProvider() {
   }
 
   private suspend fun bookmarksCommand(args: List<String>): GoResult {
-    if (db != null && instance != null) {
+    if (instance != null) {
       val previousBookmarks = configuredBookmarks().orEmpty()
       val newBookmarks = when {
         args.firstOrNull() == "add" -> // TODO error checking
@@ -46,7 +46,7 @@ class BookmarksProvider : BaseProvider() {
         else -> return Unmatched
       }
 
-      db!!.store(instance!!.copy(config = instance!!.config.plus("bookmarks" to newBookmarks)))
+      appServices.providerStore.store(instance!!.copy(config = instance!!.config.plus("bookmarks" to newBookmarks)))
       return Completed("bookmarks updated")
     }
 

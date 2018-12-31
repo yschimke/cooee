@@ -12,12 +12,13 @@ class BookmarksProviderTest {
   val services = TestAppServices()
   val userBookmarks =
     BookmarksProvider().apply {
+      init(services)
       this.configure(
         ProviderInstance(
           "yuri",
           "bookmarks",
           mapOf("bookmarks" to mapOf<String, String>())
-        ), services.providerStore
+        )
       )
     }
 

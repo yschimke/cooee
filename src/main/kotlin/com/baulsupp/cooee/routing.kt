@@ -44,7 +44,10 @@ fun Routing.root(appServices: AppServices) {
     exception<AuthenticationException> { call.respond(HttpStatusCode.Unauthorized) }
     exception<AuthorizationException> { call.respond(HttpStatusCode.Forbidden) }
     exception<BadRequestException> { call.respond(HttpStatusCode.BadRequest) }
-    exception<Exception> { x -> call.respond(HttpStatusCode.InternalServerError, x.toString()) }
+    exception<Exception> { x ->
+      application.log.warn("Failed", x)
+      call.respond(HttpStatusCode.InternalServerError, x.toString())
+    }
   }
 
   static {

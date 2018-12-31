@@ -17,7 +17,7 @@ class ProvidersProvider : BaseProvider() {
         val name = args.first()
 
         // TODO validate known and one arg
-        db!!.store(ProviderInstance(instance!!.user, name, mapOf()))
+        appServices.providerStore.store(ProviderInstance(instance!!.user, name, mapOf()))
 
         Completed("Added provider $name")
       }
@@ -25,7 +25,7 @@ class ProvidersProvider : BaseProvider() {
         // TODO validate known and one arg
         val name = args.first()
 
-        db!!.remove(instance!!.user, name)
+        appServices.providerStore.remove(instance!!.user, name)
 
         Completed("Removed provider $name")
       }

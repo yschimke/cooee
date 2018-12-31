@@ -1,12 +1,17 @@
 package com.baulsupp.cooee.providers
 
+import com.baulsupp.cooee.AppServices
+
 abstract class BaseProvider : Provider {
   var instance: ProviderInstance? = null
-  var db: ProviderStore? = null
+  lateinit var appServices: AppServices
 
-  override fun configure(instance: ProviderInstance, db: ProviderStore) {
+  override fun init(appServices: AppServices) {
+    this.appServices = appServices
+  }
+
+  override fun configure(instance: ProviderInstance) {
     this.instance = instance
-    this.db = db
   }
 
   override fun toString(): String {

@@ -12,7 +12,7 @@ import com.baulsupp.okurl.credentials.InMemoryCredentialsStore
 import io.ktor.application.ApplicationCall
 import okhttp3.OkHttpClient
 
-class TestAppServices() : AppServices {
+class TestAppServices : AppServices {
   override fun close() {
     client.connectionPool().evictAll()
     client.dispatcher().executorService().shutdown()
@@ -21,7 +21,7 @@ class TestAppServices() : AppServices {
   override val client = OkHttpClient()
 
   override val providerStore =
-    TestProviderStore { defaultProviders() }
+    TestProviderStore(this) { defaultProviders() }
 
   override val userStore = TestUserStore()
 
@@ -40,5 +40,5 @@ class TestAppServices() : AppServices {
     GithubProvider(),
     TwitterProvider(client),
     BookmarksProvider()
-  )
+  ).onEach { it.init(this) }
 }

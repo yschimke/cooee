@@ -1,17 +1,20 @@
 package com.baulsupp.cooee.test
 
+import com.baulsupp.cooee.AppServices
 import com.baulsupp.cooee.providers.Provider
 import com.baulsupp.cooee.providers.ProviderInstance
 import com.baulsupp.cooee.providers.ProviderStore
 import com.baulsupp.cooee.providers.RegistryProvider
 import com.baulsupp.cooee.providers.providers.ProvidersProvider
 
-class TestProviderStore(private val providers: () -> List<Provider>) : ProviderStore {
+class TestProviderStore(val appServices: AppServices, private val providers: () -> List<Provider>) : ProviderStore {
   val providerInstances = mutableSetOf<ProviderInstance>()
 
   override suspend fun forUser(user: String): RegistryProvider? {
-    val providersProvider = ProvidersProvider()
-    providersProvider.configure(ProviderInstance(user, "providers", mapOf()), this)
+    val providersProvider = ProvidersProvider().apply {
+      init(this@TestProviderStore.appServices)
+      configure(ProviderInstance(user, "providers", mapOf()))
+    }
 
     val userProviders = providers().mapNotNull { p ->
       val config = providerInstances.find { pi ->
@@ -19,7 +22,7 @@ class TestProviderStore(private val providers: () -> List<Provider>) : ProviderS
       }
 
       if (config != null) {
-        p.apply { configure(config, this@TestProviderStore) }
+        p.apply { configure(config) }
       } else {
         null
       }

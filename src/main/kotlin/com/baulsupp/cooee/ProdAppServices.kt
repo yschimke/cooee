@@ -40,7 +40,7 @@ class ProdAppServices(application: Application) : AppServices {
 
   val mongoDb: MongoDatabase = mongo.getDatabase("cooee")
 
-  override val providerStore = MongoProviderStore(this::defaultProviders, mongoDb)
+  override val providerStore = MongoProviderStore(this::defaultProviders, mongoDb, this)
 
   override val userStore = MongoUserStore(mongoDb)
 
@@ -52,7 +52,7 @@ class ProdAppServices(application: Application) : AppServices {
     GithubProvider(),
     TwitterProvider(client),
     BookmarksProvider()
-  )
+  ).onEach { it.init(this) }
 
   override val userServices = object : UserServices {
     override fun credentialsStore(user: String) = MongoCredentialsStore(user, mongoDb)

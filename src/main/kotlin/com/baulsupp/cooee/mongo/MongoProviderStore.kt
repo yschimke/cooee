@@ -1,5 +1,6 @@
 package com.baulsupp.cooee.mongo
 
+import com.baulsupp.cooee.AppServices
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.providers.ProviderInstance
 import com.baulsupp.cooee.providers.ProviderStore
@@ -14,7 +15,11 @@ import com.mongodb.reactivestreams.client.MongoDatabase
 import kotlinx.coroutines.reactive.awaitFirst
 import org.bson.Document
 
-class MongoProviderStore(private val providers: () -> List<BaseProvider>, private val mongoDb: MongoDatabase) :
+class MongoProviderStore(
+  private val providers: () -> List<BaseProvider>,
+  private val mongoDb: MongoDatabase,
+  private val appServices: AppServices
+) :
   ProviderStore {
   private val providerDb: MongoCollection<Document> by lazy { mongoDb.getCollection("providers") }
 
@@ -23,14 +28,15 @@ class MongoProviderStore(private val providers: () -> List<BaseProvider>, privat
       providerDb.find(eq("user", user), ProviderInstance::class.java).awaitList()
 
     val providersProvider = ProvidersProvider()
-    providersProvider.configure(ProviderInstance(user, "providers", mapOf()), this)
+    providersProvider.init(appServices = appServices)
+    providersProvider.configure(ProviderInstance(user, "providers", mapOf()))
 
     val providers = providers().mapNotNull {
       val possibleName = it.name
       val providerConfig = providerInstances.find { config -> config.name == possibleName }
 
       if (providerConfig != null) {
-        it.configure(providerConfig, this)
+        it.configure(providerConfig)
         it
       } else {
         null
