@@ -18,7 +18,7 @@ class TestAppServices : AppServices {
     client.dispatcher().executorService().shutdown()
   }
 
-  override val client = OkHttpClient()
+  override val client = com.baulsupp.okurl.kotlin.client
 
   override val providerStore =
     TestProviderStore(this) { defaultProviders() }
