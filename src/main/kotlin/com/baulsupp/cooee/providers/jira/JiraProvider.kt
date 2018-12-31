@@ -13,7 +13,7 @@ import okhttp3.OkHttpClient
 class JiraProvider(val url: String, val client: OkHttpClient) : BaseProvider() {
   override val name = "jira"
 
-  override suspend fun url(command: String, args: List<String>): GoResult = if (command.isProjectOrIssue()) {
+  override suspend fun go(command: String, args: List<String>): GoResult = if (command.isProjectOrIssue()) {
     RedirectResult("${url}browse/$command")
   } else {
     Unmatched

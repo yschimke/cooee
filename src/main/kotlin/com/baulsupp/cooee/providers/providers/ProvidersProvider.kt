@@ -11,7 +11,7 @@ import com.baulsupp.cooee.providers.ProviderInstance
 class ProvidersProvider : BaseProvider() {
   override val name = "providers"
 
-  override suspend fun url(command: String, args: List<String>): GoResult {
+  override suspend fun go(command: String, args: List<String>): GoResult {
     return when (command) {
       "add" -> {
         val name = args.first()

@@ -4,16 +4,10 @@ import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.ArgumentCompleter
 import com.baulsupp.cooee.completion.CommandCompleter
-import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
-import com.baulsupp.cooee.providers.github.GithubProvider
-import com.baulsupp.cooee.providers.google.GoogleProvider
-import com.baulsupp.cooee.providers.jira.JiraProvider
-import com.baulsupp.cooee.providers.twitter.TwitterProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import okhttp3.OkHttpClient
 
 class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
   override fun argumentCompleter(): ArgumentCompleter {
@@ -54,8 +48,8 @@ class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
     }
   }
 
-  override suspend fun url(command: String, args: List<String>): GoResult = coroutineScope {
-    provider(command)?.url(command, args) ?: Unmatched
+  override suspend fun go(command: String, args: List<String>): GoResult = coroutineScope {
+    provider(command)?.go(command, args) ?: Unmatched
   }
 
   private suspend fun CoroutineScope.provider(command: String): Provider? {

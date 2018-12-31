@@ -1,6 +1,7 @@
 package com.baulsupp.cooee
 
 import com.baulsupp.cooee.providers.ProviderInstance
+import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.kotlin.mapAdapter
 import com.baulsupp.okurl.kotlin.moshi
