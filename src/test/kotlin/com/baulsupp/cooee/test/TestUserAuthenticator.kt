@@ -1,5 +1,6 @@
-package com.baulsupp.cooee.users
+package com.baulsupp.cooee.test
 
+import com.baulsupp.cooee.users.UserAuthenticator
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.impl.DefaultJwtBuilder
 import io.ktor.application.ApplicationCall

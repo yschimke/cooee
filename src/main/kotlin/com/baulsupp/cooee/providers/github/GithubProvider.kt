@@ -10,19 +10,17 @@ class GithubProvider : BaseProvider() {
   override val name = "github"
 
   override suspend fun url(command: String, args: List<String>): GoResult {
-    if (command != null) {
-      val r = "(\\w+)/(\\w+)(?:#(\\d+))?".toRegex()
+    val r = "(\\w+)/(\\w+)(?:#(\\d+))?".toRegex()
 
-      val result = r.matchEntire(command)
+    val result = r.matchEntire(command)
 
-      if (result != null) {
-        val (org, project, id) = result.destructured
+    if (result != null) {
+      val (org, project, id) = result.destructured
 
-        return if (id.isEmpty()) {
-          RedirectResult("https://github.com/$org/$project")
-        } else {
-          RedirectResult("https://github.com/$org/$project/issues/$id")
-        }
+      return if (id.isEmpty()) {
+        RedirectResult("https://github.com/$org/$project")
+      } else {
+        RedirectResult("https://github.com/$org/$project/issues/$id")
       }
     }
 

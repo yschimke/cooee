@@ -1,14 +1,13 @@
-package com.baulsupp.cooee
+package com.baulsupp.cooee.test
 
+import com.baulsupp.cooee.AppServices
+import com.baulsupp.cooee.UserServices
 import com.baulsupp.cooee.providers.RegistryProvider
 import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
 import com.baulsupp.cooee.providers.github.GithubProvider
 import com.baulsupp.cooee.providers.google.GoogleProvider
 import com.baulsupp.cooee.providers.jira.JiraProvider
 import com.baulsupp.cooee.providers.twitter.TwitterProvider
-import com.baulsupp.cooee.test.TestProviderStore
-import com.baulsupp.cooee.test.TestUserStore
-import com.baulsupp.cooee.users.TestUserAuthenticator
 import com.baulsupp.okurl.credentials.InMemoryCredentialsStore
 import io.ktor.application.ApplicationCall
 import okhttp3.OkHttpClient
