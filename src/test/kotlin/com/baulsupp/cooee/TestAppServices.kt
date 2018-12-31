@@ -22,7 +22,7 @@ class TestAppServices() : AppServices {
   override val client = OkHttpClient()
 
   override val providerStore =
-    TestProviderStore { com.baulsupp.cooee.providers.defaultProviders(client) }
+    TestProviderStore { defaultProviders() }
 
   override val userStore = TestUserStore()
 
@@ -38,7 +38,7 @@ class TestAppServices() : AppServices {
   override fun defaultProviders() = listOf(
     GoogleProvider(),
     JiraProvider("https://jira.atlassian.com/", client),
-    GithubProvider,
+    GithubProvider(),
     TwitterProvider(client),
     BookmarksProvider()
   )

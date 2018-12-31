@@ -70,8 +70,3 @@ class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
     }
   }.awaitAll().any()
 }
-
-fun defaultProviders(client: OkHttpClient) = listOf(
-  GoogleProvider(), JiraProvider("https://jira.atlassian.com/", client),
-  GithubProvider, TwitterProvider(client), BookmarksProvider()
-)
