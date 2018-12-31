@@ -4,6 +4,7 @@ import com.baulsupp.cooee.mongo.MongoCredentialsStore
 import com.baulsupp.cooee.mongo.MongoFactory
 import com.baulsupp.cooee.mongo.MongoProviderStore
 import com.baulsupp.cooee.mongo.MongoUserStore
+import com.baulsupp.cooee.okhttp.close
 import com.baulsupp.cooee.providers.RegistryProvider
 import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
 import com.baulsupp.cooee.providers.github.GithubProvider
@@ -21,11 +22,8 @@ import okhttp3.logging.LoggingEventListener
 
 class ProdAppServices(application: Application) : AppServices {
   override fun close() {
-    client.connectionPool().evictAll()
-    client.dispatcher().executorService().shutdown()
-
+    client.close()
     mongo.close()
-
     eventLoop.shutdownGracefully()
   }
 
