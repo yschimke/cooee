@@ -6,7 +6,7 @@ import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.providers.BaseProvider
 
-object GithubProvider : BaseProvider() {
+class GithubProvider : BaseProvider() {
   override val name = "github"
 
   override suspend fun url(command: String, args: List<String>): GoResult {

@@ -49,7 +49,7 @@ class ProdAppServices(application: Application) : AppServices {
   override fun defaultProviders() = listOf(
     GoogleProvider(),
     JiraProvider("https://jira.atlassian.com/", client),
-    GithubProvider,
+    GithubProvider(),
     TwitterProvider(client),
     BookmarksProvider()
   )
