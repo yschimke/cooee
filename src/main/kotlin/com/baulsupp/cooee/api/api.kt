@@ -51,7 +51,11 @@ data class Authorize(
 
 data class Completions(val completions: List<String>)
 
-sealed class GoResult
+sealed class GoResult {
+  override fun toString(): String {
+    return this::class.java.simpleName
+  }
+}
 
 data class RedirectResult(val location: String) : GoResult()
 object Unmatched : GoResult()

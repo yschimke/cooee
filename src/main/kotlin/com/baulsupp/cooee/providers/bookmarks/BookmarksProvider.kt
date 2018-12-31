@@ -4,7 +4,9 @@ import com.baulsupp.cooee.api.Completed
 import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
+import com.baulsupp.cooee.completion.ArgumentCompleter
 import com.baulsupp.cooee.completion.CommandCompleter
+import com.baulsupp.cooee.completion.SimpleArgumentCompleter
 import com.baulsupp.cooee.providers.BaseProvider
 
 class BookmarksProvider : BaseProvider() {
@@ -15,17 +17,23 @@ class BookmarksProvider : BaseProvider() {
 
   private fun configuredBookmarks() = instance?.config?.get("bookmarks") as? Map<String, String>?
 
-  override suspend fun url(command: String, args: List<String>): GoResult {
+  override suspend fun go(command: String, args: List<String>): GoResult {
     return if (command == "bookmarks") {
       bookmarksCommand(args)
     } else {
-      val url = bookmarks[command]
+      val url = buildTargetUrl(command, args)
 
-      when (url) {
-        null -> Unmatched
-        else -> RedirectResult(url)
-      }
+      if (url != null) RedirectResult(url) else Unmatched
     }
+  }
+
+  private fun buildTargetUrl(command: String, args: List<String> = listOf()): String? {
+    val pattern = bookmarks[command]
+
+    return if (pattern != null && args.isNotEmpty())
+      pattern.replace("%s", args.joinToString("+"))
+    else
+      pattern
   }
 
   private suspend fun bookmarksCommand(args: List<String>): GoResult {
@@ -53,6 +61,18 @@ class BookmarksProvider : BaseProvider() {
     override suspend fun matches(command: String): Boolean {
       return knownCommands().contains(command)
     }
+  }
+
+  override fun argumentCompleter(): ArgumentCompleter {
+    val userBookmarks = configuredBookmarks()
+
+    val suggestions = if (userBookmarks != null) {
+      userBookmarks.map { "remove ${it.key}" } + listOf("add", "remove")
+    } else {
+      null
+    }
+
+    return SimpleArgumentCompleter(suggestions)
   }
 
   private fun knownCommands() = bookmarks.keys + "bookmarks"

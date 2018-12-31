@@ -1,5 +1,6 @@
 package com.baulsupp.cooee.providers.bookmarks
 
+import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.providers.ProviderInstance
 import com.baulsupp.cooee.test.TestAppServices
 import kotlinx.coroutines.runBlocking
@@ -36,6 +37,29 @@ class BookmarksProviderTest {
   @Test
   fun userBookmarks() = runBlocking {
     assertEquals(listOf("bookmarks"), userBookmarks.commandCompleter().suggestCommands(""))
-//    assertEquals(listOf("add", "remove"), userBookmarks.argumentCompleter().suggestArguments("bookmarks"))
+    assertEquals(listOf("add", "remove"), userBookmarks.argumentCompleter().suggestArguments("bookmarks"))
+
+    configureBookmarks("t" to "https://test.com/")
+
+    assertEquals(listOf("t", "bookmarks"), userBookmarks.commandCompleter().suggestCommands(""))
+    assertEquals(listOf("remove t", "add", "remove"), userBookmarks.argumentCompleter().suggestArguments("bookmarks"))
+  }
+
+  @Test
+  fun userBookmarkDirect() = runBlocking {
+    configureBookmarks("t" to "https://test.com/")
+
+    assertEquals(RedirectResult("https://test.com/"), userBookmarks.go("t"))
+  }
+
+  private fun configureBookmarks(vararg pairs: Pair<String, String>) {
+    userBookmarks.instance = userBookmarks.instance?.copy(config = mapOf("bookmarks" to mapOf(*pairs)))
+  }
+
+  @Test
+  fun userBookmarkSearch() = runBlocking {
+    configureBookmarks("t" to "https://test.com/q=%s")
+
+    assertEquals(RedirectResult("https://test.com/q=query"), userBookmarks.go("t", listOf("query")))
   }
 }

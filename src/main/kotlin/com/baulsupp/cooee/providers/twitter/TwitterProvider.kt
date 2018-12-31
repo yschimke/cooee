@@ -9,7 +9,7 @@ import okhttp3.OkHttpClient
 class TwitterProvider(client: OkHttpClient) : BaseProvider() {
   override val name = "twitter"
 
-  override suspend fun url(command: String, args: List<String>): GoResult {
+  override suspend fun go(command: String, args: List<String>): GoResult {
     val text = if (args.isNotEmpty()) "&text=" + args.joinToString(" ") else ""
 
     // TODO lookup real user
