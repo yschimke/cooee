@@ -8,7 +8,7 @@ import com.baulsupp.okurl.services.twitter.TwitterServiceDefinition
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.hasItem
 import org.junit.Assert.assertThat
-import org.junit.Assume.assumeTrue
+import org.junit.Assume.assumeNotNull
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -32,12 +32,11 @@ class TwitterProviderTest {
   }
 
   private suspend fun assumeHasCredentialsSet() {
-    assumeTrue(
-      OkShell.instance?.commandLine?.credentialsStore?.get(
-        TwitterServiceDefinition(),
-        DefaultToken
-      ) != null ?: false
+    val twitterCredentials = OkShell.instance?.commandLine?.credentialsStore?.get(
+      TwitterServiceDefinition(),
+      DefaultToken
     )
+    assumeNotNull(twitterCredentials)
   }
 
   @Test

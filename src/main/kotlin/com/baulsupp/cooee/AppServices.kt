@@ -13,4 +13,5 @@ interface AppServices : AutoCloseable {
   val userStore: UserStore
   val userAuthenticator: UserAuthenticator
   val userServices: UserServices
+  override fun close()
 }

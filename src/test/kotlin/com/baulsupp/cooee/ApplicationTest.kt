@@ -15,7 +15,10 @@ import io.ktor.server.testing.TestApplicationCall
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.debug.DebugProbes
 import kotlinx.coroutines.runBlocking
+import org.junit.BeforeClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -261,6 +264,15 @@ class ApplicationTest {
     }.apply {
       assertEquals(expectedCode, response.status())
       fn(this)
+    }
+  }
+
+  companion object {
+    @ExperimentalCoroutinesApi
+    @BeforeClass
+    @JvmStatic
+    fun installDebugHook() {
+      DebugProbes.install()
     }
   }
 }
