@@ -2,6 +2,7 @@ package com.baulsupp.cooee.test
 
 import com.baulsupp.cooee.AppServices
 import com.baulsupp.cooee.UserServices
+import com.baulsupp.cooee.okhttp.close
 import com.baulsupp.cooee.providers.RegistryProvider
 import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
 import com.baulsupp.cooee.providers.github.GithubProvider
@@ -14,8 +15,7 @@ import okhttp3.OkHttpClient
 
 class TestAppServices : AppServices {
   override fun close() {
-    client.connectionPool().evictAll()
-    client.dispatcher().executorService().shutdown()
+    client.close()
   }
 
   override val client = OkHttpClient()
