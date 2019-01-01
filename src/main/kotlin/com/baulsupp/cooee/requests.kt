@@ -7,7 +7,6 @@ import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.cooee.users.UserStore
 import com.baulsupp.okurl.credentials.CredentialsStore
-import com.baulsupp.okurl.credentials.DefaultToken
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
@@ -98,13 +97,13 @@ suspend fun PipelineContext<Unit, ApplicationCall>.argumentCompletionApi(
 @KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.authorize(
   authorize: Authorize,
-  userToken: String?,
+  user: String,
   credentialsStore: CredentialsStore
 ) {
-  if (authorize.serviceName == null || authorize.token == null || userToken == null) {
+  if (authorize.serviceName == null || authorize.token == null) {
     throw BadRequestException()
   }
 
-  credentialsStore.set(StringService(authorize.serviceName), DefaultToken.name, authorize.token)
+  credentialsStore.set(StringService(authorize.serviceName), user, authorize.token)
   call.respond(HttpStatusCode.Created)
 }

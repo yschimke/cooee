@@ -9,6 +9,7 @@ import com.baulsupp.cooee.providers.github.GithubProvider
 import com.baulsupp.cooee.providers.google.GoogleProvider
 import com.baulsupp.cooee.providers.jira.JiraProvider
 import com.baulsupp.cooee.providers.twitter.TwitterProvider
+import com.baulsupp.okurl.credentials.CredentialsStore
 import com.baulsupp.okurl.credentials.InMemoryCredentialsStore
 import io.ktor.application.ApplicationCall
 import okhttp3.OkHttpClient
@@ -28,18 +29,18 @@ class TestAppServices : AppServices {
 
   override val userAuthenticator = TestUserAuthenticator()
 
-  override val userServices = object : UserServices {
-    override fun credentialsStore(user: String) = InMemoryCredentialsStore()
+  override val credentialsStore: CredentialsStore = InMemoryCredentialsStore()
 
+  override val userServices = object : UserServices {
     override suspend fun providersFor(call: ApplicationCall): RegistryProvider =
       userAuthenticator.userForRequest(call)?.let { providerStore.forUser(it) } ?: RegistryProvider(defaultProviders())
   }
 
   override fun defaultProviders() = listOf(
     GoogleProvider(),
-    JiraProvider("https://jira.atlassian.com/", client),
+    JiraProvider("https://jira.atlassian.com/"),
     GithubProvider(),
-    TwitterProvider(client),
+    TwitterProvider(),
     BookmarksProvider()
   ).onEach { it.init(this) }
 }

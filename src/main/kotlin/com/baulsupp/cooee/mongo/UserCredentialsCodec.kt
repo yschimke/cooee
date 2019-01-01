@@ -15,7 +15,6 @@ object UserCredentialsCodec : Codec<UserCredentials> {
   override fun encode(writer: BsonWriter, value: UserCredentials, encoderContext: EncoderContext) {
     writer.writeStartDocument()
     writer.writeString("user", value.user)
-    writer.writeString("tokenSet", value.tokenSet)
     writer.writeString("token", value.token)
     writer.writeEndDocument()
   }
@@ -25,7 +24,6 @@ object UserCredentialsCodec : Codec<UserCredentials> {
 
     var token: String? = null
     var user: String? = null
-    var tokenSet: String? = null
     var serviceName: String? = null
 
     while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
@@ -34,7 +32,6 @@ object UserCredentialsCodec : Codec<UserCredentials> {
 
       when {
         name == "token" -> token = reader.readString()
-        name == "tokenSet" -> tokenSet = reader.readString()
         name == "user" -> user = reader.readString()
         name == "serviceName" -> serviceName = reader.readString()
         bsonType == BsonType.OBJECT_ID -> reader.readObjectId()
@@ -43,6 +40,6 @@ object UserCredentialsCodec : Codec<UserCredentials> {
 
     reader.readEndDocument()
 
-    return UserCredentials(user!!, tokenSet!!, token!!, serviceName!!)
+    return UserCredentials(user!!, token!!, serviceName!!)
   }
 }

@@ -7,11 +7,8 @@ import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.services.jira.model.Project
 import com.baulsupp.okurl.kotlin.queryList
-import okhttp3.OkHttpClient
-import org.jetbrains.kotlin.utils.rethrow
-import java.io.InterruptedIOException
 
-class JiraProvider(val url: String, val client: OkHttpClient) : BaseProvider() {
+class JiraProvider(val url: String) : BaseProvider() {
   override val name = "jira"
 
   override suspend fun go(command: String, args: List<String>): GoResult = if (command.isProjectOrIssue()) {
@@ -23,7 +20,7 @@ class JiraProvider(val url: String, val client: OkHttpClient) : BaseProvider() {
   // TODO caching
   suspend fun projects(): List<Project> {
     return try {
-      client.queryList("${url}rest/api/2/project")
+      appServices.client.queryList("${url}rest/api/2/project", userToken)
     } catch (e: Exception) {
       log.warn("project list failed", e)
       listOf()

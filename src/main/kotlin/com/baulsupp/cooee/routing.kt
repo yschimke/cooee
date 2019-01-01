@@ -33,7 +33,7 @@ fun Routing.root(appServices: AppServices) {
   get<ArgumentCompletion> { argumentCompletionApi(it, appServices.userServices.providersFor(call)) }
   post<Authorize> {
     val user = appServices.userAuthenticator.userForRequest(call) ?: throw AuthenticationException()
-    authorize(it, user, appServices.userServices.credentialsStore(user))
+    authorize(it, user, appServices.credentialsStore)
   }
 
   install(StatusPages) {

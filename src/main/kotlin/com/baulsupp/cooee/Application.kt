@@ -17,39 +17,16 @@ import io.ktor.features.gzip
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
 import io.ktor.routing.routing
-import io.ktor.server.engine.applicationEngineEnvironment
-import io.ktor.server.engine.connector
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
 import org.conscrypt.Conscrypt
 import java.security.Security
 import java.util.*
 
-@KtorExperimentalLocationsAPI
-fun main(args: Array<String>) {
+fun Application.cloud() {
   // TODO breaks Mongo
-//  setupProvider()
+  // setupProvider()
 
-  val env = applicationEngineEnvironment {
-    module {
-      local()
-    }
-    // Private API
-    connector {
-      host = "127.0.0.1"
-      port = 9090
-    }
-    // Public API
-    connector {
-      host = "0.0.0.0"
-      port = 8080
-    }
-  }
-  embeddedServer(Netty, env).start(true)
+  module(ProdAppServices(this), cloud = true)
 }
-
-fun Application.local() = module(ProdAppServices(this), cloud = false)
-fun Application.cloud() = module(ProdAppServices(this), cloud = true)
 
 @KtorExperimentalLocationsAPI
 fun Application.module(appServices: AppServices, cloud: Boolean) {

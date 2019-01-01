@@ -14,7 +14,7 @@ import kotlin.test.assertEquals
 
 class TwitterProviderTest {
   val appServices = TestAppServices()
-  val p = TwitterProvider(appServices.client)
+  val p = TwitterProvider().apply { init(this@TwitterProviderTest.appServices) }
 
   @Test
   fun basic() {

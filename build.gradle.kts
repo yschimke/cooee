@@ -111,7 +111,7 @@ dependencies {
   implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.59-kotlin-1.3.0")
   implementation("org.mongodb:mongodb-driver-reactivestreams:1.10.0")
   implementation("org.webjars:jquery:3.2.1")
-  testCompile("org.jetbrains.kotlinx:kotlinx-coroutines-debug:${Versions.kotlinCoroutines}")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:${Versions.kotlinCoroutines}")
   testCompile("io.ktor:ktor-server-tests:${Versions.ktor}")
 }
 

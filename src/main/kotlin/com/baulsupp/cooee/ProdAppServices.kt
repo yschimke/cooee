@@ -12,8 +12,9 @@ import com.baulsupp.cooee.providers.google.GoogleProvider
 import com.baulsupp.cooee.providers.jira.JiraProvider
 import com.baulsupp.cooee.providers.twitter.TwitterProvider
 import com.baulsupp.cooee.users.JwtUserAuthenticator
-import io.ktor.application.Application
+import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
 import com.mongodb.reactivestreams.client.MongoDatabase
+import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.application.log
 import io.netty.channel.nio.NioEventLoopGroup
@@ -26,10 +27,6 @@ class ProdAppServices(application: Application) : AppServices {
     mongo.close()
     eventLoop.shutdownGracefully()
   }
-
-  override val client: OkHttpClient = OkHttpClient.Builder().apply {
-    eventListenerFactory(LoggingEventListener.Factory { s -> application.log.debug(s) })
-  }.build()
 
   private val eventLoop = NioEventLoopGroup()
 
@@ -44,17 +41,22 @@ class ProdAppServices(application: Application) : AppServices {
 
   override val userAuthenticator = JwtUserAuthenticator(userStore)
 
+  override val credentialsStore = MongoCredentialsStore(mongoDb)
+
+  override val client: OkHttpClient = OkHttpClient.Builder().apply {
+    eventListenerFactory(LoggingEventListener.Factory { s -> application.log.debug(s) })
+    addNetworkInterceptor(AuthenticatingInterceptor(credentialsStore))
+  }.build()
+
   override fun defaultProviders() = listOf(
     GoogleProvider(),
-    JiraProvider("https://jira.atlassian.com/", client),
+    JiraProvider("https://jira.atlassian.com/"),
     GithubProvider(),
-    TwitterProvider(client),
+    TwitterProvider(),
     BookmarksProvider()
   ).onEach { it.init(this) }
 
   override val userServices = object : UserServices {
-    override fun credentialsStore(user: String) = MongoCredentialsStore(user, mongoDb)
-
     override suspend fun providersFor(call: ApplicationCall): RegistryProvider =
       userAuthenticator.userForRequest(call)?.let { providerStore.forUser(it) } ?: RegistryProvider(defaultProviders())
   }

@@ -12,14 +12,13 @@ import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.bson.Document
 
-class MongoCredentialsStore(val user: String, private val mongoDb: MongoDatabase) : CredentialsStore {
+class MongoCredentialsStore(private val mongoDb: MongoDatabase) : CredentialsStore {
   private val credentialsDb: MongoCollection<Document> by lazy { mongoDb.getCollection("credentials") }
 
   override suspend fun <T> get(serviceDefinition: ServiceDefinition<T>, tokenSet: String): T? {
     val token = credentialsDb.find(
       and(
-        eq("user", user),
-        eq("tokenSet", tokenSet),
+        eq("user", tokenSet),
         eq("serviceName", serviceDefinition.shortName())
       ), UserCredentials::class.java
     ).awaitFirstOrNull()
@@ -30,8 +29,7 @@ class MongoCredentialsStore(val user: String, private val mongoDb: MongoDatabase
   override suspend fun <T> remove(serviceDefinition: ServiceDefinition<T>, tokenSet: String) {
     credentialsDb.deleteMany(
       and(
-        eq("user", user),
-        eq("tokenSet", tokenSet),
+        eq("user", tokenSet),
         eq("serviceName", serviceDefinition.shortName())
       )
     )
@@ -41,13 +39,12 @@ class MongoCredentialsStore(val user: String, private val mongoDb: MongoDatabase
     val token = serviceDefinition.formatCredentialsString(credentials)
 
     val doc =
-      Document().append("token", token).append("user", user).append("tokenSet", tokenSet).append("tokenSet", tokenSet)
+      Document().append("token", token).append("user", tokenSet)
         .append("serviceName", serviceDefinition.shortName())
 
     val result = credentialsDb.replaceOne(
       and(
-        eq("user", user),
-        eq("tokenSet", tokenSet),
+        eq("user", tokenSet),
         eq("serviceName", serviceDefinition.shortName())
       ), doc, ReplaceOptions().upsert(true)
     ).awaitFirst()
