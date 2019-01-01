@@ -8,7 +8,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import org.slf4j.LoggerFactory
+import java.io.InterruptedIOException
 
+// TODO add exception handling for individual items and log errors
 class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
   override fun argumentCompleter(): ArgumentCompleter {
     return object : ArgumentCompleter {
@@ -16,7 +19,12 @@ class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
         return coroutineScope {
           providers.map {
             async {
-              it.argumentCompleter().suggestArguments(command).orEmpty()
+              try {
+                it.argumentCompleter().suggestArguments(command).orEmpty()
+              } catch (e: Exception) {
+                log.warn("suggestArguments failed: " + it.name, e)
+                listOf<String>()
+              }
             }
           }.awaitAll().flatten()
         }
@@ -30,7 +38,12 @@ class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
         return coroutineScope {
           providers.map {
             async {
-              it.commandCompleter().suggestCommands(command)
+              try {
+                it.commandCompleter().suggestCommands(command)
+              } catch (e: Exception) {
+                log.warn("suggestCommands failed: " + it.name, e)
+                listOf<String>()
+              }
             }
           }.awaitAll().flatten()
         }
@@ -40,7 +53,12 @@ class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
         return coroutineScope {
           providers.map {
             async {
-              it.commandCompleter().matches(command)
+              try {
+                it.commandCompleter().matches(command)
+              } catch (e: Exception) {
+                log.warn("matches failed: " + it.name, e)
+                false
+              }
             }
           }.awaitAll().any()
         }
@@ -54,13 +72,31 @@ class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
 
   private suspend fun CoroutineScope.provider(command: String): Provider? {
     return providers.map {
-      async { if (it.commandCompleter().matches(command)) it else null }
+      async {
+        try {
+          if (it.commandCompleter().matches(command)) it else null
+        } catch (e: Exception) {
+          log.warn("provider search failed: " + it.name, e)
+          null
+        }
+      }
     }.awaitAll().filterNotNull().firstOrNull()
   }
 
   override suspend fun matches(command: String): Boolean = coroutineScope {
     providers.map {
-      async { it.matches(command) }
+      async {
+        try {
+        it.matches(command)
+        } catch (e: Exception) {
+          log.warn("matches failed: " + it.name, e)
+          false
+        }
+      }
     }
   }.awaitAll().any()
+
+  companion object {
+    val log = LoggerFactory.getLogger(this::class.java.declaringClass)
+  }
 }

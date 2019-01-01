@@ -7,8 +7,9 @@ import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.services.jira.model.Project
 import com.baulsupp.okurl.kotlin.queryList
-import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
+import org.jetbrains.kotlin.utils.rethrow
+import java.io.InterruptedIOException
 
 class JiraProvider(val url: String, val client: OkHttpClient) : BaseProvider() {
   override val name = "jira"
@@ -19,15 +20,19 @@ class JiraProvider(val url: String, val client: OkHttpClient) : BaseProvider() {
     Unmatched
   }
 
-  val projects: List<Project> by lazy {
-    runBlocking {
-      client.queryList<Project>("${url}rest/api/2/project")
+  // TODO caching
+  suspend fun projects(): List<Project> {
+    return try {
+      client.queryList("${url}rest/api/2/project")
+    } catch (e: Exception) {
+      log.warn("project list failed", e)
+      listOf()
     }
   }
 
   override fun commandCompleter(): CommandCompleter = object : CommandCompleter {
     override suspend fun suggestCommands(command: String): List<String> {
-      val projectKeys = projects.map { it.key }
+      val projectKeys = projects().map { it.key }
 
       return when {
         command == "" -> listOf()
@@ -44,7 +49,7 @@ class JiraProvider(val url: String, val client: OkHttpClient) : BaseProvider() {
     }
 
     override suspend fun matches(command: String): Boolean {
-      return (command.isProjectOrIssue()) && projects.any {
+      return (command.isProjectOrIssue()) && projects().any {
         command == it.key || command.startsWith(
           "${it.key}-"
         )

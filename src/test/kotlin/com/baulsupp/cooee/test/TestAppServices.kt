@@ -15,10 +15,11 @@ import okhttp3.OkHttpClient
 
 class TestAppServices : AppServices {
   override fun close() {
-    client.close()
+    // TODO tearing down hear causes the request to
+//    client.close()
   }
 
-  override val client = OkHttpClient()
+  override val client = com.baulsupp.okurl.kotlin.client
 
   override val providerStore =
     TestProviderStore(this) { defaultProviders() }
