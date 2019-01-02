@@ -6,6 +6,7 @@ import com.baulsupp.cooee.api.CommandCompletion
 import com.baulsupp.cooee.api.Go
 import com.baulsupp.cooee.api.GoInfo
 import com.baulsupp.cooee.api.Login
+import com.baulsupp.cooee.api.SearchSuggestion
 import com.baulsupp.cooee.api.UserInfo
 import io.jsonwebtoken.JwtException
 import io.ktor.application.application
@@ -22,6 +23,7 @@ import io.ktor.locations.get
 import io.ktor.locations.post
 import io.ktor.response.respond
 import io.ktor.routing.Routing
+import io.ktor.util.pipeline.PipelineContext
 
 @KtorExperimentalLocationsAPI
 fun Routing.root(appServices: AppServices) {
@@ -34,6 +36,9 @@ fun Routing.root(appServices: AppServices) {
   post<Authorize> {
     val user = appServices.userAuthenticator.userForRequest(call) ?: throw AuthenticationException()
     authorize(it, user, appServices.credentialsStore)
+  }
+  get<SearchSuggestion> {
+    searchSuggestion(it, appServices)
   }
 
   install(StatusPages) {
