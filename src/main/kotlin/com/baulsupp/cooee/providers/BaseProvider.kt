@@ -1,6 +1,9 @@
 package com.baulsupp.cooee.providers
 
 import com.baulsupp.cooee.AppServices
+import com.baulsupp.cooee.completion.ArgumentCompleter
+import com.baulsupp.cooee.completion.CommandCompleter
+import com.baulsupp.cooee.completion.SimpleCommandCompleter
 import com.baulsupp.okurl.credentials.DefaultToken
 import com.baulsupp.okurl.credentials.TokenSet
 import org.slf4j.LoggerFactory
@@ -20,6 +23,10 @@ abstract class BaseProvider : Provider {
 
   override fun configure(instance: ProviderInstance) {
     this.instance = instance
+  }
+
+  override fun commandCompleter(): CommandCompleter {
+    return SimpleCommandCompleter(name)
   }
 
   override fun toString(): String {

@@ -10,6 +10,7 @@ import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
 import com.baulsupp.cooee.providers.github.GithubProvider
 import com.baulsupp.cooee.providers.google.GoogleProvider
 import com.baulsupp.cooee.providers.jira.JiraProvider
+import com.baulsupp.cooee.providers.strava.StravaProvider
 import com.baulsupp.cooee.providers.twitter.TwitterProvider
 import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
@@ -20,6 +21,7 @@ import io.ktor.application.log
 import io.netty.channel.nio.NioEventLoopGroup
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
+import org.slf4j.LoggerFactory
 
 class ProdAppServices(application: Application) : AppServices {
   override fun close() {
@@ -53,7 +55,8 @@ class ProdAppServices(application: Application) : AppServices {
     JiraProvider("https://jira.atlassian.com/"),
     GithubProvider(),
     TwitterProvider(),
-    BookmarksProvider()
+    BookmarksProvider(),
+    StravaProvider()
   ).onEach { it.init(this) }
 
   override val userServices = object : UserServices {

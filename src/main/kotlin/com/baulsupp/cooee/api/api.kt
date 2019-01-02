@@ -59,6 +59,6 @@ sealed class GoResult {
 
 data class RedirectResult(val location: String) : GoResult()
 object Unmatched : GoResult()
-data class Completed(val message: String) : GoResult()
+data class Completed(val message: String, val image: String? = null, val location: String? = null) : GoResult()
 
 data class UserResult(val user: String, val name: String)

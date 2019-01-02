@@ -9,10 +9,14 @@ import com.baulsupp.cooee.providers.github.GithubProvider
 import com.baulsupp.cooee.providers.google.GoogleProvider
 import com.baulsupp.cooee.providers.jira.JiraProvider
 import com.baulsupp.cooee.providers.twitter.TwitterProvider
+import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
 import com.baulsupp.okurl.credentials.CredentialsStore
 import com.baulsupp.okurl.credentials.InMemoryCredentialsStore
 import io.ktor.application.ApplicationCall
+import io.ktor.application.log
 import okhttp3.OkHttpClient
+import okhttp3.logging.LoggingEventListener
+import org.slf4j.LoggerFactory
 
 class TestAppServices : AppServices {
   override fun close() {
@@ -20,7 +24,7 @@ class TestAppServices : AppServices {
 //    client.close()
   }
 
-  override val client = com.baulsupp.okurl.kotlin.client
+  val log = LoggerFactory.getLogger(this::class.java)
 
   override val providerStore =
     TestProviderStore(this) { defaultProviders() }
@@ -29,7 +33,12 @@ class TestAppServices : AppServices {
 
   override val userAuthenticator = TestUserAuthenticator()
 
-  override val credentialsStore: CredentialsStore = InMemoryCredentialsStore()
+  override val credentialsStore = InMemoryCredentialsStore()
+
+  override val client: OkHttpClient = OkHttpClient.Builder().apply {
+    eventListenerFactory(LoggingEventListener.Factory { s -> log.info(s) })
+    addNetworkInterceptor(AuthenticatingInterceptor(credentialsStore))
+  }.build()
 
   override val userServices = object : UserServices {
     override suspend fun providersFor(call: ApplicationCall): RegistryProvider =

@@ -1,10 +1,11 @@
 package com.baulsupp.cooee.providers.twitter
 
 import com.baulsupp.cooee.api.RedirectResult
+import com.baulsupp.cooee.providers.ProviderInstance
 import com.baulsupp.cooee.test.TestAppServices
+import com.baulsupp.okurl.credentials.CredentialFactory
 import com.baulsupp.okurl.credentials.DefaultToken
-import com.baulsupp.okurl.kotlin.OkShell
-import com.baulsupp.okurl.services.twitter.TwitterServiceDefinition
+import com.baulsupp.okurl.services.twitter.TwitterAuthInterceptor
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.hasItem
 import org.junit.Assert.assertThat
@@ -23,7 +24,7 @@ class TwitterProviderTest {
 
   @Test
   fun sendUser() = runBlocking {
-    assumeHasCredentialsSet()
+    setLocalCredentials()
 
     assertEquals(
       RedirectResult("https://m.twitter.com/messages/compose?recipient_id=735627895645691905"),
@@ -31,17 +32,20 @@ class TwitterProviderTest {
     )
   }
 
-  private suspend fun assumeHasCredentialsSet() {
-    val twitterCredentials = OkShell.instance?.commandLine?.credentialsStore?.get(
-      TwitterServiceDefinition(),
+  private suspend fun setLocalCredentials() {
+    val serviceDefinition = TwitterAuthInterceptor().serviceDefinition
+    val credentials = CredentialFactory.createCredentialsStore().get(
+      serviceDefinition,
       DefaultToken
     )
-    assumeNotNull(twitterCredentials)
+    assumeNotNull(credentials)
+    appServices.credentialsStore.set(serviceDefinition, "testuser", credentials!!)
+    p.configure(ProviderInstance("testuser", p.name, mapOf()))
   }
 
   @Test
   fun completeFriends() = runBlocking {
-    assumeHasCredentialsSet()
+    setLocalCredentials()
 
     assertThat(
       p.commandCompleter().suggestCommands("@sh"),
