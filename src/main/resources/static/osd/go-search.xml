@@ -8,6 +8,8 @@
        <!--template="https://coo.ee/go?q={searchTerms}&amp;pw={startPage?}&amp;format=atom"/>-->
   <Url type="text/html"
        template="https://coo.ee/go?q={searchTerms}&amp;pw={startPage?}"/>
+  <Url type="application/x-suggestions+json"
+       template="https://coo.ee/api/v0/search-suggestion?q={searchTerms}"/>
   <LongName>Coo.ee Go Search</LongName>
   <Image height="192" width="192" type="image/png">https://coo.ee/images/boomerang.ico</Image>
   <Image height="16" width="16" type="image/vnd.microsoft.icon">https://coo.ee/images/boomerang.ico/favicon.ico</Image>

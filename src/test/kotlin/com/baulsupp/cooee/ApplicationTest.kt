@@ -236,6 +236,22 @@ class ApplicationTest {
     testRequest("/go?q=bookmarks add nb https://newbookmark", user = "yuri")
   }
 
+  @Test
+  fun testSearchSuggestions() {
+    testRequest("/api/v0/search-suggestion?q=ABC", expectedCode = OK) {
+      assertEquals(" [\"ABC\",\n" +
+        "  [\"ABC-A\",\n" +
+        "   \"ABC-B\",\n" +
+        "   \"ABC-C\"],\n" +
+        "  [\"Desc A\",\n" +
+        "   \"Desc B\",\n" +
+        "   \"Desc C\"],\n" +
+        "  [\"https://coo.ee/go?q=ABC-A\",\n" +
+        "   \"https://coo.ee/go?q=ABC-B\",\n" +
+        "   \"https://coo.ee/go?q=ABC-C\"]]", response.content)
+    }
+  }
+
   private fun testRequest(
     path: String,
     method: HttpMethod = Get,

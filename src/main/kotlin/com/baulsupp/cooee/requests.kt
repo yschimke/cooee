@@ -107,3 +107,24 @@ suspend fun PipelineContext<Unit, ApplicationCall>.authorize(
   credentialsStore.set(StringService(authorize.serviceName), user, authorize.token)
   call.respond(HttpStatusCode.Created)
 }
+
+@KtorExperimentalLocationsAPI
+suspend fun PipelineContext<Unit, ApplicationCall>.searchSuggestion(
+  it: SearchSuggestion,
+  appServices: AppServices
+) {
+  val q = it.q
+
+  val result = " [\"$q\",\n" +
+    "  [\"$q-A\",\n" +
+    "   \"$q-B\",\n" +
+    "   \"$q-C\"],\n" +
+    "  [\"Desc A\",\n" +
+    "   \"Desc B\",\n" +
+    "   \"Desc C\"],\n" +
+    "  [\"https://coo.ee/go?q=$q-A\",\n" +
+    "   \"https://coo.ee/go?q=$q-B\",\n" +
+    "   \"https://coo.ee/go?q=$q-C\"]]"
+
+  call.respond(result)
+}

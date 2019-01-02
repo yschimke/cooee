@@ -33,6 +33,10 @@ data class ArgumentCompletion(val q: String? = null) {
 }
 
 @KtorExperimentalLocationsAPI
+@Location("/api/v0/search-suggestion")
+data class SearchSuggestion(val q: String? = null)
+
+@KtorExperimentalLocationsAPI
 @Location("/login")
 data class Login(
   val user: String? = null,
