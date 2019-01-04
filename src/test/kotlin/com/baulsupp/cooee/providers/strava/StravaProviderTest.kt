@@ -6,11 +6,14 @@ import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.okurl.credentials.CredentialFactory
 import com.baulsupp.okurl.credentials.DefaultToken
 import com.baulsupp.okurl.services.strava.StravaAuthInterceptor
+import com.baulsupp.okurl.util.ClientException
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Assert.assertThat
+import org.junit.Assume.assumeFalse
 import org.junit.Assume.assumeNotNull
+import org.junit.AssumptionViolatedException
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -35,13 +38,19 @@ class StravaProviderTest {
   }
 
   private suspend fun setLocalCredentials() {
-    val serviceDefinition = StravaAuthInterceptor().serviceDefinition
+    val authInterceptor = StravaAuthInterceptor()
+    val serviceDefinition = authInterceptor.serviceDefinition
     val credentials = CredentialFactory.createCredentialsStore().get(
       serviceDefinition,
       DefaultToken
     )
     assumeNotNull(credentials)
-    appServices.credentialsStore.set(serviceDefinition, "testuser", credentials!!)
+    try {
+      authInterceptor.validate(appServices.client, credentials!!)
+    } catch (e: ClientException) {
+      throw AssumptionViolatedException("working connection", e)
+    }
+    appServices.credentialsStore.set(serviceDefinition, "testuser", credentials)
     p.configure(ProviderInstance("testuser", p.name, mapOf()))
   }
 
