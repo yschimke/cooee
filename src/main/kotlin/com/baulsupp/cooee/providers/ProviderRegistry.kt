@@ -15,7 +15,7 @@ import java.io.InterruptedIOException
 class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
   override fun argumentCompleter(): ArgumentCompleter {
     return object : ArgumentCompleter {
-      override suspend fun suggestArguments(command: String): List<String>? {
+      override suspend fun suggestArguments(command: String, arguments: List<String>?): List<String>? {
         return coroutineScope {
           providers.map {
             async {
