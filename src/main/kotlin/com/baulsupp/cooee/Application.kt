@@ -1,7 +1,10 @@
 package com.baulsupp.cooee
 
+import com.baulsupp.cooee.api.SearchSuggestionsResults
+import com.baulsupp.cooee.api.SearchSuggestionsResultsAdapter
 import com.ryanharter.ktor.moshi.moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.ktor.application.Application
 import io.ktor.application.ApplicationStopped
 import io.ktor.application.install
@@ -36,6 +39,8 @@ fun Application.module(appServices: AppServices, cloud: Boolean) {
 
   install(ContentNegotiation) {
     moshi {
+      add(SearchSuggestionsResults::class.java, SearchSuggestionsResultsAdapter())
+      add(KotlinJsonAdapterFactory())
       add(Date::class.java, Rfc3339DateJsonAdapter())
     }
   }

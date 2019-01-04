@@ -1,7 +1,11 @@
 package com.baulsupp.cooee.api
 
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonReader
+import com.squareup.moshi.JsonWriter
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Location
+
 
 @KtorExperimentalLocationsAPI
 @Location("/go")
@@ -35,6 +39,40 @@ data class ArgumentCompletion(val q: String? = null) {
 @KtorExperimentalLocationsAPI
 @Location("/api/v0/search-suggestion")
 data class SearchSuggestion(val q: String? = null)
+
+data class SearchSuggestionsResults(
+  val q: String,
+  val suggestions: List<String>,
+  val descriptions: List<String>,
+  val links: List<String>
+)
+
+class SearchSuggestionsResultsAdapter : JsonAdapter<SearchSuggestionsResults>() {
+  override fun fromJson(reader: JsonReader): SearchSuggestionsResults? = TODO()
+
+  override fun toJson(writer: JsonWriter, value: SearchSuggestionsResults?) {
+    if (value != null) {
+      writer.beginArray()
+      writer.value(value.q)
+      writer.beginArray()
+      value.suggestions.forEach {
+        writer.value(it)
+      }
+      writer.endArray()
+      writer.beginArray()
+      value.descriptions.forEach {
+        writer.value(it)
+      }
+      writer.endArray()
+      writer.beginArray()
+      value.links.forEach {
+        writer.value(it)
+      }
+      writer.endArray()
+      writer.endArray()
+    }
+  }
+}
 
 @KtorExperimentalLocationsAPI
 @Location("/login")

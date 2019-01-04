@@ -21,4 +21,5 @@
   <Language>en-us</Language>
   <OutputEncoding>UTF-8</OutputEncoding>
   <InputEncoding>UTF-8</InputEncoding>
+  <!--<SearchForm>http://www.skipser.com/</SearchForm>-->
 </OpenSearchDescription>

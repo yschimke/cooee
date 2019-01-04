@@ -190,7 +190,7 @@ class ApplicationTest {
     registerUser("yuri")
 
     testRequest("/api/v0/user", user = "yuri") {
-      assertEquals("{\"email\":\"yuri@schimke.ee\",\"token\":\"$token\",\"user\":\"yuri\"}", response.content)
+      assertEquals("{\"token\":\"$token\",\"user\":\"yuri\",\"email\":\"yuri@schimke.ee\"}", response.content)
     }
   }
 
@@ -237,18 +237,28 @@ class ApplicationTest {
   }
 
   @Test
-  fun testSearchSuggestions() {
-    testRequest("/api/v0/search-suggestion?q=ABC", expectedCode = OK) {
-      assertEquals(" [\"ABC\",\n" +
-        "  [\"ABC-A\",\n" +
-        "   \"ABC-B\",\n" +
-        "   \"ABC-C\"],\n" +
-        "  [\"Desc A\",\n" +
-        "   \"Desc B\",\n" +
-        "   \"Desc C\"],\n" +
-        "  [\"https://coo.ee/go?q=ABC-A\",\n" +
-        "   \"https://coo.ee/go?q=ABC-B\",\n" +
-        "   \"https://coo.ee/go?q=ABC-C\"]]", response.content)
+  fun testSearchSuggestionsCommands() {
+    testRequest("/api/v0/search-suggestion?q=TRANS-", expectedCode = OK) {
+      assertEquals(
+        "[\"TRANS-\"," +
+          "[\"TRANS-123\",\"TRANS-1234\",\"TRANS-1235\"]," +
+          "[\"Desc TRANS-123\",\"Desc TRANS-1234\",\"Desc TRANS-1235\"]," +
+          "[\"https://coo.ee/go?q=TRANS-123\",\"https://coo.ee/go?q=TRANS-1234\",\"https://coo.ee/go?q=TRANS-1235\"]]",
+        response.content
+      )
+    }
+  }
+
+  @Test
+  fun testSearchSuggestionsArguments() {
+    testRequest("/api/v0/search-suggestion?q=TRANS-1234+", expectedCode = OK) {
+      assertEquals(
+        "[\"TRANS-1234 \"," +
+          "[\"TRANS-1234 close\",\"TRANS-1234 comment\"]," +
+          "[\"Desc TRANS-1234 close\",\"Desc TRANS-1234 comment\"]," +
+          "[\"https://coo.ee/go?q=TRANS-1234+close\",\"https://coo.ee/go?q=TRANS-1234+comment\"]]",
+        response.content
+      )
     }
   }
 

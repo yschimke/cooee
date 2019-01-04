@@ -23,7 +23,6 @@ import io.ktor.locations.get
 import io.ktor.locations.post
 import io.ktor.response.respond
 import io.ktor.routing.Routing
-import io.ktor.util.pipeline.PipelineContext
 
 @KtorExperimentalLocationsAPI
 fun Routing.root(appServices: AppServices) {
@@ -38,7 +37,7 @@ fun Routing.root(appServices: AppServices) {
     authorize(it, user, appServices.credentialsStore)
   }
   get<SearchSuggestion> {
-    searchSuggestion(it, appServices)
+    searchSuggestion(it, appServices, appServices.userServices.providersFor(call))
   }
 
   install(StatusPages) {

@@ -3,7 +3,9 @@ package com.baulsupp.cooee.providers.jira
 import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
+import com.baulsupp.cooee.completion.ArgumentCompleter
 import com.baulsupp.cooee.completion.CommandCompleter
+import com.baulsupp.cooee.completion.SimpleArgumentCompleter
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.services.jira.model.Project
 import com.baulsupp.okurl.kotlin.queryList
@@ -52,6 +54,10 @@ class JiraProvider(val url: String) : BaseProvider() {
         )
       }
     }
+  }
+
+  override fun argumentCompleter(): ArgumentCompleter {
+    return SimpleArgumentCompleter(listOf("close", "comment"))
   }
 
   private fun mostLikelyProjectIssues(project: String): List<String> =

@@ -78,12 +78,19 @@ suspend fun PipelineContext<Unit, ApplicationCall>.commandCompletionApi(
 ) {
   val command = commandQuery.q ?: ""
 
+  val filtered = commandCompletion(registryProvider, command)
+
+  call.respond(Completions(filtered))
+}
+
+private suspend fun commandCompletion(
+  registryProvider: RegistryProvider,
+  command: String
+): List<String> {
   val completions = registryProvider.commandCompleter().suggestCommands(command)
 
   // TODO not needed
-  val filtered = completions.filter { it.startsWith(command) }
-
-  call.respond(Completions(filtered))
+  return completions.filter { it.startsWith(command) }
 }
 
 @KtorExperimentalLocationsAPI
@@ -91,7 +98,15 @@ suspend fun PipelineContext<Unit, ApplicationCall>.argumentCompletionApi(
   argumentQuery: ArgumentCompletion,
   registryProvider: RegistryProvider
 ) {
-  call.respond(Completions(listOf("close", "comment")))
+  call.respond(Completions(argumentCompletion(registryProvider, argumentQuery.command!!, argumentQuery.args)))
+}
+
+private suspend fun argumentCompletion(
+  registryProvider: RegistryProvider,
+  command: String,
+  arguments: List<String>
+): List<String> {
+  return registryProvider.argumentCompleter().suggestArguments(command, arguments).orEmpty()
 }
 
 @KtorExperimentalLocationsAPI
@@ -111,20 +126,26 @@ suspend fun PipelineContext<Unit, ApplicationCall>.authorize(
 @KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.searchSuggestion(
   it: SearchSuggestion,
-  appServices: AppServices
+  appServices: AppServices,
+  registryProvider: RegistryProvider
 ) {
-  val q = it.q
+  val q = it.q ?: ""
 
-  val result = " [\"$q\",\n" +
-    "  [\"$q-A\",\n" +
-    "   \"$q-B\",\n" +
-    "   \"$q-C\"],\n" +
-    "  [\"Desc A\",\n" +
-    "   \"Desc B\",\n" +
-    "   \"Desc C\"],\n" +
-    "  [\"https://coo.ee/go?q=$q-A\",\n" +
-    "   \"https://coo.ee/go?q=$q-B\",\n" +
-    "   \"https://coo.ee/go?q=$q-C\"]]"
+  // TODO smarter split
+  val query = q.split(" ")
 
-  call.respond(result)
+  val results = when {
+    query.isEmpty() -> listOf()
+    query.size == 1 -> commandCompletion(registryProvider, query.first())
+    else -> argumentCompletion(registryProvider, query.first(), query.drop(1)).map { "${query.first()} $it" }
+  }
+
+  val response: SearchSuggestionsResults =
+    SearchSuggestionsResults(
+      q,
+      results,
+      results.map { "Desc $it" },
+      results.map { "https://coo.ee/go?q=${it.replace(" ", "+")}" })
+
+  call.respond(response)
 }
