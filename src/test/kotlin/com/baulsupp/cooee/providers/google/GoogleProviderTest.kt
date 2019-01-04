@@ -1,12 +1,17 @@
 package com.baulsupp.cooee.providers.google
 
 import com.baulsupp.cooee.api.RedirectResult
+import com.baulsupp.cooee.test.TestAppServices
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers
+import org.hamcrest.CoreMatchers.*
+import org.junit.Assert.assertThat
 import org.junit.Test
 import kotlin.test.assertEquals
 
 class GoogleProviderTest {
-  val p = GoogleProvider()
+  val appServices = TestAppServices()
+  val p = GoogleProvider().apply { init(this@GoogleProviderTest.appServices) }
 
   @Test
   fun basic() {
@@ -31,6 +36,14 @@ class GoogleProviderTest {
     assertEquals(
       RedirectResult("https://www.google.com/search?q=query+terms&btnI"),
       p.go("gl", listOf("query", "terms"))
+    )
+  }
+
+  @Test
+  fun googleSuggest() = runBlocking {
+    assertThat(
+      p.argumentCompleter().suggestArguments("gl", "how to convert to".split(" ")),
+      hasItem(containsString("how to convert to pdf"))
     )
   }
 
