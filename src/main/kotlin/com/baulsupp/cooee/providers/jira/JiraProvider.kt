@@ -43,7 +43,7 @@ class JiraProvider(val url: String) : BaseProvider() {
         }
         command.isProjectIssueStart() -> mostLikelyProjectIssues(command.projectCode()!!)
         command.isIssueOrPartialIssue() -> mostLikelyIssueCompletions(command)
-        else -> listOf("X") // consider returning all projects
+        else -> listOf()
       }
     }
 
