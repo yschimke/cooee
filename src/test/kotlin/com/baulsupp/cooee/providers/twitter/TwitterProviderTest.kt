@@ -48,8 +48,18 @@ class TwitterProviderTest {
     setLocalCredentials()
 
     assertThat(
-      p.commandCompleter().suggestCommands("@sh"),
+      p.commandCompleter().suggestCommands("@s"),
       hasItem("@shoutcooee")
+    )
+  }
+
+  @Test
+  fun completeFriendsPrefix() = runBlocking {
+    setLocalCredentials()
+
+    assertThat(
+      p.commandCompleter().suggestCommands(""),
+      hasItem("@s")
     )
   }
 }

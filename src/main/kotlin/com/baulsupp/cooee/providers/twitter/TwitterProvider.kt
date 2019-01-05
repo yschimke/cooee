@@ -33,6 +33,10 @@ class TwitterProvider : BaseProvider() {
             userToken
           )
 
+        if (command == "") {
+          return friends.users.map { "@" + it.screen_name.substring(0, 1) }.distinct()
+        }
+
         friends.users.map { "@" + it.screen_name }.filter { it.startsWith(command, ignoreCase = true) }
       } catch (e: Exception) {
         log.warn("Failed to suggest completions", e)
