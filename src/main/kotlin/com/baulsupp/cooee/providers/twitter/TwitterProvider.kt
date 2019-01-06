@@ -12,6 +12,8 @@ data class FriendsList(val users: List<Friend>)
 class TwitterProvider : BaseProvider() {
   override val name = "twitter"
 
+  override fun associatedServices(): Set<String> = setOf("twitter")
+
   override suspend fun go(command: String, args: List<String>): GoResult {
     val text = if (args.isNotEmpty()) "&text=" + args.joinToString(" ") else ""
     val screen_name = command.substring(1)

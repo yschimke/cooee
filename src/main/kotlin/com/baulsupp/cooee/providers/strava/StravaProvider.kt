@@ -16,6 +16,8 @@ fun Double.format(digits: Int) = java.lang.String.format("%.${digits}f", this)
 class StravaProvider : BaseProvider() {
   override val name = "strava"
 
+  override fun associatedServices(): Set<String> = setOf("strava")
+
   override suspend fun go(command: String, args: List<String>): GoResult = if (args.firstOrNull() == "lastrun") {
     lastRun()
   } else {

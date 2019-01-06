@@ -37,4 +37,6 @@ class GithubProvider : BaseProvider() {
       return command.matches("\\w+/\\w+(?:#\\d+)?".toRegex())
     }
   }
+
+  override fun associatedServices(): Set<String> = setOf("github")
 }
