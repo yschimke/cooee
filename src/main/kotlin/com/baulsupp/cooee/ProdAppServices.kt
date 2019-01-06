@@ -8,6 +8,7 @@ import com.baulsupp.cooee.okhttp.close
 import com.baulsupp.cooee.providers.RegistryProvider
 import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
 import com.baulsupp.cooee.providers.github.GithubProvider
+import com.baulsupp.cooee.providers.google.GmailProvider
 import com.baulsupp.cooee.providers.google.GoogleProvider
 import com.baulsupp.cooee.providers.jira.JiraProvider
 import com.baulsupp.cooee.providers.strava.StravaProvider
@@ -55,6 +56,7 @@ class ProdAppServices(application: Application) : AppServices {
     GithubProvider(),
     TwitterProvider(),
     BookmarksProvider(),
+    GmailProvider(),
     StravaProvider()
   ).onEach { it.init(this) }
 
