@@ -59,7 +59,7 @@ class BookmarksProvider : BaseProvider() {
     }
 
     override suspend fun matches(command: String): Boolean {
-      return knownCommands().contains(command)
+      return command == "bookmarks" || knownCommands().contains(command)
     }
   }
 
@@ -67,7 +67,7 @@ class BookmarksProvider : BaseProvider() {
     val userBookmarks = configuredBookmarks()
 
     val suggestions = if (userBookmarks != null) {
-      userBookmarks.map { "remove ${it.key}" } + listOf("add", "remove")
+      userBookmarks.map { "remove ${it.key}" } + listOf("add")
     } else {
       null
     }

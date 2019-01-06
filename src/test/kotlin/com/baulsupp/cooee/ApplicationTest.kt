@@ -77,49 +77,6 @@ class ApplicationTest {
     }
   }
 
-  @Test
-  fun testJiraCommandCompletionDefault() {
-    testCompletion("") {
-      // no default project completion for now
-      assertFalse { it.contains("TRANS") }
-    }
-  }
-
-  @Test
-  fun testJiraCommandCompletionPartialProject() {
-    testCompletion("T") {
-      assertEquals(listOf("TRANS", "TRANS-"), it)
-    }
-  }
-
-  @Test
-  fun testJiraCommandCompletionProject() {
-    testCompletion("TRANS") {
-      assertEquals(listOf("TRANS", "TRANS-"), it)
-    }
-  }
-
-  @Test
-  fun testJiraCommandCompletionProjectIssueStart() {
-    testCompletion("TRANS-") {
-      assertEquals(listOf("TRANS-123", "TRANS-1234", "TRANS-1235"), it)
-    }
-  }
-
-  @Test
-  fun testJiraCommandCompletionProjectIssue() {
-    testCompletion("TRANS-123") { completions ->
-      assertEquals(listOf("TRANS-123") + (1230..1239).map { "TRANS-$it" }, completions)
-    }
-  }
-
-  @Test
-  fun testJiraCommandCompletionProjectIssueLong() {
-    testCompletion("TRANS-12345") {
-      assertEquals(listOf("TRANS-12345"), it)
-    }
-  }
-
   private fun testCompletion(prefix: String, check: (List<String>) -> Unit = {}) {
     withTestApplication({ test() }) {
       handleRequest(HttpMethod.Get, "/api/v0/command-completion?q=$prefix").apply {
@@ -133,23 +90,9 @@ class ApplicationTest {
 
   @Test
   fun testArgumentCompletion() {
-    testRequest("/api/v0/argument-completion?q=TRANS-1234 ") {
+    testRequest("/api/v0/argument-completion?q=test ") {
       assertEquals(HttpStatusCode.OK, response.status())
-      assertEquals("{\"completions\":[\"close\",\"comment\"]}", response.content)
-    }
-  }
-
-  @Test
-  fun testJiraProject() {
-    testRequest("/go?q=TRANS", expectedCode = Found) {
-      assertEquals("https://jira.atlassian.com/browse/TRANS", response.headers["Location"])
-    }
-  }
-
-  @Test
-  fun testJiraIssue() {
-    testRequest("/go?q=TRANS-2474", expectedCode = Found) {
-      assertEquals("https://jira.atlassian.com/browse/TRANS-2474", response.headers["Location"])
+      assertEquals("{\"completions\":[\"aaa\",\"bbb\"]}", response.content)
     }
   }
 
@@ -238,12 +181,12 @@ class ApplicationTest {
 
   @Test
   fun testSearchSuggestionsCommands() {
-    testRequest("/api/v0/search-suggestion?q=TRANS-", expectedCode = OK) {
+    testRequest("/api/v0/search-suggestion?q=tes", expectedCode = OK) {
       assertEquals(
-        "[\"TRANS-\"," +
-          "[\"TRANS-123\",\"TRANS-1234\",\"TRANS-1235\"]," +
-          "[\"Desc TRANS-123\",\"Desc TRANS-1234\",\"Desc TRANS-1235\"]," +
-          "[\"https://coo.ee/go?q=TRANS-123\",\"https://coo.ee/go?q=TRANS-1234\",\"https://coo.ee/go?q=TRANS-1235\"]]",
+        "[\"tes\"," +
+          "[\"test\"]," +
+          "[\"Desc test\"]," +
+          "[\"https://coo.ee/go?q=test\"]]",
         response.content
       )
     }
@@ -251,12 +194,12 @@ class ApplicationTest {
 
   @Test
   fun testSearchSuggestionsArguments() {
-    testRequest("/api/v0/search-suggestion?q=TRANS-1234+", expectedCode = OK) {
+    testRequest("/api/v0/search-suggestion?q=test+", expectedCode = OK) {
       assertEquals(
-        "[\"TRANS-1234 \"," +
-          "[\"TRANS-1234 close\",\"TRANS-1234 comment\"]," +
-          "[\"Desc TRANS-1234 close\",\"Desc TRANS-1234 comment\"]," +
-          "[\"https://coo.ee/go?q=TRANS-1234+close\",\"https://coo.ee/go?q=TRANS-1234+comment\"]]",
+        "[\"test \"," +
+          "[\"test aaa\",\"test bbb\"]," +
+          "[\"Desc test aaa\",\"Desc test bbb\"]," +
+          "[\"https://coo.ee/go?q=test+aaa\",\"https://coo.ee/go?q=test+bbb\"]]",
         response.content
       )
     }
