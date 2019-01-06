@@ -59,7 +59,7 @@ class BookmarksProvider : BaseProvider() {
     }
 
     override suspend fun matches(command: String): Boolean {
-      return knownCommands().contains(command)
+      return command == "bookmarks" || knownCommands().contains(command)
     }
   }
 

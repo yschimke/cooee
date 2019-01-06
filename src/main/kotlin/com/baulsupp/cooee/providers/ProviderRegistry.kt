@@ -17,12 +17,16 @@ class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
     return object : ArgumentCompleter {
       override suspend fun suggestArguments(command: String, arguments: List<String>?): List<String>? {
         return coroutineScope {
-          providers.map {
+          providers.map { provider ->
             async {
               try {
-                it.argumentCompleter().suggestArguments(command).orEmpty()
+                if (provider.matches(command)) {
+                  provider.argumentCompleter().suggestArguments(command).orEmpty()
+                } else {
+                  listOf()
+                }
               } catch (e: Exception) {
-                log.warn("suggestArguments failed: " + it.name, e)
+                log.warn("suggestArguments failed: " + provider.name, e)
                 listOf<String>()
               }
             }

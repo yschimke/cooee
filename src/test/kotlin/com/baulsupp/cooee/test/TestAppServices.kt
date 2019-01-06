@@ -8,6 +8,7 @@ import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
 import com.baulsupp.cooee.providers.github.GithubProvider
 import com.baulsupp.cooee.providers.google.GoogleProvider
 import com.baulsupp.cooee.providers.jira.JiraProvider
+import com.baulsupp.cooee.providers.strava.StravaProvider
 import com.baulsupp.cooee.providers.twitter.TwitterProvider
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
 import com.baulsupp.okurl.credentials.CredentialsStore
@@ -47,9 +48,8 @@ class TestAppServices : AppServices {
 
   override fun defaultProviders() = listOf(
     GoogleProvider(),
-    JiraProvider("https://jira.atlassian.com/"),
     GithubProvider(),
-    TwitterProvider(),
-    BookmarksProvider()
+    BookmarksProvider(),
+    TestProvider()
   ).onEach { it.init(this) }
 }
