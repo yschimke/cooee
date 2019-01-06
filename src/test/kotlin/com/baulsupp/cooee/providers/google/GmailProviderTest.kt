@@ -38,7 +38,6 @@ class GmailProviderTest {
     val result = p.go("gmail", listOf("label:inbox"))
 
     assertTrue(result is Completed)
-    assertThat(result.message, CoreMatchers.startsWith("Results: "))
   }
 
   @Test
