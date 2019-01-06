@@ -67,7 +67,7 @@ class BookmarksProvider : BaseProvider() {
     val userBookmarks = configuredBookmarks()
 
     val suggestions = if (userBookmarks != null) {
-      userBookmarks.map { "remove ${it.key}" } + listOf("add")
+      userBookmarks.map { "remove ${it.key}" } + listOf("add", "remove")
     } else {
       null
     }
