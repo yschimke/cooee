@@ -23,7 +23,11 @@ suspend fun PipelineContext<Unit, ApplicationCall>.bounceApi(
   val r =
     goInfo.command?.let { registryProvider.go(it, goInfo.args) } ?: Unmatched
 
-  call.respond(r)
+  if (r == Unmatched) {
+    call.respond(Completed(message = "no match"))
+  } else {
+    call.respond(r)
+  }
 }
 
 suspend fun PipelineContext<Unit, ApplicationCall>.userApi(
