@@ -32,4 +32,6 @@ abstract class BaseProvider : Provider {
   override fun toString(): String {
     return "${this.javaClass.simpleName} $instance"
   }
+
+  open fun associatedServices()= setOf<String>()
 }

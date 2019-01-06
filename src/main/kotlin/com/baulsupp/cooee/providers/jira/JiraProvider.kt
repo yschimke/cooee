@@ -31,6 +31,8 @@ data class IssueReference(val project: ProjectReference, val issue: String) {
 class JiraProvider : BaseProvider() {
   override val name = "jira"
 
+  override fun associatedServices(): Set<String> = setOf("atlassian")
+
   // TODO cache with extreme prejudice
   lateinit var knownProjects: List<ProjectReference>
 
