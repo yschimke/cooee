@@ -1,6 +1,7 @@
 package com.baulsupp.cooee
 
 import io.ktor.application.Application
+import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
@@ -8,8 +9,10 @@ import io.ktor.server.netty.Netty
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.debug.DebugProbes
 
+@KtorExperimentalLocationsAPI
 fun Application.local() = module(ProdAppServices(this), cloud = false)
 
+@KtorExperimentalLocationsAPI
 @ExperimentalCoroutinesApi
 fun main(args: Array<String>) {
   // TODO breaks Mongo

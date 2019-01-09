@@ -5,7 +5,6 @@ import com.baulsupp.cooee.mongo.StringService
 import com.baulsupp.cooee.providers.RegistryProvider
 import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.cooee.users.UserEntry
-import com.baulsupp.cooee.users.UserStore
 import com.baulsupp.okurl.credentials.CredentialsStore
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
@@ -31,33 +30,13 @@ suspend fun PipelineContext<Unit, ApplicationCall>.bounceApi(
 }
 
 suspend fun PipelineContext<Unit, ApplicationCall>.userApi(
-  user: String?,
-  userStore: UserStore
+  user: UserEntry?
 ) {
   if (user == null) {
     throw AuthenticationException()
   }
 
-  val userResult = userStore.userInfo(user) ?: throw AuthorizationException()
-
-  call.respond(userResult)
-}
-
-@KtorExperimentalLocationsAPI
-suspend fun PipelineContext<Unit, ApplicationCall>.loginWeb(
-  login: Login,
-  userStore: UserStore
-) {
-  if (login.callback != null && login.user != null) {
-    val token = JwtUserAuthenticator.tokenForLogin(login)
-
-    if (token != null) {
-      userStore.storeUser(UserEntry(token, login.user, login.email))
-      call.respondRedirect(login.callback + "?code=" + token, permanent = false)
-    }
-  }
-
-  call.respond(HttpStatusCode.Unauthorized)
+  call.respond(user)
 }
 
 @KtorExperimentalLocationsAPI
@@ -116,14 +95,14 @@ private suspend fun argumentCompletion(
 @KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.authorize(
   authorize: Authorize,
-  user: String,
+  user: UserEntry,
   credentialsStore: CredentialsStore
 ) {
   if (authorize.serviceName == null || authorize.token == null) {
     throw BadRequestException()
   }
 
-  credentialsStore.set(StringService(authorize.serviceName), user, authorize.token)
+  credentialsStore.set(StringService(authorize.serviceName), user.user, authorize.token)
   call.respond(HttpStatusCode.Created)
 }
 

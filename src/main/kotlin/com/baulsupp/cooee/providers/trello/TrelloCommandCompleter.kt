@@ -13,6 +13,8 @@ class TrelloCommandCompleter(val provider: TrelloProvider) : CommandCompleter {
   }
 
   override suspend fun matches(command: String): Boolean {
-    return command == "trello"
+    return command == "trello" || provider.userBoards().any {
+      it.url.split("/").last() == command
+    }
   }
 }

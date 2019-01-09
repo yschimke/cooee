@@ -75,15 +75,6 @@ class SearchSuggestionsResultsAdapter : JsonAdapter<SearchSuggestionsResults>() 
 }
 
 @KtorExperimentalLocationsAPI
-@Location("/login")
-data class Login(
-  val user: String? = null,
-  val email: String? = null,
-  val secret: String? = null,
-  val callback: String? = null
-)
-
-@KtorExperimentalLocationsAPI
 @Location("/api/v0/authorize")
 data class Authorize(
   val serviceName: String? = null,
