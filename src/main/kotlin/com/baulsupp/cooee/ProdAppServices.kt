@@ -3,7 +3,6 @@ package com.baulsupp.cooee
 import com.baulsupp.cooee.mongo.MongoCredentialsStore
 import com.baulsupp.cooee.mongo.MongoFactory
 import com.baulsupp.cooee.mongo.MongoProviderStore
-import com.baulsupp.cooee.mongo.MongoUserStore
 import com.baulsupp.cooee.okhttp.close
 import com.baulsupp.cooee.providers.RegistryProvider
 import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
@@ -40,9 +39,7 @@ class ProdAppServices(application: Application) : AppServices {
 
   override val providerStore = MongoProviderStore(this::defaultProviders, mongoDb, this)
 
-  override val userStore = MongoUserStore(mongoDb)
-
-  override val userAuthenticator = JwtUserAuthenticator(userStore)
+  override val userAuthenticator = JwtUserAuthenticator()
 
   override val credentialsStore = MongoCredentialsStore(mongoDb)
 
@@ -64,6 +61,6 @@ class ProdAppServices(application: Application) : AppServices {
 
   override val userServices = object : UserServices {
     override suspend fun providersFor(call: ApplicationCall): RegistryProvider =
-      userAuthenticator.userForRequest(call)?.let { providerStore.forUser(it) } ?: RegistryProvider(defaultProviders())
+      userAuthenticator.userForRequest(call)?.let { providerStore.forUser(it.user) } ?: RegistryProvider(defaultProviders())
   }
 }

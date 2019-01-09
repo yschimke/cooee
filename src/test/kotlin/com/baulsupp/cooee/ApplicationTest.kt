@@ -130,22 +130,9 @@ class ApplicationTest {
   @Test
   fun testUser() {
     val token = services.userAuthenticator.tokenFor("yuri")
-    registerUser("yuri")
 
     testRequest("/api/v0/user", user = "yuri") {
       assertEquals("{\"token\":\"$token\",\"user\":\"yuri\",\"email\":\"yuri@schimke.ee\"}", response.content)
-    }
-  }
-
-  private fun registerUser(name: String, token: String? = null) {
-    runBlocking {
-      services.userStore.storeUser(
-        UserEntry(
-          token ?: services.userAuthenticator.tokenFor("yuri"),
-          name,
-          "$name@schimke.ee"
-        )
-      )
     }
   }
 
@@ -161,8 +148,6 @@ class ApplicationTest {
 
   @Test
   fun testAddBookmarkProvider() {
-    registerUser("yuri")
-
     testRequest("/go?q=add bookmarks", user = "yuri")
 
     assertEquals(1, services.providerStore.providerInstances.size)
@@ -170,8 +155,6 @@ class ApplicationTest {
 
   @Test
   fun testAddBookmarkName() {
-    registerUser("yuri")
-
     runBlocking {
       services.providerStore.store(ProviderInstance("yuri", "bookmarks", mapOf()))
     }

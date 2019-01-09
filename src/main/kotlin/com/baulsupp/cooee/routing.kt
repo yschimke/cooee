@@ -5,7 +5,6 @@ import com.baulsupp.cooee.api.Authorize
 import com.baulsupp.cooee.api.CommandCompletion
 import com.baulsupp.cooee.api.Go
 import com.baulsupp.cooee.api.GoInfo
-import com.baulsupp.cooee.api.Login
 import com.baulsupp.cooee.api.SearchSuggestion
 import com.baulsupp.cooee.api.UserInfo
 import io.jsonwebtoken.JwtException
@@ -26,10 +25,9 @@ import io.ktor.routing.Routing
 
 @KtorExperimentalLocationsAPI
 fun Routing.root(appServices: AppServices) {
-  get<Login> { loginWeb(it, appServices.userStore) }
   get<Go> { bounceWeb(it, appServices.userServices.providersFor(call)) }
   get<GoInfo> { bounceApi(it, appServices.userServices.providersFor(call)) }
-  get<UserInfo> { userApi(appServices.userAuthenticator.userForRequest(call), appServices.userStore) }
+  get<UserInfo> { userApi(appServices.userAuthenticator.userForRequest(call)) }
   get<CommandCompletion> { commandCompletionApi(it, appServices.userServices.providersFor(call)) }
   get<ArgumentCompletion> { argumentCompletionApi(it, appServices.userServices.providersFor(call)) }
   post<Authorize> {

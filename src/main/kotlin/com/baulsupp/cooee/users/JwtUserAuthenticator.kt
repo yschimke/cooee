@@ -1,56 +1,50 @@
 package com.baulsupp.cooee.users
 
-import com.baulsupp.cooee.api.Login
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.impl.DefaultJwtBuilder
+import io.jsonwebtoken.security.Keys
 import io.ktor.application.ApplicationCall
-import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.request.header
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
-class JwtUserAuthenticator(private val userStore: UserStore) : UserAuthenticator {
+class JwtUserAuthenticator : UserAuthenticator {
   private val bearerRegex = "Bearer (.*)".toRegex()
 
-  override suspend fun userForRequest(call: ApplicationCall): String? {
+  override suspend fun userForRequest(call: ApplicationCall): UserEntry? {
     return call.request.header("Authorization")?.let {
       val token = bearerRegex.matchEntire(it)?.groupValues?.get(1)
-
-      if (token != null) {
-        val jwt = Jwts.parser().parseClaimsJwt(token)
-
-        // TODO use token and validate signature
-        val user = jwt.body["user"] as? String
-
-        if (user != null) {
-          val entry = userStore.userInfo(user)
-
-          if (entry != null) {
-            return entry.user
-          }
-        }
-      }
-
-      null
+      return parseToken(token)
     }
   }
 
-  @KtorExperimentalLocationsAPI
-  companion object {
-    val logger: Logger = LoggerFactory.getLogger(JwtUserAuthenticator::class.java)
+  fun parseToken(token: String?): UserEntry? {
+    if (token != null) {
+      val jwt = Jwts.parser().setSigningKey("baulsupp4evabaulsupp4evabaulsupp4eva".toByteArray()).parseClaimsJws(token)
 
-    fun tokenForLogin(login: Login): String? {
-      if (login.user == null) {
-        return null
+      val user = jwt.body["user"] as? String
+      val email = jwt.body["email"] as? String
+
+      if (user != null && email != null) {
+        return UserEntry(token = token, user = user, email = email)
       }
-
-      val builder = DefaultJwtBuilder()
-
-      builder.claim("user", login.user)
-      builder.claim("secret", login.secret)
-      builder.claim("email", login.email)
-
-      return builder.compact()
     }
+
+    return null
   }
+
+  fun tokenFor(user: String): String {
+    return DefaultJwtBuilder().claim("user", user).claim("email", "$user@coo.ee")
+      .signWith(Keys.hmacShaKeyFor("baulsupp4evabaulsupp4evabaulsupp4eva".toByteArray())).compact()
+  }
+}
+
+fun main(args: Array<String>) {
+  val auth = JwtUserAuthenticator()
+
+  val token1 = auth.tokenFor("yuri")
+  println(token1)
+  println(auth.parseToken(token1))
+
+  val token =
+    "eyJhbGciOiJIUzI1NiIsImtpZCI6IlRCRCIsImV4cCI6MTU0NzA2NjE4M30.eyJlbWFpbCI6Inl1cmlAY29vLmVlIiwidXNlciI6Inl1cmkifQ.LKlqvPDEcgzNUDYP4tbAkZJHVuw5UvH3B5fzneFG3Z8"
+  println(auth.parseToken(token))
 }

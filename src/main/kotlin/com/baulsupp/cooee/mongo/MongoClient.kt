@@ -12,7 +12,7 @@ import org.bson.codecs.configuration.CodecRegistry
 object MongoFactory {
   private fun codecRegistry(): CodecRegistry {
     return CodecRegistries.fromRegistries(
-      CodecRegistries.fromCodecs(UserEntryCodec, ProviderInstanceCodec, UserCredentialsCodec),
+      CodecRegistries.fromCodecs(ProviderInstanceCodec, UserCredentialsCodec),
       MongoClientSettings.getDefaultCodecRegistry()
     )
   }

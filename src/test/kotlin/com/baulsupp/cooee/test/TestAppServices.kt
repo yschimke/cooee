@@ -10,6 +10,7 @@ import com.baulsupp.cooee.providers.google.GoogleProvider
 import com.baulsupp.cooee.providers.jira.JiraProvider
 import com.baulsupp.cooee.providers.strava.StravaProvider
 import com.baulsupp.cooee.providers.twitter.TwitterProvider
+import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
 import com.baulsupp.okurl.credentials.CredentialsStore
 import com.baulsupp.okurl.credentials.InMemoryCredentialsStore
@@ -30,9 +31,7 @@ class TestAppServices : AppServices {
   override val providerStore =
     TestProviderStore(this) { defaultProviders() }
 
-  override val userStore = TestUserStore()
-
-  override val userAuthenticator = TestUserAuthenticator()
+  override val userAuthenticator = JwtUserAuthenticator()
 
   override val credentialsStore = InMemoryCredentialsStore()
 
@@ -43,7 +42,7 @@ class TestAppServices : AppServices {
 
   override val userServices = object : UserServices {
     override suspend fun providersFor(call: ApplicationCall): RegistryProvider =
-      userAuthenticator.userForRequest(call)?.let { providerStore.forUser(it) } ?: RegistryProvider(defaultProviders())
+      userAuthenticator.userForRequest(call)?.let { providerStore.forUser(it.user) } ?: RegistryProvider(defaultProviders())
   }
 
   override fun defaultProviders() = listOf(
