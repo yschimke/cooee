@@ -12,6 +12,7 @@ import com.baulsupp.cooee.providers.google.GmailProvider
 import com.baulsupp.cooee.providers.google.GoogleProvider
 import com.baulsupp.cooee.providers.jira.JiraProvider
 import com.baulsupp.cooee.providers.strava.StravaProvider
+import com.baulsupp.cooee.providers.trello.TrelloProvider
 import com.baulsupp.cooee.providers.twitter.TwitterProvider
 import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
@@ -57,7 +58,8 @@ class ProdAppServices(application: Application) : AppServices {
     TwitterProvider(),
     BookmarksProvider(),
     GmailProvider(),
-    StravaProvider()
+    StravaProvider(),
+    TrelloProvider()
   ).onEach { it.init(this) }
 
   override val userServices = object : UserServices {

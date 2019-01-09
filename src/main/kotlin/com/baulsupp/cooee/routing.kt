@@ -37,7 +37,7 @@ fun Routing.root(appServices: AppServices) {
     authorize(it, user, appServices.credentialsStore)
   }
   get<SearchSuggestion> {
-    searchSuggestion(it, appServices, appServices.userServices.providersFor(call))
+    searchSuggestion(it, appServices.userServices.providersFor(call))
   }
 
   install(StatusPages) {

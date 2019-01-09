@@ -10,6 +10,7 @@ import com.mongodb.reactivestreams.client.MongoCollection
 import com.mongodb.reactivestreams.client.MongoDatabase
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.reactive.awaitLast
 import org.bson.Document
 
 class MongoCredentialsStore(private val mongoDb: MongoDatabase) : CredentialsStore {
@@ -42,12 +43,12 @@ class MongoCredentialsStore(private val mongoDb: MongoDatabase) : CredentialsSto
       Document().append("token", token).append("user", tokenSet)
         .append("serviceName", serviceDefinition.shortName())
 
-    val result = credentialsDb.replaceOne(
+    credentialsDb.replaceOne(
       and(
         eq("user", tokenSet),
         eq("serviceName", serviceDefinition.shortName())
       ), doc, ReplaceOptions().upsert(true)
-    ).awaitFirst()
+    ).awaitLast()
   }
 }
 
