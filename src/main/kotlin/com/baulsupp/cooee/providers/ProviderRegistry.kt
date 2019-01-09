@@ -70,8 +70,8 @@ class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
     }
   }
 
-  override suspend fun go(command: String, args: List<String>): GoResult = coroutineScope {
-    provider(command)?.go(command, args) ?: Unmatched
+  override suspend fun go(command: String, vararg args: String): GoResult = coroutineScope {
+    provider(command)?.go(command, *args) ?: Unmatched
   }
 
   private suspend fun CoroutineScope.provider(command: String): Provider? {

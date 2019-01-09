@@ -28,14 +28,14 @@ class GoogleProviderTest {
 
   @Test
   fun googleSearch() = runBlocking {
-    assertEquals(RedirectResult("https://www.google.com/search?q=query+terms"), p.go("g", listOf("query", "terms")))
+    assertEquals(RedirectResult("https://www.google.com/search?q=query+terms"), p.go("g", "query", "terms"))
   }
 
   @Test
   fun luckySearch() = runBlocking {
     assertEquals(
       RedirectResult("https://www.google.com/search?q=query+terms&btnI"),
-      p.go("gl", listOf("query", "terms"))
+      p.go("gl", "query", "terms")
     )
   }
 

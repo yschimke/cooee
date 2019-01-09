@@ -17,11 +17,11 @@ class BookmarksProvider : BaseProvider() {
 
   private fun configuredBookmarks() = instance?.config?.get("bookmarks") as? Map<String, String>?
 
-  override suspend fun go(command: String, args: List<String>): GoResult {
+  override suspend fun go(command: String, vararg args: String): GoResult {
     return if (command == "bookmarks") {
-      bookmarksCommand(args)
+      bookmarksCommand(args.toList())
     } else {
-      val url = buildTargetUrl(command, args)
+      val url = buildTargetUrl(command, args.toList())
 
       if (url != null) RedirectResult(url) else Unmatched
     }

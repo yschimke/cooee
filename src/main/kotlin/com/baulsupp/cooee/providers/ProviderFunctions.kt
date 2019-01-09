@@ -6,7 +6,7 @@ import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.completion.SimpleArgumentCompleter
 
 interface ProviderFunctions {
-  suspend fun go(command: String, args: List<String> = listOf()): GoResult
+  suspend fun go(command: String, vararg args: String): GoResult
 
   suspend fun matches(command: String): Boolean = commandCompleter().matches(command)
 

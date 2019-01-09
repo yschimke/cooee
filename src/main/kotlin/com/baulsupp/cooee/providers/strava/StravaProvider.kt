@@ -18,7 +18,7 @@ class StravaProvider : BaseProvider() {
 
   override fun associatedServices(): Set<String> = setOf("strava")
 
-  override suspend fun go(command: String, args: List<String>): GoResult = if (args.firstOrNull() == "lastrun") {
+  override suspend fun go(command: String, vararg args: String): GoResult = if (args.firstOrNull() == "lastrun") {
     lastRun()
   } else {
     Unmatched

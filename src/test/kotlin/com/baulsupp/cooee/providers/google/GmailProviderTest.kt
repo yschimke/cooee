@@ -35,7 +35,7 @@ class GmailProviderTest {
   fun inbox() = runBlocking {
     p.setLocalCredentials(GoogleAuthInterceptor(), appServices)
 
-    val result = p.go("gmail", listOf("label:inbox"))
+    val result = p.go("gmail", "label:inbox")
 
     assertTrue(result is Completed)
   }

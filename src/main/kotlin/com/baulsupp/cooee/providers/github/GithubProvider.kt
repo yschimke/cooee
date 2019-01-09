@@ -9,7 +9,7 @@ import com.baulsupp.cooee.providers.BaseProvider
 class GithubProvider : BaseProvider() {
   override val name = "github"
 
-  override suspend fun go(command: String, args: List<String>): GoResult {
+  override suspend fun go(command: String, vararg args: String): GoResult {
     val r = "(\\w+)/(\\w+)(?:#(\\d+))?".toRegex()
 
     val result = r.matchEntire(command)

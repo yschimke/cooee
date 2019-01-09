@@ -61,6 +61,6 @@ class BookmarksProviderTest {
   fun userBookmarkSearch() = runBlocking {
     configureBookmarks("t" to "https://test.com/q=%s")
 
-    assertEquals(RedirectResult("https://test.com/q=query"), userBookmarks.go("t", listOf("query")))
+    assertEquals(RedirectResult("https://test.com/q=query"), userBookmarks.go("t", "query"))
   }
 }
