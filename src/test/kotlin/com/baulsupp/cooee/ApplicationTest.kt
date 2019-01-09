@@ -132,17 +132,7 @@ class ApplicationTest {
     val token = services.userAuthenticator.tokenFor("yuri")
 
     testRequest("/api/v0/user", user = "yuri") {
-      assertEquals("{\"token\":\"$token\",\"user\":\"yuri\",\"email\":\"yuri@schimke.ee\"}", response.content)
-    }
-  }
-
-  @Test
-  fun testLogin() {
-    testRequest("/login?user=yuri&callback=http://localhost:3000/callback", expectedCode = Found) {
-      assertEquals(
-        "http://localhost:3000/callback?code=eyJhbGciOiJub25lIn0.eyJ1c2VyIjoieXVyaSJ9.",
-        response.headers["Location"]
-      )
+      assertEquals("{\"token\":\"$token\",\"user\":\"yuri\",\"email\":\"yuri@coo.ee\"}", response.content)
     }
   }
 
