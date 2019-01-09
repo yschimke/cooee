@@ -53,6 +53,8 @@ class TrelloProviderTest {
 
   @Test
   fun basicCommandCompletion() = runBlocking {
+    p.setLocalCredentials(TrelloAuthInterceptor(), appServices)
+
     assertThat(
       p.commandCompleter().suggestCommands("trell"),
       equalTo(listOf("trello"))
