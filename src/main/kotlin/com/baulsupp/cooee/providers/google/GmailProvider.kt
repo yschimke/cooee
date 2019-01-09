@@ -16,10 +16,10 @@ data class ThreadList(val threads: List<Thread>, val nextPageToken: String?, val
 class GmailProvider : BaseProvider() {
   override val name = "gmail"
 
-  override suspend fun go(command: String, args: List<String>): GoResult = if (args.isEmpty())
+  override suspend fun go(command: String, vararg args: String): GoResult = if (args.isEmpty())
     RedirectResult("https://mail.google.com/")
   else
-    listInbox(args)
+    listInbox(args.toList())
 
   private suspend fun listInbox(args: List<String>): GoResult {
     val q = args.first()
