@@ -24,6 +24,7 @@ import org.conscrypt.Conscrypt
 import java.security.Security
 import java.util.*
 
+@KtorExperimentalLocationsAPI
 fun Application.cloud() {
   // TODO breaks Mongo
   // setupProvider()

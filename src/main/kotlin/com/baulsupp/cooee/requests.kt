@@ -130,7 +130,6 @@ suspend fun PipelineContext<Unit, ApplicationCall>.authorize(
 @KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.searchSuggestion(
   it: SearchSuggestion,
-  appServices: AppServices,
   registryProvider: RegistryProvider
 ) {
   val q = it.q ?: ""

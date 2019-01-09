@@ -7,7 +7,6 @@ plugins {
   war
   id("com.github.ben-manes.versions") version "0.20.0"
   id ("com.google.cloud.tools.appengine") version "2.0.0-rc4"
-  id("org.akhikhl.gretty") version "2.0.0"
 }
 
 group = "cooee"
@@ -113,10 +112,6 @@ dependencies {
   implementation("org.webjars:jquery:3.2.1")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:${Versions.kotlinCoroutines}")
   testCompile("io.ktor:ktor-server-tests:${Versions.ktor}")
-}
-
-gretty {
-  contextPath = '/'
 }
 
 kotlin.sourceSets["main"].kotlin.srcDirs("src/main/kotlin")

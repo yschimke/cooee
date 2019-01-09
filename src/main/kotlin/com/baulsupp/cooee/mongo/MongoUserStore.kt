@@ -8,6 +8,7 @@ import com.mongodb.reactivestreams.client.MongoCollection
 import com.mongodb.reactivestreams.client.MongoDatabase
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.reactive.awaitLast
 import org.bson.Document
 
 class MongoUserStore(private val mongoDb: MongoDatabase) : UserStore {
@@ -21,6 +22,6 @@ class MongoUserStore(private val mongoDb: MongoDatabase) : UserStore {
     val doc =
       Document().append("token", userEntry.token).append("user", userEntry.user).append("email", userEntry.email)
 
-    val result = userDb.replaceOne(eq("token", userEntry.token), doc, ReplaceOptions().upsert(true)).awaitFirst()
+    userDb.replaceOne(eq("token", userEntry.token), doc, ReplaceOptions().upsert(true)).awaitLast()
   }
 }
