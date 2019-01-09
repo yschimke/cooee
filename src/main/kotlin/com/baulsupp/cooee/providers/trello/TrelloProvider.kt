@@ -28,7 +28,7 @@ class TrelloProvider : BaseProvider() {
   override suspend fun go(command: String, vararg args: String): GoResult {
     if (command == name) {
       if (args.contentEquals(arrayOf("boards"))) {
-        return Completed("Boards: " + userBoards().map { it.url.split("/") }.joinToString(", "))
+        return Completed("Boards: " + userBoards().joinToString(", ") { it.url.split("/").last() })
       }
 
       return RedirectResult("https://trello.com/")
