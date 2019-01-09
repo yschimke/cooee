@@ -9,6 +9,7 @@ import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.hasItem
 import org.junit.Assert.assertThat
+import org.junit.Ignore
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -73,16 +74,17 @@ class JiraProviderTest {
   }
 
   @Test
+  @Ignore("can't vote on own issues")
   fun completeVoteCommand() = runBlocking {
     p.setLocalCredentials(AtlassianAuthInterceptor(), appServices)
 
-    assertEquals(Completed("voted for COOEE-1"), p.go("COOEE-1", listOf("vote")))
+    assertEquals(Completed("voted for COOEE-1"), p.go("COOEE-1", "vote"))
   }
 
   @Test
   fun completeCommentCommand() = runBlocking {
     p.setLocalCredentials(AtlassianAuthInterceptor(), appServices)
 
-    assertEquals(Completed("comments on COOEE-1"), p.go("COOEE-1", listOf("comment", "hello")))
+    assertEquals(Completed("comments on COOEE-1"), p.go("COOEE-1", "comment", "hello"))
   }
 }

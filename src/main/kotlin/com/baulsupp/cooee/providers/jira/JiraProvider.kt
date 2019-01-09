@@ -4,9 +4,6 @@ import com.baulsupp.cooee.api.Completed
 import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
-import com.baulsupp.cooee.completion.ArgumentCompleter
-import com.baulsupp.cooee.completion.CommandCompleter
-import com.baulsupp.cooee.completion.SimpleArgumentCompleter
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.okurl.kotlin.JSON
 import com.baulsupp.okurl.kotlin.execute
@@ -36,7 +33,7 @@ class JiraProvider : BaseProvider() {
   // TODO cache with extreme prejudice
   lateinit var knownProjects: List<ProjectReference>
 
-  override suspend fun go(command: String, args: List<String>): GoResult {
+  override suspend fun go(command: String, vararg args: String): GoResult {
     if (command.isProjectOrIssue()) {
       val ipp = issueProjectPair(command)
 
@@ -47,9 +44,6 @@ class JiraProvider : BaseProvider() {
         } else if (args.firstOrNull() == "comment") {
           ipp.comment(args.drop(1).joinToString(" "))
           return Completed("comments on $command")
-//        } else if (args.firstOrNull() == "close") {
-//          ipp.close(args.drop(1).joinToString(" "))
-//          return Completed("closed $command")
         } else {
           return RedirectResult(ipp.url(command))
         }
@@ -102,7 +96,7 @@ class JiraProvider : BaseProvider() {
     return knownProjects
   }
 
-  suspend fun IssueReference.vote() {
+  private suspend fun IssueReference.vote() {
     return appServices.client.query(
       request(
         "https://api.atlassian.com/ex/jira/${project.serverId}/rest/api/3/issue/$issue/votes",
@@ -113,7 +107,7 @@ class JiraProvider : BaseProvider() {
     )
   }
 
-  suspend fun IssueReference.comment(comment: String) {
+  private suspend fun IssueReference.comment(comment: String) {
     appServices.client.execute(
       request(
         "https://api.atlassian.com/ex/jira/${project.serverId}/rest/api/3/issue/$issue/comment",
@@ -129,71 +123,16 @@ class JiraProvider : BaseProvider() {
     )
   }
 
-  suspend fun IssueReference.close(comment: String) {
-    return appServices.client.query(
-      request(
-        "https://api.atlassian.com/ex/jira/${project.serverId}/rest/api/3/issue/$issue/votes",
-        userToken
-      ) {
-        postJsonBody("")
-      }
-    )
-  }
-
-  private suspend fun mostLikelyProjectIssues(project: String): List<String> =
+  suspend fun mostLikelyProjectIssues(project: String): List<String> =
     issues(project)?.issues?.map { it.key }.orEmpty()
 
-  private fun mostLikelyIssueCompletions(issue: String): List<String> =
+  fun mostLikelyIssueCompletions(issue: String): List<String> =
     when {
       issue.issueNumber()!!.length > 4 -> listOf(issue)
       else -> listOf(issue) + (0..9).map { issue + it }
     }
 
-  override fun commandCompleter(): CommandCompleter = object : CommandCompleter {
-    override suspend fun suggestCommands(command: String): List<String> {
-      val visibleProjects = allprojects()
+  override fun commandCompleter() = JiraCommandCompleter(this)
 
-      val projectKeys = visibleProjects.map { it.projectKey }
-
-      return when {
-        command == "" -> listOf()
-        command.isProjectOrPartialProject() -> projectKeys.filter { it.startsWith(command) }.flatMap {
-          listOf(
-            it,
-            "$it-"
-          )
-        }
-        command.isProjectIssueStart() -> mostLikelyProjectIssues(command.projectCode()!!)
-        command.isIssueOrPartialIssue() -> mostLikelyIssueCompletions(command)
-        else -> listOf()
-      }
-    }
-
-    override suspend fun matches(command: String): Boolean {
-      return (command.isProjectOrIssue()) && knownProjects.any {
-        command == it.projectKey || command.startsWith("${it.projectKey}-")
-      }
-    }
-  }
-
-  override fun argumentCompleter(): ArgumentCompleter {
-    return SimpleArgumentCompleter(listOf("comment", "vote"))
-  }
-
-  // TODO introduce sealed type for JIRA issues to avoid double parsing and null hacks
-  private fun String.isProjectOrPartialIssue() = matches("[A-Z]+(?:-\\d*)?".toRegex())
-
-  private fun String.isProjectOrIssue() = matches("[A-Z]+(?:-\\d+)?".toRegex())
-  private fun String.isProjectOrPartialProject() = matches("[A-Z]+".toRegex())
-  private fun String.isProjectIssueStart() = matches("[A-Z]+-".toRegex())
-  private fun String.isIssueOrPartialIssue() = matches("[A-Z]+-\\d+".toRegex())
-  private fun String.projectCode(): String? =
-    if (isProjectOrPartialIssue()) split('-')[0] else throw NullPointerException(
-      "null for $this"
-    )
-
-  private fun String.issueNumber(): String? =
-    if (isIssueOrPartialIssue()) split('-')[1] else throw NullPointerException(
-      "null for $this"
-    )
+  override fun argumentCompleter() = JiraArgumentCompleter(this)
 }

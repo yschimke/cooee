@@ -21,7 +21,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.bounceApi(
   registryProvider: RegistryProvider
 ) {
   val r =
-    goInfo.command?.let { registryProvider.go(it, goInfo.args) } ?: Unmatched
+    goInfo.command?.let { registryProvider.go(it, *goInfo.args.toTypedArray()) } ?: Unmatched
 
   if (r == Unmatched) {
     call.respond(Completed(message = "no match"))
@@ -66,7 +66,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.bounceWeb(
   registryProvider: RegistryProvider
 ) {
   val r =
-    go.command?.let { registryProvider.go(it, go.args) } ?: Unmatched
+    go.command?.let { registryProvider.go(it, *go.args.toTypedArray()) } ?: Unmatched
 
   when (r) {
     is RedirectResult -> call.respondRedirect(r.location, permanent = false)

@@ -17,6 +17,9 @@ abstract class BaseProvider : Provider {
   val userToken
     get() = instance?.let { TokenSet(it.user) } ?: DefaultToken
 
+  val client
+    get() = appServices.client
+
   override fun init(appServices: AppServices) {
     this.appServices = appServices
   }

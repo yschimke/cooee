@@ -11,7 +11,7 @@ import com.baulsupp.cooee.providers.BaseProvider
 class TestProvider: BaseProvider() {
   override val name = "test"
 
-  override suspend fun go(command: String, args: List<String>): GoResult {
+  override suspend fun go(command: String, vararg args: String): GoResult {
     return RedirectResult("https://test.com")
   }
 

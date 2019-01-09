@@ -12,7 +12,7 @@ import com.baulsupp.okurl.kotlin.query
 class GoogleProvider : BaseProvider() {
   override val name = "google"
 
-  override suspend fun go(command: String, args: List<String>): GoResult = if (args.isEmpty()) {
+  override suspend fun go(command: String, vararg args: String): GoResult = if (args.isEmpty()) {
     RedirectResult("https://www.google.com/")
   } else {
     RedirectResult("https://www.google.com/search?q=${args.joinToString("+")}${if (command == "gl") "&btnI" else ""}")

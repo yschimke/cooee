@@ -32,7 +32,7 @@ class StravaProviderTest {
   fun lastrun() = runBlocking {
     p.setLocalCredentials(StravaAuthInterceptor(), appServices)
 
-    val result = p.go("strava", listOf("lastrun"))
+    val result = p.go("strava", "lastrun")
 
     assertTrue(result is Completed)
     assertThat(result.message, startsWith("Distance: "))

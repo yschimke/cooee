@@ -14,7 +14,7 @@ class TwitterProvider : BaseProvider() {
 
   override fun associatedServices(): Set<String> = setOf("twitter")
 
-  override suspend fun go(command: String, args: List<String>): GoResult {
+  override suspend fun go(command: String, vararg args: String): GoResult {
     val text = if (args.isNotEmpty()) "&text=" + args.joinToString(" ") else ""
     val screen_name = command.substring(1)
 
