@@ -15,6 +15,7 @@ import com.baulsupp.cooee.providers.trello.TrelloProvider
 import com.baulsupp.cooee.providers.twitter.TwitterProvider
 import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
+import com.baulsupp.okurl.authenticator.RenewingInterceptor
 import com.mongodb.reactivestreams.client.MongoDatabase
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
@@ -44,8 +45,11 @@ class ProdAppServices(application: Application) : AppServices {
   override val credentialsStore = MongoCredentialsStore(mongoDb)
 
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
+    val services = AuthenticatingInterceptor.defaultServices()
+
     eventListenerFactory(LoggingEventListener.Factory { s -> application.log.debug(s) })
-    addNetworkInterceptor(AuthenticatingInterceptor(credentialsStore))
+    addInterceptor(RenewingInterceptor(credentialsStore, services))
+    addNetworkInterceptor(AuthenticatingInterceptor(credentialsStore, services))
   }.build()
 
   override fun defaultProviders() = listOf(
