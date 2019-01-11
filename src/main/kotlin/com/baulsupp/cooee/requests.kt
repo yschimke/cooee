@@ -3,7 +3,6 @@ package com.baulsupp.cooee
 import com.baulsupp.cooee.api.*
 import com.baulsupp.cooee.mongo.StringService
 import com.baulsupp.cooee.providers.RegistryProvider
-import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.credentials.CredentialsStore
 import io.ktor.application.ApplicationCall
@@ -55,41 +54,39 @@ suspend fun PipelineContext<Unit, ApplicationCall>.bounceWeb(
 }
 
 @KtorExperimentalLocationsAPI
-suspend fun PipelineContext<Unit, ApplicationCall>.commandCompletionApi(
-  commandQuery: CommandCompletion,
+suspend fun PipelineContext<Unit, ApplicationCall>.completionApi(
+  commandQuery: CompletionRequest,
   registryProvider: RegistryProvider
 ) {
-  val command = commandQuery.q ?: ""
+  val completions =
+    if (commandQuery.isCommand()) commandCompletion(registryProvider, commandQuery) else argumentCompletion(
+      registryProvider,
+      commandQuery
+    )
 
-  val filtered = commandCompletion(registryProvider, command)
-
-  call.respond(Completions(filtered))
-}
-
-private suspend fun commandCompletion(
-  registryProvider: RegistryProvider,
-  command: String
-): List<String> {
-  val completions = registryProvider.commandCompleter().suggestCommands(command)
-
-  // TODO not needed
-  return completions.filter { it.startsWith(command) }
+  call.respond(completions)
 }
 
 @KtorExperimentalLocationsAPI
-suspend fun PipelineContext<Unit, ApplicationCall>.argumentCompletionApi(
-  argumentQuery: ArgumentCompletion,
-  registryProvider: RegistryProvider
-) {
-  call.respond(Completions(argumentCompletion(registryProvider, argumentQuery.command!!, argumentQuery.args)))
+private suspend fun commandCompletion(
+  registryProvider: RegistryProvider,
+  command: CompletionRequest
+): Completions {
+  val commands = registryProvider.commandCompleter().suggestCommands(command.command)
+  return Completions(commands.map { CompletionItem(it, it, "Command for '$it'") })
 }
 
+@KtorExperimentalLocationsAPI
 private suspend fun argumentCompletion(
   registryProvider: RegistryProvider,
-  command: String,
-  arguments: List<String>
-): List<String> {
-  return registryProvider.argumentCompleter().suggestArguments(command, arguments).orEmpty()
+  command: CompletionRequest
+): Completions {
+  val suggestArguments = registryProvider.argumentCompleter().suggestArguments(
+    command.command,
+    command.args
+  )
+  val commands = suggestArguments.orEmpty()
+  return Completions.complete(command, commands)
 }
 
 @KtorExperimentalLocationsAPI
@@ -111,23 +108,19 @@ suspend fun PipelineContext<Unit, ApplicationCall>.searchSuggestion(
   it: SearchSuggestion,
   registryProvider: RegistryProvider
 ) {
-  val q = it.q ?: ""
-
-  // TODO smarter split
-  val query = q.split(" ")
+  val query = CompletionRequest(it.q ?: "")
 
   val results = when {
-    query.isEmpty() -> listOf()
-    query.size == 1 -> commandCompletion(registryProvider, query.first())
-    else -> argumentCompletion(registryProvider, query.first(), query.drop(1)).map { "${query.first()} $it" }
+    query.isCommand() -> commandCompletion(registryProvider, query)
+    else -> argumentCompletion(registryProvider, query)
   }
 
   val response: SearchSuggestionsResults =
     SearchSuggestionsResults(
-      q,
-      results,
-      results.map { "Desc $it" },
-      results.map { "https://coo.ee/go?q=${it.replace(" ", "+")}" })
+      it.q ?: "",
+      results.completions.map { it.line },
+      results.completions.map { it.description },
+      results.completions.map { "https://coo.ee/go?q=${it.line.replace(" ", "+")}" })
 
   call.respond(response)
 }

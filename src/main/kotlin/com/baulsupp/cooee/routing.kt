@@ -1,8 +1,7 @@
 package com.baulsupp.cooee
 
-import com.baulsupp.cooee.api.ArgumentCompletion
 import com.baulsupp.cooee.api.Authorize
-import com.baulsupp.cooee.api.CommandCompletion
+import com.baulsupp.cooee.api.CompletionRequest
 import com.baulsupp.cooee.api.Go
 import com.baulsupp.cooee.api.GoInfo
 import com.baulsupp.cooee.api.SearchSuggestion
@@ -28,8 +27,7 @@ fun Routing.root(appServices: AppServices) {
   get<Go> { bounceWeb(it, appServices.userServices.providersFor(call)) }
   get<GoInfo> { bounceApi(it, appServices.userServices.providersFor(call)) }
   get<UserInfo> { userApi(appServices.userAuthenticator.userForRequest(call)) }
-  get<CommandCompletion> { commandCompletionApi(it, appServices.userServices.providersFor(call)) }
-  get<ArgumentCompletion> { argumentCompletionApi(it, appServices.userServices.providersFor(call)) }
+  get<CompletionRequest> { completionApi(it, appServices.userServices.providersFor(call)) }
   post<Authorize> {
     val user = appServices.userAuthenticator.userForRequest(call) ?: throw AuthenticationException()
     authorize(it, user, appServices.credentialsStore)

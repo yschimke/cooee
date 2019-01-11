@@ -9,7 +9,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import org.slf4j.LoggerFactory
-import java.io.InterruptedIOException
 
 // TODO add exception handling for individual items and log errors
 class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
@@ -43,7 +42,7 @@ class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
           providers.map {
             async {
               try {
-                it.commandCompleter().suggestCommands(command)
+                it.commandCompleter().suggestCommands(command).filter { s -> s.startsWith(command) }
               } catch (e: Exception) {
                 log.warn("suggestCommands failed: " + it.name, e)
                 listOf<String>()
@@ -91,7 +90,7 @@ class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
     providers.map {
       async {
         try {
-        it.matches(command)
+          it.matches(command)
         } catch (e: Exception) {
           log.warn("matches failed: " + it.name, e)
           false
