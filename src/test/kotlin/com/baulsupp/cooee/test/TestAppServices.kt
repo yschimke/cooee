@@ -12,6 +12,7 @@ import com.baulsupp.cooee.providers.strava.StravaProvider
 import com.baulsupp.cooee.providers.twitter.TwitterProvider
 import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
+import com.baulsupp.okurl.authenticator.RenewingInterceptor
 import com.baulsupp.okurl.credentials.CredentialsStore
 import com.baulsupp.okurl.credentials.InMemoryCredentialsStore
 import io.ktor.application.ApplicationCall
@@ -36,8 +37,11 @@ class TestAppServices : AppServices {
   override val credentialsStore = InMemoryCredentialsStore()
 
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
+    val services = AuthenticatingInterceptor.defaultServices()
+
     eventListenerFactory(LoggingEventListener.Factory { s -> log.info(s) })
-    addNetworkInterceptor(AuthenticatingInterceptor(credentialsStore))
+    addInterceptor(RenewingInterceptor(credentialsStore, services))
+    addNetworkInterceptor(AuthenticatingInterceptor(credentialsStore, services))
   }.build()
 
   override val userServices = object : UserServices {
