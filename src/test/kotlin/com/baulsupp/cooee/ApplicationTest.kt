@@ -72,14 +72,14 @@ class ApplicationTest {
 
   @Test
   fun testCommandCompletion() {
-    testRequest("/api/v0/command-completion?q=g") {
+    testRequest("/api/v0/completion?q=g") {
       assertEquals("{\"completions\":[\"g\",\"gl\",\"google\",\"gmail\"]}", response.content)
     }
   }
 
   private fun testCompletion(prefix: String, check: (List<String>) -> Unit = {}) {
     withTestApplication({ test() }) {
-      handleRequest(HttpMethod.Get, "/api/v0/command-completion?q=$prefix").apply {
+      handleRequest(HttpMethod.Get, "/api/v0/completion?q=$prefix").apply {
         assertEquals(HttpStatusCode.OK, response.status())
         val completions = moshi.mapAdapter<List<String>>().fromJson(response.content!!)
 
@@ -90,7 +90,7 @@ class ApplicationTest {
 
   @Test
   fun testArgumentCompletion() {
-    testRequest("/api/v0/argument-completion?q=test ") {
+    testRequest("/api/v0/completion?q=test ") {
       assertEquals(HttpStatusCode.OK, response.status())
       assertEquals("{\"completions\":[\"aaa\",\"bbb\"]}", response.content)
     }

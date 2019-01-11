@@ -63,17 +63,14 @@ suspend fun PipelineContext<Unit, ApplicationCall>.commandCompletionApi(
 
   val filtered = commandCompletion(registryProvider, command)
 
-  call.respond(Completions(filtered))
+  call.respond(filtered)
 }
 
 private suspend fun commandCompletion(
   registryProvider: RegistryProvider,
   command: String
-): List<String> {
-  val completions = registryProvider.commandCompleter().suggestCommands(command)
-
-  // TODO not needed
-  return completions.filter { it.startsWith(command) }
+): Completions {
+  return Completions(registryProvider.commandCompleter().suggestCommands(command))
 }
 
 @KtorExperimentalLocationsAPI
@@ -81,15 +78,15 @@ suspend fun PipelineContext<Unit, ApplicationCall>.argumentCompletionApi(
   argumentQuery: ArgumentCompletion,
   registryProvider: RegistryProvider
 ) {
-  call.respond(Completions(argumentCompletion(registryProvider, argumentQuery.command!!, argumentQuery.args)))
+  call.respond(argumentCompletion(registryProvider, argumentQuery.command!!, argumentQuery.args))
 }
 
 private suspend fun argumentCompletion(
   registryProvider: RegistryProvider,
   command: String,
   arguments: List<String>
-): List<String> {
-  return registryProvider.argumentCompleter().suggestArguments(command, arguments).orEmpty()
+): Completions {
+  return Completions(registryProvider.argumentCompleter().suggestArguments(command, arguments)?.map { "$command $it" }.orEmpty())
 }
 
 @KtorExperimentalLocationsAPI
@@ -117,17 +114,17 @@ suspend fun PipelineContext<Unit, ApplicationCall>.searchSuggestion(
   val query = q.split(" ")
 
   val results = when {
-    query.isEmpty() -> listOf()
+    query.isEmpty() -> Completions(listOf())
     query.size == 1 -> commandCompletion(registryProvider, query.first())
-    else -> argumentCompletion(registryProvider, query.first(), query.drop(1)).map { "${query.first()} $it" }
+    else -> argumentCompletion(registryProvider, query.first(), query.drop(1))
   }
 
   val response: SearchSuggestionsResults =
     SearchSuggestionsResults(
       q,
-      results,
-      results.map { "Desc $it" },
-      results.map { "https://coo.ee/go?q=${it.replace(" ", "+")}" })
+      results.completion_list.map { it.completion },
+      results.completion_list.map { it.description },
+      results.completion_list.map { "https://coo.ee/go?q=${it.completion.replace(" ", "+")}" })
 
   call.respond(response)
 }

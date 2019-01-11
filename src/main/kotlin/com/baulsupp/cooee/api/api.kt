@@ -82,7 +82,10 @@ data class Authorize(
   val tokenSet: String? = null
 )
 
-data class Completions(val completions: List<String>)
+data class CompletionItem(val completion: String, val description: String)
+data class Completions(val completions: List<String>, val completion_list: List<CompletionItem>) {
+  constructor(completions: List<String>) : this(completions, completions.map { CompletionItem(it, "Desc $it") })
+}
 
 sealed class GoResult {
   override fun toString(): String {
