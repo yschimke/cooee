@@ -1,9 +1,9 @@
 package com.baulsupp.cooee
 
+import com.baulsupp.cooee.api.CompletionItem
+import com.baulsupp.cooee.api.Completions
 import com.baulsupp.cooee.providers.ProviderInstance
 import com.baulsupp.cooee.test.TestAppServices
-import com.baulsupp.cooee.users.UserEntry
-import com.baulsupp.okurl.kotlin.mapAdapter
 import com.baulsupp.okurl.kotlin.moshi
 import io.ktor.application.Application
 import io.ktor.http.HttpMethod
@@ -11,6 +11,7 @@ import io.ktor.http.HttpMethod.Companion.Get
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.HttpStatusCode.Companion.Found
 import io.ktor.http.HttpStatusCode.Companion.OK
+import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.server.testing.TestApplicationCall
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
@@ -21,7 +22,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.BeforeClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ApplicationTest {
@@ -73,17 +73,23 @@ class ApplicationTest {
   @Test
   fun testCommandCompletion() {
     testRequest("/api/v0/completion?q=g") {
-      assertEquals("{\"completions\":[\"g\",\"gl\",\"google\",\"gmail\"]}", response.content)
+      assertEquals(
+        "{\"completions\":[" +
+          "{\"word\":\"g\",\"line\":\"g\",\"description\":\"Command for 'g'\"}," +
+          "{\"word\":\"gl\",\"line\":\"gl\",\"description\":\"Command for 'gl'\"}," +
+          "{\"word\":\"google\",\"line\":\"google\",\"description\":\"Command for 'google'\"}," +
+          "{\"word\":\"gmail\",\"line\":\"gmail\",\"description\":\"Command for 'gmail'\"}]}", response.content
+      )
     }
   }
 
-  private fun testCompletion(prefix: String, check: (List<String>) -> Unit = {}) {
+  private fun testCompletion(prefix: String, check: (Completions) -> Unit = {}) {
     withTestApplication({ test() }) {
       handleRequest(HttpMethod.Get, "/api/v0/completion?q=$prefix").apply {
         assertEquals(HttpStatusCode.OK, response.status())
-        val completions = moshi.mapAdapter<List<String>>().fromJson(response.content!!)
+        val completions: Completions = moshi.adapter(Completions::class.java).fromJson(response.content!!)!!
 
-        check(completions!!.getValue("completions"))
+        check(completions)
       }
     }
   }
@@ -92,7 +98,10 @@ class ApplicationTest {
   fun testArgumentCompletion() {
     testRequest("/api/v0/completion?q=test ") {
       assertEquals(HttpStatusCode.OK, response.status())
-      assertEquals("{\"completions\":[\"aaa\",\"bbb\"]}", response.content)
+      assertEquals(
+        "{\"completions\":[{\"word\":\"test\",\"line\":\"test\",\"description\":\"Command for 'test'\"}]}",
+        response.content
+      )
     }
   }
 
@@ -110,10 +119,11 @@ class ApplicationTest {
     }
   }
 
+  @KtorExperimentalLocationsAPI
   @Test
   fun testBookmarkCompletion() {
     testCompletion("gm") {
-      assertEquals(listOf("gmail"), it)
+      assertEquals(Completions(listOf(CompletionItem("gmail", "gmail", "Command for 'gmail'"))), it)
     }
   }
 
@@ -158,7 +168,7 @@ class ApplicationTest {
       assertEquals(
         "[\"tes\"," +
           "[\"test\"]," +
-          "[\"Desc test\"]," +
+          "[\"Command for 'test'\"]," +
           "[\"https://coo.ee/go?q=test\"]]",
         response.content
       )
@@ -171,7 +181,7 @@ class ApplicationTest {
       assertEquals(
         "[\"test \"," +
           "[\"test aaa\",\"test bbb\"]," +
-          "[\"Desc test aaa\",\"Desc test bbb\"]," +
+          "[\"Description for 'aaa'\",\"Description for 'bbb'\"]," +
           "[\"https://coo.ee/go?q=test+aaa\",\"https://coo.ee/go?q=test+bbb\"]]",
         response.content
       )

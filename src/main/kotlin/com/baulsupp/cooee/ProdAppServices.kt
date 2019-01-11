@@ -34,9 +34,9 @@ class ProdAppServices(application: Application) : AppServices {
   private val eventLoop = NioEventLoopGroup()
 
   // TODO allow local
-  val mongo = MongoFactory.mongo(false, eventLoop)
+  private val mongo = MongoFactory.mongo(false, eventLoop)
 
-  val mongoDb: MongoDatabase = mongo.getDatabase("cooee")
+  private val mongoDb: MongoDatabase = mongo.getDatabase("cooee")
 
   override val providerStore = MongoProviderStore(this::defaultProviders, mongoDb, this)
 

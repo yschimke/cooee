@@ -15,9 +15,6 @@ fun Application.local() = module(ProdAppServices(this), cloud = false)
 @KtorExperimentalLocationsAPI
 @ExperimentalCoroutinesApi
 fun main(args: Array<String>) {
-  // TODO breaks Mongo
-//  setupProvider()
-
   DebugProbes.install()
 
   val env = applicationEngineEnvironment {

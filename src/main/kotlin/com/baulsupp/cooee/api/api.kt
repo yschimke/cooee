@@ -26,13 +26,11 @@ data class GoInfo(val q: String? = null) {
 class UserInfo
 
 @KtorExperimentalLocationsAPI
-@Location("/api/v0/command-completion")
-data class CommandCompletion(val q: String? = null)
+@Location("/api/v0/completion")
+data class CompletionRequest(val q: String? = "") {
+  fun isCommand(): Boolean = args.isEmpty()
 
-@KtorExperimentalLocationsAPI
-@Location("/api/v0/argument-completion")
-data class ArgumentCompletion(val q: String? = null) {
-  val command: String? = q?.split(" ")?.firstOrNull()
+  val command: String = q?.split(" ")?.firstOrNull() ?: ""
   val args: List<String> = q?.split(" ")?.drop(1).orEmpty()
 }
 
@@ -82,9 +80,20 @@ data class Authorize(
   val tokenSet: String? = null
 )
 
-data class CompletionItem(val completion: String, val description: String)
-data class Completions(val completions: List<String>, val completion_list: List<CompletionItem>) {
-  constructor(completions: List<String>) : this(completions, completions.map { CompletionItem(it, "Desc $it") })
+data class CompletionItem(val word: String, val line: String, val description: String)
+
+@KtorExperimentalLocationsAPI
+data class Completions(val completions: List<CompletionItem>) {
+  companion object {
+    fun complete(command: CompletionRequest, commands: List<String>): Completions {
+      val query = command.q ?: ""
+
+      // TODO improve or test logic
+      val prefix = query.substring(0, query.lastIndexOf(" ") + 1)
+
+      return Completions(commands.map { s -> CompletionItem(s, prefix + s, "Description for '$s'") })
+    }
+  }
 }
 
 sealed class GoResult {
