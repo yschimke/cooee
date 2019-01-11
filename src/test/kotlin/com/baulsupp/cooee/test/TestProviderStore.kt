@@ -10,15 +10,15 @@ import com.baulsupp.cooee.providers.providers.ProvidersProvider
 class TestProviderStore(val appServices: AppServices, private val providers: () -> List<Provider>) : ProviderStore {
   val providerInstances = mutableSetOf<ProviderInstance>()
 
-  override suspend fun forUser(user: String): RegistryProvider? {
+  override suspend fun forUser(email: String): RegistryProvider? {
     val providersProvider = ProvidersProvider().apply {
       init(this@TestProviderStore.appServices)
-      configure(ProviderInstance(user, "providers", mapOf()))
+      configure(ProviderInstance(email, "providers", mapOf()))
     }
 
     val userProviders = providers().mapNotNull { p ->
       val config = providerInstances.find { pi ->
-        p.name == pi.name && pi.user == user
+        p.name == pi.name && pi.user == email
       }
 
       if (config != null) {

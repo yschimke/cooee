@@ -99,7 +99,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.authorize(
     throw BadRequestException()
   }
 
-  credentialsStore.set(StringService(authorize.serviceName), user.user, authorize.token)
+  credentialsStore.set(StringService(authorize.serviceName), user.email, authorize.token)
   call.respond(HttpStatusCode.Created)
 }
 

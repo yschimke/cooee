@@ -19,17 +19,16 @@ class MongoProviderStore(
   private val providers: () -> List<BaseProvider>,
   private val mongoDb: MongoDatabase,
   private val appServices: AppServices
-) :
-  ProviderStore {
+) : ProviderStore {
   private val providerDb: MongoCollection<Document> by lazy { mongoDb.getCollection("providers") }
 
-  override suspend fun forUser(user: String): RegistryProvider? {
+  override suspend fun forUser(email: String): RegistryProvider? {
     val providerInstances =
-      providerDb.find(eq("user", user), ProviderInstance::class.java).awaitList()
+      providerDb.find(eq("user", email), ProviderInstance::class.java).awaitList()
 
     val providersProvider = ProvidersProvider()
     providersProvider.init(appServices = appServices)
-    providersProvider.configure(ProviderInstance(user, "providers", mapOf()))
+    providersProvider.configure(ProviderInstance(email, "providers", mapOf()))
 
     val providers = providers().mapNotNull {
       val possibleName = it.name
@@ -58,7 +57,7 @@ class MongoProviderStore(
     ).awaitFirst()
   }
 
-  override suspend fun remove(user: String, name: String) {
-    providerDb.deleteMany(and(eq("user", user), eq("name", name))).awaitFirst()
+  override suspend fun remove(email: String, providerName: String) {
+    providerDb.deleteMany(and(eq("user", email), eq("name", providerName))).awaitFirst()
   }
 }

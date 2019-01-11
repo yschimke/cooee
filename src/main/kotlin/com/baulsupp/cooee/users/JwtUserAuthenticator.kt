@@ -20,11 +20,11 @@ class JwtUserAuthenticator : UserAuthenticator {
     if (token != null) {
       val jwt = Jwts.parser().setSigningKey("baulsupp4evabaulsupp4evabaulsupp4eva".toByteArray()).parseClaimsJws(token)
 
-      val user = jwt.body["user"] as? String
+      val name = jwt.body["name"] as? String
       val email = jwt.body["email"] as? String
 
-      if (user != null && email != null) {
-        return UserEntry(token = token, user = user, email = email)
+      if (name != null && email != null) {
+        return UserEntry(token = token, name = name, email = email)
       }
     }
 

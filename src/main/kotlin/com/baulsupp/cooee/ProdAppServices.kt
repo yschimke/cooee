@@ -65,6 +65,6 @@ class ProdAppServices(application: Application) : AppServices {
 
   override val userServices = object : UserServices {
     override suspend fun providersFor(call: ApplicationCall): RegistryProvider =
-      userAuthenticator.userForRequest(call)?.let { providerStore.forUser(it.user) } ?: RegistryProvider(defaultProviders())
+      userAuthenticator.userForRequest(call)?.let { providerStore.forUser(it.email) } ?: RegistryProvider(defaultProviders())
   }
 }
