@@ -48,7 +48,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.bounceWeb(
 
   when (r) {
     is RedirectResult -> call.respondRedirect(r.location, permanent = false)
-    is Unmatched -> call.respond(HttpStatusCode.NotFound)
+    is Unmatched -> call.respond("Not Found Page")
     is Completed -> call.respond(r)
   }
 }

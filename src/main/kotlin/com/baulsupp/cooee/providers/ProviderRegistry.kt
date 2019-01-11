@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 // TODO add exception handling for individual items and log errors
@@ -100,6 +101,6 @@ class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
   }.awaitAll().any()
 
   companion object {
-    val log = LoggerFactory.getLogger(this::class.java.declaringClass)
+    val log: Logger = LoggerFactory.getLogger(this::class.java.declaringClass)
   }
 }

@@ -31,7 +31,7 @@ class JiraProvider : BaseProvider() {
   override fun associatedServices(): Set<String> = setOf("atlassian")
 
   // TODO cache with extreme prejudice
-  lateinit var knownProjects: List<ProjectReference>
+  private lateinit var knownProjects: List<ProjectReference>
 
   override suspend fun go(command: String, vararg args: String): GoResult {
     if (command.isProjectOrIssue()) {

@@ -23,7 +23,7 @@ class JiraCommandCompleter(val provider: JiraProvider) : CommandCompleter {
   }
 
   override suspend fun matches(command: String): Boolean {
-    return (command.isProjectOrIssue()) && provider.knownProjects.any {
+    return (command.isProjectOrIssue()) && provider.allprojects().any {
       command == it.projectKey || command.startsWith("${it.projectKey}-")
     }
   }
