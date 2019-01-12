@@ -38,5 +38,3 @@ data class Issues(
 )
 
 data class IssueQuery(val jql: String, val fields: List<String>? = null)
-
-

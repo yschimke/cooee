@@ -32,19 +32,7 @@ class JwtUserAuthenticator : UserAuthenticator {
   }
 
   fun tokenFor(user: String): String {
-    return DefaultJwtBuilder().claim("user", user).claim("email", "$user@coo.ee")
+    return DefaultJwtBuilder().claim("name", user).claim("email", "$user@coo.ee")
       .signWith(Keys.hmacShaKeyFor("baulsupp4evabaulsupp4evabaulsupp4eva".toByteArray())).compact()
   }
-}
-
-fun main(args: Array<String>) {
-  val auth = JwtUserAuthenticator()
-
-  val token1 = auth.tokenFor("yuri")
-  println(token1)
-  println(auth.parseToken(token1))
-
-  val token =
-    "eyJhbGciOiJIUzI1NiIsImtpZCI6IlRCRCIsImV4cCI6MTU0NzA2NjE4M30.eyJlbWFpbCI6Inl1cmlAY29vLmVlIiwidXNlciI6Inl1cmkifQ.LKlqvPDEcgzNUDYP4tbAkZJHVuw5UvH3B5fzneFG3Z8"
-  println(auth.parseToken(token))
 }

@@ -2,7 +2,8 @@ package com.baulsupp.cooee
 
 import com.baulsupp.cooee.api.CompletionItem
 import com.baulsupp.cooee.api.Completions
-import com.baulsupp.cooee.providers.ProviderInstance
+import com.baulsupp.cooee.mongo.ProviderInstance
+import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
 import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.okurl.kotlin.moshi
 import io.ktor.application.Application
@@ -72,7 +73,12 @@ class ApplicationTest {
 
   @Test
   fun testCommandCompletion() {
-    testRequest("/api/v0/completion?q=g") {
+    runBlocking {
+      services.providerConfigStore.store("yuri@coo.ee", "google", mapOf())
+      services.providerConfigStore.store("yuri@coo.ee", "bookmarks", mapOf("bookmarks" to BookmarksProvider.defaultBookmarks))
+    }
+
+    testRequest("/api/v0/completion?q=g", user = "yuri") {
       assertEquals(
         "{\"completions\":[" +
           "{\"word\":\"g\",\"line\":\"g\",\"description\":\"Command for 'g'\"}," +
@@ -96,7 +102,11 @@ class ApplicationTest {
 
   @Test
   fun testArgumentCompletion() {
-    testRequest("/api/v0/completion?q=test ") {
+    runBlocking {
+      services.providerConfigStore.store("yuri@coo.ee", "test", mapOf())
+    }
+
+    testRequest("/api/v0/completion?q=test ", user = "yuri") {
       assertEquals(HttpStatusCode.OK, response.status())
       assertEquals(
         "{\"completions\":[{\"word\":\"test\",\"line\":\"test\",\"description\":\"Command for 'test'\"}]}",
@@ -142,21 +152,21 @@ class ApplicationTest {
     val token = services.userAuthenticator.tokenFor("yuri")
 
     testRequest("/api/v0/user", user = "yuri") {
-      assertEquals("{\"token\":\"$token\",\"user\":\"yuri\",\"email\":\"yuri@coo.ee\"}", response.content)
+      assertEquals("{\"token\":\"$token\",\"name\":\"yuri\",\"email\":\"yuri@coo.ee\"}", response.content)
     }
   }
 
   @Test
   fun testAddBookmarkProvider() {
-    testRequest("/go?q=add bookmarks", user = "yuri")
+    testRequest("/go?q=add test", user = "yuri")
 
-    assertEquals(1, services.providerStore.providerInstances.size)
+    assertEquals(1, services.providerConfigStore.providerInstances.size)
   }
 
   @Test
   fun testAddBookmarkName() {
     runBlocking {
-      services.providerStore.store(ProviderInstance("yuri", "bookmarks", mapOf()))
+      services.providerConfigStore.store("yuri@coo.ee", "bookmarks", mapOf())
     }
 
     testRequest("/go?q=bookmarks add nb https://newbookmark", user = "yuri")
@@ -164,7 +174,11 @@ class ApplicationTest {
 
   @Test
   fun testSearchSuggestionsCommands() {
-    testRequest("/api/v0/search-suggestion?q=tes", expectedCode = OK) {
+    runBlocking {
+      services.providerConfigStore.store("yuri@coo.ee", "test", mapOf())
+    }
+
+    testRequest("/api/v0/search-suggestion?q=tes", expectedCode = OK, user = "yuri") {
       assertEquals(
         "[\"tes\"," +
           "[\"test\"]," +
@@ -177,7 +191,11 @@ class ApplicationTest {
 
   @Test
   fun testSearchSuggestionsArguments() {
-    testRequest("/api/v0/search-suggestion?q=test+", expectedCode = OK) {
+    runBlocking {
+      services.providerConfigStore.store("yuri@coo.ee", "test", mapOf())
+    }
+
+    testRequest("/api/v0/search-suggestion?q=test+", expectedCode = OK, user = "yuri") {
       assertEquals(
         "[\"test \"," +
           "[\"test aaa\",\"test bbb\"]," +

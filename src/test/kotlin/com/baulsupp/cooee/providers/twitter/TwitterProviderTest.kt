@@ -1,8 +1,9 @@
 package com.baulsupp.cooee.providers.twitter
 
 import com.baulsupp.cooee.api.RedirectResult
-import com.baulsupp.cooee.providers.ProviderInstance
+import com.baulsupp.cooee.mongo.ProviderInstance
 import com.baulsupp.cooee.test.TestAppServices
+import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.credentials.CredentialFactory
 import com.baulsupp.okurl.credentials.DefaultToken
 import com.baulsupp.okurl.services.twitter.TwitterAuthInterceptor
@@ -15,7 +16,10 @@ import kotlin.test.assertEquals
 
 class TwitterProviderTest {
   val appServices = TestAppServices()
-  val p = TwitterProvider().apply { init(this@TwitterProviderTest.appServices) }
+  val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
+  val p = TwitterProvider().apply {
+    init(this@TwitterProviderTest.appServices, userEntry)
+  }
 
   @Test
   fun basic() {
@@ -40,7 +44,6 @@ class TwitterProviderTest {
     )
     assumeNotNull(credentials)
     appServices.credentialsStore.set(serviceDefinition, "testuser", credentials!!)
-    p.configure(ProviderInstance("testuser", p.name, mapOf()))
   }
 
   @Test

@@ -1,36 +1,31 @@
 package com.baulsupp.cooee.test
 
 import com.baulsupp.cooee.AppServices
-import com.baulsupp.cooee.UserServices
-import com.baulsupp.cooee.okhttp.close
-import com.baulsupp.cooee.providers.RegistryProvider
-import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
-import com.baulsupp.cooee.providers.github.GithubProvider
-import com.baulsupp.cooee.providers.google.GoogleProvider
-import com.baulsupp.cooee.providers.jira.JiraProvider
-import com.baulsupp.cooee.providers.strava.StravaProvider
-import com.baulsupp.cooee.providers.twitter.TwitterProvider
+import com.baulsupp.cooee.providers.ProviderRegistry
 import com.baulsupp.cooee.users.JwtUserAuthenticator
+import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
 import com.baulsupp.okurl.authenticator.RenewingInterceptor
-import com.baulsupp.okurl.credentials.CredentialsStore
 import com.baulsupp.okurl.credentials.InMemoryCredentialsStore
 import io.ktor.application.ApplicationCall
-import io.ktor.application.log
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
 import org.slf4j.LoggerFactory
 
 class TestAppServices : AppServices {
+  val log = LoggerFactory.getLogger(this::class.java)
+
   override fun close() {
-    // TODO tearing down hear causes the request to
+    // TODO tearing down here causes the request to
 //    client.close()
   }
 
-  val log = LoggerFactory.getLogger(this::class.java)
+  override val apiHost = "api.coo.ee"
+  override val wwwHost = "www.coo.ee"
 
-  override val providerStore =
-    TestProviderStore(this) { defaultProviders() }
+  override val providerConfigStore = TestProviderStore(this)
+
+  override val providerRegistry = ProviderRegistry(this, ProviderRegistry.known + ("test" to TestProvider::class))
 
   override val userAuthenticator = JwtUserAuthenticator()
 
@@ -43,16 +38,4 @@ class TestAppServices : AppServices {
     addInterceptor(RenewingInterceptor(credentialsStore, services))
     addNetworkInterceptor(AuthenticatingInterceptor(credentialsStore, services))
   }.build()
-
-  override val userServices = object : UserServices {
-    override suspend fun providersFor(call: ApplicationCall): RegistryProvider =
-      userAuthenticator.userForRequest(call)?.let { providerStore.forUser(it.email) } ?: RegistryProvider(defaultProviders())
-  }
-
-  override fun defaultProviders() = listOf(
-    GoogleProvider(),
-    GithubProvider(),
-    BookmarksProvider(),
-    TestProvider()
-  ).onEach { it.init(this) }
 }

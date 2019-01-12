@@ -12,10 +12,8 @@ import com.baulsupp.cooee.providers.BaseProvider
 class BookmarksProvider : BaseProvider() {
   override val name = "bookmarks"
 
-  private val bookmarks: Map<String, String>
-    get() = configuredBookmarks() ?: defaultBookmarks
-
-  private fun configuredBookmarks() = instance?.config?.get("bookmarks") as? Map<String, String>?
+  private val configuredBookmarks
+    get() = config["bookmarks"] as? Map<String, String>? ?: mapOf()
 
   override suspend fun go(command: String, vararg args: String): GoResult {
     return if (command == "bookmarks") {
@@ -28,7 +26,7 @@ class BookmarksProvider : BaseProvider() {
   }
 
   private fun buildTargetUrl(command: String, args: List<String> = listOf()): String? {
-    val pattern = bookmarks[command]
+    val pattern = configuredBookmarks[command]
 
     return if (pattern != null && args.isNotEmpty())
       pattern.replace("%s", args.joinToString("+"))
@@ -37,8 +35,9 @@ class BookmarksProvider : BaseProvider() {
   }
 
   private suspend fun bookmarksCommand(args: List<String>): GoResult {
-    if (instance != null) {
-      val previousBookmarks = configuredBookmarks().orEmpty()
+    user?.let {
+      val previousBookmarks = configuredBookmarks
+
       val newBookmarks = when {
         args.firstOrNull() == "add" -> // TODO error checking
           previousBookmarks + (args[1] to args[2])
@@ -46,7 +45,9 @@ class BookmarksProvider : BaseProvider() {
         else -> return Unmatched
       }
 
-      appServices.providerStore.store(instance!!.copy(config = instance!!.config.plus("bookmarks" to newBookmarks)))
+      config["bookmarks"] = newBookmarks
+
+      appServices.providerConfigStore.store(it.email, name, config)
       return Completed("bookmarks updated")
     }
 
@@ -64,10 +65,8 @@ class BookmarksProvider : BaseProvider() {
   }
 
   override fun argumentCompleter(): ArgumentCompleter {
-    val userBookmarks = configuredBookmarks()
-
-    val suggestions = if (userBookmarks != null) {
-      userBookmarks.map { "remove ${it.key}" } + listOf("add", "remove")
+    val suggestions = if (user != null) {
+      configuredBookmarks.map { "remove ${it.key}" } + listOf("add", "remove")
     } else {
       null
     }
@@ -75,15 +74,18 @@ class BookmarksProvider : BaseProvider() {
     return SimpleArgumentCompleter(suggestions)
   }
 
-  private fun knownCommands() = bookmarks.keys + "bookmarks"
+  private fun knownCommands() = configuredBookmarks.keys + "bookmarks"
 
   companion object {
-    val defaultBookmarks =
-      mutableMapOf(
-        "google" to "https://google.com",
-        "facebook" to "https://facebook.com",
-        "twitter" to "https://m.twitter.com",
-        "gmail" to "https://mail.google.com"
-      )
+    fun loggedOut(): BaseProvider {
+      return BookmarksProvider().apply { configure(mapOf("bookmarks" to defaultBookmarks)) }
+    }
+
+    val defaultBookmarks = mapOf(
+      "google" to "https://google.com",
+      "facebook" to "https://facebook.com",
+      "twitter" to "https://m.twitter.com",
+      "gmail" to "https://mail.google.com"
+    )
   }
 }

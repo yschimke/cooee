@@ -2,6 +2,7 @@ package com.baulsupp.cooee.providers.google
 
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.test.TestAppServices
+import com.baulsupp.cooee.users.UserEntry
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.*
@@ -11,7 +12,10 @@ import kotlin.test.assertEquals
 
 class GoogleProviderTest {
   val appServices = TestAppServices()
-  val p = GoogleProvider().apply { init(this@GoogleProviderTest.appServices) }
+  val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
+  val p = GoogleProvider().apply {
+    init(this@GoogleProviderTest.appServices, userEntry)
+  }
 
   @Test
   fun basic() {

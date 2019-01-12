@@ -1,106 +1,54 @@
 package com.baulsupp.cooee.providers
 
-import com.baulsupp.cooee.api.GoResult
-import com.baulsupp.cooee.api.Unmatched
-import com.baulsupp.cooee.completion.ArgumentCompleter
-import com.baulsupp.cooee.completion.CommandCompleter
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import com.baulsupp.cooee.AppServices
+import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
+import com.baulsupp.cooee.providers.cooee.CooeeProvider
+import com.baulsupp.cooee.providers.github.GithubProvider
+import com.baulsupp.cooee.providers.google.GmailProvider
+import com.baulsupp.cooee.providers.google.GoogleProvider
+import com.baulsupp.cooee.providers.jira.JiraProvider
+import com.baulsupp.cooee.providers.providers.ProvidersProvider
+import com.baulsupp.cooee.providers.strava.StravaProvider
+import com.baulsupp.cooee.providers.trello.TrelloProvider
+import com.baulsupp.cooee.providers.twitter.TwitterProvider
+import com.baulsupp.cooee.users.UserEntry
+import kotlin.reflect.KClass
+import kotlin.reflect.full.createInstance
 
-// TODO add exception handling for individual items and log errors
-class RegistryProvider(val providers: List<Provider>) : ProviderFunctions {
-  override fun argumentCompleter(): ArgumentCompleter {
-    return object : ArgumentCompleter {
-      override suspend fun suggestArguments(command: String, arguments: List<String>?): List<String>? {
-        return coroutineScope {
-          providers.map { provider ->
-            async {
-              try {
-                if (provider.matches(command)) {
-                  provider.argumentCompleter().suggestArguments(command).orEmpty()
-                } else {
-                  listOf()
-                }
-              } catch (e: Exception) {
-                log.warn("suggestArguments failed: " + provider.name, e)
-                listOf<String>()
-              }
-            }
-          }.awaitAll().flatten()
-        }
-      }
+class ProviderRegistry(val appServices: AppServices, val registered: Map<String, KClass<out BaseProvider>> = known) {
+  suspend fun forUser(user: UserEntry?): CombinedProvider {
+    val providers = mutableListOf<BaseProvider>()
+
+    if (user != null) {
+      val configs = appServices.providerConfigStore.forUser(user.email)
+      val p1 = configs.mapNotNull { pi -> byName(pi.providerName)?.apply { configure(pi.config) } }
+      providers.addAll(p1)
+
+      providers.add(ProvidersProvider())
+    } else {
+      providers.add(BookmarksProvider.loggedOut())
+      providers.add(GoogleProvider())
+      providers.add(GithubProvider())
     }
+
+    providers.add(CooeeProvider())
+
+    return CombinedProvider(providers)
   }
 
-  override fun commandCompleter(): CommandCompleter {
-    return object : CommandCompleter {
-      override suspend fun suggestCommands(command: String): List<String> {
-        return coroutineScope {
-          providers.map {
-            async {
-              try {
-                it.commandCompleter().suggestCommands(command).filter { s -> s.startsWith(command) }
-              } catch (e: Exception) {
-                log.warn("suggestCommands failed: " + it.name, e)
-                listOf<String>()
-              }
-            }
-          }.awaitAll().flatten()
-        }
-      }
-
-      override suspend fun matches(command: String): Boolean {
-        return coroutineScope {
-          providers.map {
-            async {
-              try {
-                it.commandCompleter().matches(command)
-              } catch (e: Exception) {
-                log.warn("matches failed: " + it.name, e)
-                false
-              }
-            }
-          }.awaitAll().any()
-        }
-      }
-    }
-  }
-
-  override suspend fun go(command: String, vararg args: String): GoResult = coroutineScope {
-    provider(command)?.go(command, *args) ?: Unmatched
-  }
-
-  private suspend fun CoroutineScope.provider(command: String): Provider? {
-    return providers.map {
-      async {
-        try {
-          if (it.commandCompleter().matches(command)) it else null
-        } catch (e: Exception) {
-          log.warn("provider search failed: " + it.name, e)
-          null
-        }
-      }
-    }.awaitAll().filterNotNull().firstOrNull()
-  }
-
-  override suspend fun matches(command: String): Boolean = coroutineScope {
-    providers.map {
-      async {
-        try {
-          it.matches(command)
-        } catch (e: Exception) {
-          log.warn("matches failed: " + it.name, e)
-          false
-        }
-      }
-    }
-  }.awaitAll().any()
+  fun byName(name: String): BaseProvider? = registered[name]?.createInstance()
 
   companion object {
-    val log: Logger = LoggerFactory.getLogger(this::class.java.declaringClass)
+    val known = mapOf(
+      "cooee" to CooeeProvider::class,
+      "google" to GoogleProvider::class,
+      "github" to JiraProvider::class,
+      "twitter" to TwitterProvider::class,
+      "bookmarks" to BookmarksProvider::class,
+      "gmail" to GmailProvider::class,
+      "strava" to StravaProvider::class,
+      "trello" to TrelloProvider::class,
+      "jira" to JiraProvider::class
+    )
   }
 }

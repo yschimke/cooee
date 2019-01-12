@@ -6,7 +6,6 @@ import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.completion.SimpleCommandCompleter
 import com.baulsupp.cooee.providers.BaseProvider
-import com.baulsupp.cooee.providers.ProviderInstance
 
 class ProvidersProvider : BaseProvider() {
   override val name = "providers"
@@ -16,16 +15,14 @@ class ProvidersProvider : BaseProvider() {
       "add" -> {
         val name = args.first()
 
-        // TODO validate known and one arg
-        appServices.providerStore.store(ProviderInstance(instance!!.user, name, mapOf()))
+        appServices.providerConfigStore.store(user!!.email, name, mapOf())
 
         Completed("Added provider $name")
       }
       "remove" -> {
-        // TODO validate known and one arg
         val name = args.first()
 
-        appServices.providerStore.remove(instance!!.user, name)
+        appServices.providerConfigStore.remove(user!!.email, name)
 
         Completed("Removed provider $name")
       }
