@@ -26,11 +26,16 @@ class ProvidersProvider : BaseProvider() {
 
         Completed("Removed provider $name")
       }
+      "list" -> {
+        val names = appServices.providerConfigStore.forUser(user!!.email).map { it.providerName }
+
+        Completed("Providers ${names.joinToString(", ")}")
+      }
       else -> Unmatched
     }
   }
 
   override fun commandCompleter(): CommandCompleter {
-    return SimpleCommandCompleter("add", "remove")
+    return SimpleCommandCompleter("add", "remove", "list")
   }
 }

@@ -16,22 +16,22 @@ class MongoProviderConfigStore(
   private val providerDb: MongoCollection<Document> by lazy { mongoDb.getCollection("providers") }
 
   override suspend fun forUser(email: String): List<ProviderInstance> {
-    return providerDb.find(eq("user", email), ProviderInstance::class.java).awaitList()
+    return providerDb.find(eq("email", email), ProviderInstance::class.java).awaitList()
   }
 
   override suspend fun store(email: String, providerName: String, config: Map<String, Any>) {
     val doc =
-      Document().append("email", email).append("name", providerName)
+      Document().append("email", email).append("provider", providerName)
         .append("config", config)
 
     providerDb.replaceOne(
-      and(eq("email", email), eq("name", providerName)),
+      and(eq("email", email), eq("provider", providerName)),
       doc,
       ReplaceOptions().upsert(true)
     ).awaitFirst()
   }
 
   override suspend fun remove(email: String, providerName: String) {
-    providerDb.deleteMany(and(eq("email", email), eq("name", providerName))).awaitFirst()
+    providerDb.deleteMany(and(eq("email", email), eq("provider", providerName))).awaitFirst()
   }
 }
