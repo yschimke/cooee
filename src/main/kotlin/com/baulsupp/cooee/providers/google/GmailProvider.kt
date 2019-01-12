@@ -8,10 +8,8 @@ import com.baulsupp.cooee.completion.SimpleArgumentCompleter
 import com.baulsupp.cooee.completion.SimpleCommandCompleter
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.okurl.kotlin.query
-import com.baulsupp.okurl.kotlin.queryForString
 
-data class Thread(val id: String, val snippet: String, val historyId: String)
-data class ThreadList(val threads: List<Thread>, val nextPageToken: String?, val resultSizeEstimate: Int)
+
 
 class GmailProvider : BaseProvider() {
   override val name = "gmail"
@@ -38,4 +36,3 @@ class GmailProvider : BaseProvider() {
 
   override fun associatedServices() = setOf("google")
 }
-

@@ -1,43 +1,23 @@
 package com.baulsupp.cooee.test
 
 import com.baulsupp.cooee.AppServices
-import com.baulsupp.cooee.providers.Provider
-import com.baulsupp.cooee.providers.ProviderInstance
-import com.baulsupp.cooee.providers.ProviderStore
-import com.baulsupp.cooee.providers.RegistryProvider
-import com.baulsupp.cooee.providers.providers.ProvidersProvider
+import com.baulsupp.cooee.mongo.ProviderInstance
+import com.baulsupp.cooee.providers.ProviderConfigStore
 
-class TestProviderStore(val appServices: AppServices, private val providers: () -> List<Provider>) : ProviderStore {
+class TestProviderStore(val appServices: AppServices) : ProviderConfigStore {
   val providerInstances = mutableSetOf<ProviderInstance>()
 
-  override suspend fun forUser(email: String): RegistryProvider? {
-    val providersProvider = ProvidersProvider().apply {
-      init(this@TestProviderStore.appServices)
-      configure(ProviderInstance(email, "providers", mapOf()))
-    }
-
-    val userProviders = providers().mapNotNull { p ->
-      val config = providerInstances.find { pi ->
-        p.name == pi.name && pi.user == email
-      }
-
-      if (config != null) {
-        p.apply { configure(config) }
-      } else {
-        null
-      }
-    } + providersProvider
-
-    return RegistryProvider(userProviders)
+  override suspend fun forUser(email: String): List<ProviderInstance> {
+    return providerInstances.filter { it.email == email }
   }
 
-  override suspend fun store(providerInstance: ProviderInstance) {
-    remove(providerInstance.user, providerInstance.name)
+  override suspend fun store(email: String, providerName: String, config: Map<String, Any>) {
+    remove(email, providerName)
 
-    providerInstances.add(providerInstance)
+    providerInstances.add(ProviderInstance(email, providerName, config))
   }
 
-  override suspend fun remove(user: String, name: String) {
-    providerInstances.removeIf { it.user == user && it.name == name }
+  override suspend fun remove(email: String, providerName: String) {
+    providerInstances.removeIf { it.email == email && it.providerName == providerName }
   }
 }

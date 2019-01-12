@@ -1,6 +1,5 @@
 package com.baulsupp.cooee.mongo
 
-import com.baulsupp.cooee.providers.ProviderInstance
 import org.bson.BsonReader
 import org.bson.BsonType
 import org.bson.BsonWriter
@@ -16,8 +15,8 @@ object ProviderInstanceCodec : Codec<ProviderInstance> {
 
   override fun encode(writer: BsonWriter, value: ProviderInstance, encoderContext: EncoderContext) {
     writer.writeStartDocument()
-    writer.writeString("user", value.user)
-    writer.writeString("name", value.name)
+    writer.writeString("email", value.email)
+    writer.writeString("provider", value.providerName)
     encoderContext.encodeWithChildContext(MapCodec(), writer, value.config)
     writer.writeEndDocument()
   }
@@ -25,8 +24,8 @@ object ProviderInstanceCodec : Codec<ProviderInstance> {
   override fun decode(reader: BsonReader, decoderContext: DecoderContext): ProviderInstance {
     reader.readStartDocument()
 
-    var user: String? = null
-    var name: String? = null
+    var email: String? = null
+    var providerName: String? = null
     var config: Map<String, Any>? = null
 
     while (reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
@@ -34,8 +33,8 @@ object ProviderInstanceCodec : Codec<ProviderInstance> {
       val bsonType = reader.currentBsonType
 
       when {
-        fieldName == "name" -> name = reader.readString()
-        fieldName == "user" -> user = reader.readString()
+        fieldName == "provider" -> providerName = reader.readString()
+        fieldName == "email" -> email = reader.readString()
         fieldName == "config" -> config = decoderContext.decodeWithChildContext(MapCodec(), reader)
         bsonType == BsonType.OBJECT_ID -> reader.readObjectId()
       }
@@ -43,6 +42,6 @@ object ProviderInstanceCodec : Codec<ProviderInstance> {
 
     reader.readEndDocument()
 
-    return ProviderInstance(user!!, name!!, config!!)
+    return ProviderInstance(email!!, providerName!!, config!!)
   }
 }

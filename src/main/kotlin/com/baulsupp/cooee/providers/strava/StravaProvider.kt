@@ -11,10 +11,10 @@ import com.baulsupp.okurl.kotlin.queryList
 import com.baulsupp.okurl.services.mapbox.staticMap
 import com.baulsupp.okurl.services.strava.model.ActivitySummary
 
-fun Double.format(digits: Int) = java.lang.String.format("%.${digits}f", this)
-
 class StravaProvider : BaseProvider() {
   override val name = "strava"
+
+  fun Double.format(digits: Int) = java.lang.String.format("%.${digits}f", this)
 
   override fun associatedServices(): Set<String> = setOf("strava")
 

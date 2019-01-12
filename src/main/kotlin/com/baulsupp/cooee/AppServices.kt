@@ -1,17 +1,45 @@
 package com.baulsupp.cooee
 
-import com.baulsupp.cooee.providers.BaseProvider
-import com.baulsupp.cooee.providers.ProviderStore
+import com.baulsupp.cooee.providers.CombinedProvider
+import com.baulsupp.cooee.providers.ProviderRegistry
+import com.baulsupp.cooee.providers.ProviderConfigStore
 import com.baulsupp.cooee.users.UserAuthenticator
+import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.credentials.CredentialsStore
+import io.ktor.application.ApplicationCall
 import okhttp3.OkHttpClient
 
 interface AppServices : AutoCloseable {
-  fun defaultProviders(): List<BaseProvider>
   val client: OkHttpClient
-  val providerStore: ProviderStore
+  val providerConfigStore: ProviderConfigStore
+  val providerRegistry: ProviderRegistry
   val userAuthenticator: UserAuthenticator
-  val userServices: UserServices
   val credentialsStore: CredentialsStore
+  val wwwHost: String
+  val apiHost: String
+
   override fun close()
+
+  fun wwwUrl(path: String): String {
+    return if (wwwHost.startsWith("localhost:")) {
+      "http://$wwwHost$path"
+    } else {
+      "https://$wwwHost$path"
+    }
+  }
+
+  fun apiUrl(path: String): String {
+    return if (apiHost.startsWith("localhost:")) {
+      "http://$apiHost$path"
+    } else {
+      "https://$apiHost$path"
+    }
+  }
+
+  suspend fun userForCall(call: ApplicationCall): UserEntry? = userAuthenticator.userForRequest(call)
+
+  suspend fun providers(call: ApplicationCall): CombinedProvider {
+    val user = userForCall(call)
+    return providerRegistry.forUser(user).apply { init(this@AppServices, user) }
+  }
 }

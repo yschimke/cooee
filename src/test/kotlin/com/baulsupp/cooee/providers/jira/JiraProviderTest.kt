@@ -4,6 +4,7 @@ import com.baulsupp.cooee.api.Completed
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.cooee.test.setLocalCredentials
+import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.services.atlassian.AtlassianAuthInterceptor
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.equalTo
@@ -16,7 +17,10 @@ import kotlin.test.assertTrue
 
 class JiraProviderTest {
   val appServices = TestAppServices()
-  val p = JiraProvider().apply { init(this@JiraProviderTest.appServices) }
+  val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
+  val p = JiraProvider().apply {
+    init(this@JiraProviderTest.appServices, userEntry)
+  }
 
   @Test
   fun basic() {

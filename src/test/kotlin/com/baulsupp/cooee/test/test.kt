@@ -1,14 +1,12 @@
 package com.baulsupp.cooee.test
 
 import com.baulsupp.cooee.providers.BaseProvider
-import com.baulsupp.cooee.providers.ProviderInstance
 import com.baulsupp.okurl.authenticator.AuthInterceptor
 import com.baulsupp.okurl.credentials.CredentialFactory
 import com.baulsupp.okurl.credentials.DefaultToken
 import com.baulsupp.okurl.util.ClientException
 import org.junit.Assume
 import org.junit.AssumptionViolatedException
-
 
 suspend fun <T> BaseProvider.setLocalCredentials(authInterceptor: AuthInterceptor<T>, appServices: TestAppServices) {
   val serviceDefinition = authInterceptor.serviceDefinition
@@ -23,5 +21,4 @@ suspend fun <T> BaseProvider.setLocalCredentials(authInterceptor: AuthIntercepto
     throw AssumptionViolatedException("needs working credentials", e)
   }
   appServices.credentialsStore.set(serviceDefinition, "testuser", credentials)
-  this.configure(ProviderInstance("testuser", this.name, mapOf()))
 }

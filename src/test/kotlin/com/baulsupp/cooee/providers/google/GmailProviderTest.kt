@@ -4,6 +4,7 @@ import com.baulsupp.cooee.api.Completed
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.cooee.test.setLocalCredentials
+import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.services.google.GoogleAuthInterceptor
 import com.baulsupp.okurl.services.strava.StravaAuthInterceptor
 import kotlinx.coroutines.runBlocking
@@ -16,7 +17,10 @@ import kotlin.test.assertTrue
 
 class GmailProviderTest {
   val appServices = TestAppServices()
-  val p = GmailProvider().apply { init(this@GmailProviderTest.appServices) }
+  val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
+  val p = GmailProvider().apply {
+    init(this@GmailProviderTest.appServices, userEntry)
+  }
 
   @Test
   fun basic() {

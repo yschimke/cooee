@@ -24,16 +24,16 @@ import io.ktor.routing.Routing
 
 @KtorExperimentalLocationsAPI
 fun Routing.root(appServices: AppServices) {
-  get<Go> { bounceWeb(it, appServices.userServices.providersFor(call)) }
-  get<GoInfo> { bounceApi(it, appServices.userServices.providersFor(call)) }
+  get<Go> { bounceWeb(it, appServices.providers(call)) }
+  get<GoInfo> { bounceApi(it, appServices.providers(call)) }
   get<UserInfo> { userApi(appServices.userAuthenticator.userForRequest(call)) }
-  get<CompletionRequest> { completionApi(it, appServices.userServices.providersFor(call)) }
+  get<CompletionRequest> { completionApi(it, appServices.providers(call)) }
   post<Authorize> {
     val user = appServices.userAuthenticator.userForRequest(call) ?: throw AuthenticationException()
-    authorize(it, user, appServices.credentialsStore)
+    authorize(it, user, appServices)
   }
   get<SearchSuggestion> {
-    searchSuggestion(it, appServices.userServices.providersFor(call))
+    searchSuggestion(it, appServices.providers(call))
   }
 
   install(StatusPages) {
@@ -54,5 +54,4 @@ fun Routing.root(appServices: AppServices) {
     resources("static")
     defaultResource("static/index.html")
   }
-
 }

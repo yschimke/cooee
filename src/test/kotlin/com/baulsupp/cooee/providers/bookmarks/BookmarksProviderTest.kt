@@ -1,25 +1,20 @@
 package com.baulsupp.cooee.providers.bookmarks
 
 import com.baulsupp.cooee.api.RedirectResult
-import com.baulsupp.cooee.providers.ProviderInstance
 import com.baulsupp.cooee.test.TestAppServices
+import com.baulsupp.cooee.users.UserEntry
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.test.assertEquals
 
 class BookmarksProviderTest {
-  val defaultBookmarks = BookmarksProvider()
+  val defaultBookmarks = BookmarksProvider.loggedOut()
   val services = TestAppServices()
+  val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
   val userBookmarks =
     BookmarksProvider().apply {
-      init(services)
-      this.configure(
-        ProviderInstance(
-          "yuri",
-          "bookmarks",
-          mapOf("bookmarks" to mapOf<String, String>())
-        )
-      )
+      init(services, userEntry)
+      configure(mapOf("bookmarks" to mapOf<String, String>()))
     }
 
   @Test
@@ -54,7 +49,7 @@ class BookmarksProviderTest {
   }
 
   private fun configureBookmarks(vararg pairs: Pair<String, String>) {
-    userBookmarks.instance = userBookmarks.instance?.copy(config = mapOf("bookmarks" to mapOf(*pairs)))
+    userBookmarks.config["bookmarks"] = mapOf(*pairs)
   }
 
   @Test

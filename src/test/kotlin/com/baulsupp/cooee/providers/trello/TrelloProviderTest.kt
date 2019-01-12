@@ -4,6 +4,7 @@ import com.baulsupp.cooee.api.Completed
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.cooee.test.setLocalCredentials
+import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.services.trello.TrelloAuthInterceptor
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.*
@@ -14,7 +15,10 @@ import kotlin.test.assertTrue
 
 class TrelloProviderTest {
   val appServices = TestAppServices()
-  val p = TrelloProvider().apply { init(this@TrelloProviderTest.appServices) }
+  val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
+  val p = TrelloProvider().apply {
+    init(this@TrelloProviderTest.appServices, userEntry)
+  }
 
   @Test
   fun basic() {

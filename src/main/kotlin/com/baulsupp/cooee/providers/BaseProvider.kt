@@ -1,9 +1,9 @@
 package com.baulsupp.cooee.providers
 
 import com.baulsupp.cooee.AppServices
-import com.baulsupp.cooee.completion.ArgumentCompleter
 import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.completion.SimpleCommandCompleter
+import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.credentials.DefaultToken
 import com.baulsupp.okurl.credentials.TokenSet
 import org.slf4j.LoggerFactory
@@ -11,21 +11,23 @@ import org.slf4j.LoggerFactory
 abstract class BaseProvider : Provider {
   val log = LoggerFactory.getLogger(this::class.java)
 
-  var instance: ProviderInstance? = null
+  var config: MutableMap<String, Any> = mutableMapOf()
   lateinit var appServices: AppServices
+  var user: UserEntry? = null
 
   val userToken
-    get() = instance?.let { TokenSet(it.user) } ?: DefaultToken
+    get() = user?.let { TokenSet(it.email) } ?: DefaultToken
 
   val client
     get() = appServices.client
 
-  override fun init(appServices: AppServices) {
+  override fun init(appServices: AppServices, user: UserEntry?) {
     this.appServices = appServices
+    this.user = user
   }
 
-  override fun configure(instance: ProviderInstance) {
-    this.instance = instance
+  override fun configure(config: Map<String, Any>) {
+    this.config = config.toMutableMap()
   }
 
   override fun commandCompleter(): CommandCompleter {
@@ -33,8 +35,8 @@ abstract class BaseProvider : Provider {
   }
 
   override fun toString(): String {
-    return "${this.javaClass.simpleName} $instance"
+    return "${this.javaClass.simpleName}:${user?.email ?: "anon"}"
   }
 
-  open fun associatedServices()= setOf<String>()
+  open fun associatedServices() = setOf<String>()
 }
