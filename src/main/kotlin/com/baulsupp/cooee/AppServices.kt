@@ -5,6 +5,8 @@ import com.baulsupp.cooee.providers.ProviderRegistry
 import com.baulsupp.cooee.providers.ProviderConfigStore
 import com.baulsupp.cooee.users.UserAuthenticator
 import com.baulsupp.cooee.users.UserEntry
+import com.baulsupp.okurl.authenticator.AuthInterceptor
+import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
 import com.baulsupp.okurl.credentials.CredentialsStore
 import io.ktor.application.ApplicationCall
 import okhttp3.OkHttpClient
@@ -17,6 +19,8 @@ interface AppServices : AutoCloseable {
   val credentialsStore: CredentialsStore
   val wwwHost: String
   val apiHost: String
+
+  val services: List<AuthInterceptor<*>>
 
   override fun close()
 

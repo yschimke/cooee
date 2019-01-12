@@ -4,6 +4,7 @@ import com.baulsupp.cooee.AppServices
 import com.baulsupp.cooee.providers.ProviderRegistry
 import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.cooee.users.UserEntry
+import com.baulsupp.okurl.authenticator.AuthInterceptor
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
 import com.baulsupp.okurl.authenticator.RenewingInterceptor
 import com.baulsupp.okurl.credentials.InMemoryCredentialsStore
@@ -19,6 +20,8 @@ class TestAppServices : AppServices {
     // TODO tearing down here causes the request to
 //    client.close()
   }
+
+  override val services = AuthenticatingInterceptor.defaultServices()
 
   override val apiHost = "api.coo.ee"
   override val wwwHost = "www.coo.ee"

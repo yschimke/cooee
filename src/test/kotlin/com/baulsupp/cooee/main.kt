@@ -1,6 +1,5 @@
 package com.baulsupp.cooee
 
-import io.ktor.application.Application
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
@@ -10,16 +9,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.debug.DebugProbes
 
 @KtorExperimentalLocationsAPI
-fun Application.local() = module(ProdAppServices(this), cloud = false)
-
-@KtorExperimentalLocationsAPI
 @ExperimentalCoroutinesApi
 fun main(args: Array<String>) {
   DebugProbes.install()
 
   val env = applicationEngineEnvironment {
     module {
-      local()
+      module(ProdAppServices(this), cloud = false)
     }
     // Private API
     connector {

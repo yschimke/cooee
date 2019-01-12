@@ -30,6 +30,8 @@ class ProdAppServices(application: Application) : AppServices {
 
   private val eventLoop = NioEventLoopGroup()
 
+  override val services = AuthenticatingInterceptor.defaultServices()
+
   // TODO allow local
   private val mongo = MongoFactory.mongo(false, eventLoop)
 
@@ -43,17 +45,7 @@ class ProdAppServices(application: Application) : AppServices {
 
   override val providerRegistry = ProviderRegistry(this)
 
-  override fun wwwUrl(path: String): String {
-    return super.wwwUrl(path)
-  }
-
-  override fun apiUrl(path: String): String {
-    return super.apiUrl(path)
-  }
-
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
-    val services = AuthenticatingInterceptor.defaultServices()
-
     eventListenerFactory(LoggingEventListener.Factory { s -> application.log.debug(s) })
     addInterceptor(RenewingInterceptor(credentialsStore, services))
     addNetworkInterceptor(AuthenticatingInterceptor(credentialsStore, services))
