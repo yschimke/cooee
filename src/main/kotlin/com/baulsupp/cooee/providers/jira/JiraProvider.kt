@@ -25,13 +25,15 @@ data class IssueReference(val project: ProjectReference, val issue: String) {
   }
 }
 
+data class KnownProjects(val list: List<ProjectReference>)
+
 class JiraProvider : BaseProvider() {
   override val name = "jira"
 
   override fun associatedServices(): Set<String> = setOf("atlassian")
 
   // TODO cache with extreme prejudice
-  private lateinit var knownProjects: List<ProjectReference>
+  private lateinit var knownProjects: KnownProjects
 
   override suspend fun go(command: String, vararg args: String): GoResult {
     if (command.isProjectOrIssue()) {
@@ -89,18 +91,18 @@ class JiraProvider : BaseProvider() {
 
   suspend fun allprojects(): List<ProjectReference> {
     if (!this::knownProjects.isInitialized) {
-      val cachedProjects = appServices.cache.get<List<ProjectReference>>(user?.email, name, "projects")
+      val cachedProjects = appServices.cache.get<KnownProjects>(user?.email, name, "projects")
 
       if (cachedProjects == null) {
-        knownProjects =
-          instances().flatMap { instance -> projects(instance.id).values.map { ProjectReference(it, instance) } }
+        knownProjects = KnownProjects(
+          instances().flatMap { instance -> projects(instance.id).values.map { ProjectReference(it, instance) } })
         appServices.cache.set(user?.email, name, "projects", knownProjects)
       } else {
         knownProjects = cachedProjects
       }
     }
 
-    return knownProjects
+    return knownProjects.list
   }
 
   private suspend fun IssueReference.vote() {

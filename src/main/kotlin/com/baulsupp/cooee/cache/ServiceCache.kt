@@ -1,7 +1,7 @@
 package com.baulsupp.cooee.cache
 
 interface ServiceCache {
-  fun <T : Any> get(email: String?, providerName: String?, key: String): T?
+  suspend fun get(email: String?, providerName: String?, key: String): String?
 
-  fun <T : Any> set(email: String?, providerName: String?, key: String, value: T)
+  suspend fun set(email: String?, providerName: String?, key: String, value: String)
 }

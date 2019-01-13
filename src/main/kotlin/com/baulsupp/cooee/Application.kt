@@ -3,6 +3,7 @@ package com.baulsupp.cooee
 import com.baulsupp.cooee.api.SearchSuggestionsResults
 import com.baulsupp.cooee.api.SearchSuggestionsResultsAdapter
 import com.baulsupp.cooee.api.root
+import com.baulsupp.okurl.kotlin.moshi
 import com.ryanharter.ktor.moshi.moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory

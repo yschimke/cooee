@@ -1,5 +1,6 @@
 package com.baulsupp.cooee
 
+import com.baulsupp.cooee.cache.MoshiTypedCache
 import com.baulsupp.cooee.cache.ServiceCache
 import com.baulsupp.cooee.providers.CombinedProvider
 import com.baulsupp.cooee.providers.ProviderRegistry
@@ -20,7 +21,7 @@ interface AppServices : AutoCloseable {
   val credentialsStore: CredentialsStore
   val wwwHost: String
   val apiHost: String
-  val cache: ServiceCache
+  val cache: MoshiTypedCache
 
   val services: List<AuthInterceptor<*>>
 
