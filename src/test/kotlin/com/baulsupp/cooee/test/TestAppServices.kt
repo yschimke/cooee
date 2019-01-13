@@ -1,6 +1,8 @@
 package com.baulsupp.cooee.test
 
 import com.baulsupp.cooee.AppServices
+import com.baulsupp.cooee.cache.LocalCache
+import com.baulsupp.cooee.cache.ServiceCache
 import com.baulsupp.cooee.providers.ProviderRegistry
 import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.cooee.users.UserEntry
@@ -33,6 +35,8 @@ class TestAppServices : AppServices {
   override val userAuthenticator = JwtUserAuthenticator()
 
   override val credentialsStore = InMemoryCredentialsStore()
+
+  override val cache = LocalCache()
 
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
     val services = AuthenticatingInterceptor.defaultServices()

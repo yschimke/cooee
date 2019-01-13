@@ -19,7 +19,14 @@ class TrelloProvider : BaseProvider() {
 
   suspend fun userBoards(): List<BoardResponse> {
     if (!this::boards.isInitialized) {
-      boards = client.queryList("https://api.trello.com/1/members/me/boards", userToken)
+      val cachedBoards = appServices.cache.get<List<BoardResponse>>(user?.email, name, "boards")
+
+      if (cachedBoards == null) {
+        boards = client.queryList("https://api.trello.com/1/members/me/boards", userToken)
+        appServices.cache.set(user?.email, name, "boards", boards)
+      } else {
+        boards = cachedBoards
+      }
     }
 
     return boards

@@ -1,5 +1,6 @@
 package com.baulsupp.cooee
 
+import com.baulsupp.cooee.cache.LocalCache
 import com.baulsupp.cooee.mongo.MongoCredentialsStore
 import com.baulsupp.cooee.mongo.MongoFactory
 import com.baulsupp.cooee.mongo.MongoProviderConfigStore
@@ -45,6 +46,8 @@ class ProdAppServices(application: Application) : AppServices {
   override val credentialsStore = MongoCredentialsStore(mongoDb)
 
   override val providerRegistry = ProviderRegistry(this)
+
+  override val cache = LocalCache()
 
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
     eventListenerFactory(LoggingEventListener.Factory { s -> logger.info(s) })

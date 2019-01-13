@@ -9,5 +9,5 @@ object Versions {
   val okhttp = "3.12.1"
   val okio = "2.1.0"
   val okurl = "1.74.0"
-  val reactor = "3.2.3.RELEASE"
+  val reactor = "3.2.5.RELEASE"
 }

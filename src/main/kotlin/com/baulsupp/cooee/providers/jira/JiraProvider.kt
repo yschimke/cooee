@@ -89,8 +89,15 @@ class JiraProvider : BaseProvider() {
 
   suspend fun allprojects(): List<ProjectReference> {
     if (!this::knownProjects.isInitialized) {
-      knownProjects =
-        instances().flatMap { instance -> projects(instance.id).values.map { ProjectReference(it, instance) } }
+      val cachedProjects = appServices.cache.get<List<ProjectReference>>(user?.email, name, "projects")
+
+      if (cachedProjects == null) {
+        knownProjects =
+          instances().flatMap { instance -> projects(instance.id).values.map { ProjectReference(it, instance) } }
+        appServices.cache.set(user?.email, name, "projects", knownProjects)
+      } else {
+        knownProjects = cachedProjects
+      }
     }
 
     return knownProjects

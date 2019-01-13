@@ -46,7 +46,8 @@ class ProviderRegistry(val appServices: AppServices, val registered: Map<String,
       "twitter" to TwitterProvider::class,
       "bookmarks" to BookmarksProvider::class,
       "gmail" to GmailProvider::class,
-      "strava" to StravaProvider::class,
+      // disabled for now
+//      "strava" to StravaProvider::class,
       "trello" to TrelloProvider::class,
       "jira" to JiraProvider::class
     )

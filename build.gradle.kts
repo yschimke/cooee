@@ -107,7 +107,7 @@ dependencies {
   implementation("org.conscrypt:conscrypt-openjdk-uber:${Versions.conscrypt}")
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:${Versions.kotlinCoroutines}")
-  implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.59-kotlin-1.3.0")
+  implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.66-kotlin-1.3.11")
   implementation("org.mongodb:mongodb-driver-reactivestreams:1.10.0")
   implementation("org.webjars:jquery:3.2.1")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:${Versions.kotlinCoroutines}")
