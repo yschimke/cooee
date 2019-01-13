@@ -10,7 +10,7 @@ interface ProviderFunctions {
 
   suspend fun matches(command: String): Boolean = commandCompleter().matches(command)
 
-  fun argumentCompleter(): ArgumentCompleter = SimpleArgumentCompleter(null)
+  fun argumentCompleter(): ArgumentCompleter = SimpleArgumentCompleter()
 
   fun commandCompleter(): CommandCompleter
 }

@@ -16,6 +16,7 @@ import io.ktor.application.log
 import io.netty.channel.nio.NioEventLoopGroup
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
+import org.slf4j.LoggerFactory
 
 class ProdAppServices(application: Application) : AppServices {
   override fun close() {
@@ -46,8 +47,12 @@ class ProdAppServices(application: Application) : AppServices {
   override val providerRegistry = ProviderRegistry(this)
 
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
-    eventListenerFactory(LoggingEventListener.Factory { s -> application.log.debug(s) })
+    eventListenerFactory(LoggingEventListener.Factory { s -> logger.info(s) })
     addInterceptor(RenewingInterceptor(credentialsStore, services))
     addNetworkInterceptor(AuthenticatingInterceptor(credentialsStore, services))
   }.build()
+
+  companion object {
+      val logger = LoggerFactory.getLogger(ProdAppServices::class.java)
+  }
 }

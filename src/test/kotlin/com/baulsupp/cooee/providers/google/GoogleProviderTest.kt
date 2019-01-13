@@ -26,7 +26,7 @@ class GoogleProviderTest {
   fun defaultBookmarks() = runBlocking {
     assertEquals(
       listOf("g", "gl"),
-      p.commandCompleter().suggestCommands("")
+      p.commandCompleter().suggestCommands("").map { it.completion }
     )
   }
 
@@ -46,7 +46,7 @@ class GoogleProviderTest {
   @Test
   fun googleSuggest() = runBlocking {
     assertThat(
-      p.argumentCompleter().suggestArguments("gl", "how to convert to".split(" ")),
+      p.argumentCompleter().suggestArguments("gl", "how to convert to".split(" ")).map { it.completion },
       hasItem(containsString("how to convert to pdf"))
     )
   }

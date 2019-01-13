@@ -1,4 +1,4 @@
-package com.baulsupp.cooee
+package com.baulsupp.cooee.api
 
 class AuthenticationException : RuntimeException()
 class AuthorizationException : RuntimeException()

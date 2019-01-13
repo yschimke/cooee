@@ -60,7 +60,7 @@ class TrelloProviderTest {
     p.setLocalCredentials(TrelloAuthInterceptor(), appServices)
 
     assertThat(
-      p.commandCompleter().suggestCommands("trell"),
+      p.commandCompleter().suggestCommands("trell").map { it.completion },
       equalTo(listOf("trello"))
     )
   }
@@ -70,7 +70,7 @@ class TrelloProviderTest {
     p.setLocalCredentials(TrelloAuthInterceptor(), appServices)
 
     assertThat(
-      p.commandCompleter().suggestCommands("cooee-d"),
+      p.commandCompleter().suggestCommands("cooee-d").map { it.completion },
       hasItem("cooee-dev")
     )
   }
@@ -78,7 +78,7 @@ class TrelloProviderTest {
   @Test
   fun basicArgumentsCompletion() = runBlocking {
     assertThat(
-      p.argumentCompleter().suggestArguments("trello"),
+      p.argumentCompleter().suggestArguments("trello").map { it.completion },
       equalTo(listOf("boards"))
     )
   }

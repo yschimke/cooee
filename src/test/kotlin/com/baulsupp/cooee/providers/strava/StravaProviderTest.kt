@@ -37,7 +37,7 @@ class StravaProviderTest {
   @Test
   fun basicCommandCompletion() = runBlocking {
     assertThat(
-      p.commandCompleter().suggestCommands("strav"),
+      p.commandCompleter().suggestCommands("strav").map { it.completion },
       equalTo(listOf("strava"))
     )
   }
@@ -45,7 +45,7 @@ class StravaProviderTest {
   @Test
   fun basicArgumentsCompletion() = runBlocking {
     assertThat(
-      p.argumentCompleter().suggestArguments("strava"),
+      p.argumentCompleter().suggestArguments("strava").map { it.completion },
       equalTo(listOf("lastrun"))
     )
   }

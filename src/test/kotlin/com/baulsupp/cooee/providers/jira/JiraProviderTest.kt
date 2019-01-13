@@ -52,7 +52,7 @@ class JiraProviderTest {
     p.setLocalCredentials(AtlassianAuthInterceptor(), appServices)
 
     assertThat(
-      p.commandCompleter().suggestCommands("COOE"),
+      p.commandCompleter().suggestCommands("COOE").map { it.completion },
       equalTo(listOf("COOEE", "COOEE-"))
     )
   }

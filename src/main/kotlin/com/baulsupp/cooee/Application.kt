@@ -2,6 +2,7 @@ package com.baulsupp.cooee
 
 import com.baulsupp.cooee.api.SearchSuggestionsResults
 import com.baulsupp.cooee.api.SearchSuggestionsResultsAdapter
+import com.baulsupp.cooee.api.root
 import com.ryanharter.ktor.moshi.moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -20,15 +21,10 @@ import io.ktor.features.gzip
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.locations.Locations
 import io.ktor.routing.routing
-import org.conscrypt.Conscrypt
-import java.security.Security
 import java.util.*
 
 @KtorExperimentalLocationsAPI
 fun Application.cloud() {
-  // TODO breaks Mongo
-  // setupProvider()
-
   module(ProdAppServices(this), cloud = true)
 }
 
@@ -74,13 +70,5 @@ fun Application.module(appServices: AppServices, cloud: Boolean) {
     }
 
     root(appServices)
-  }
-}
-
-private fun setupProvider() {
-  try {
-    Security.insertProviderAt(Conscrypt.newProviderBuilder().provideTrustManager().build(), 1)
-  } catch (e: NoClassDefFoundError) {
-    // Drop back to JDK
   }
 }

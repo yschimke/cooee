@@ -2,7 +2,6 @@ package com.baulsupp.cooee
 
 import com.baulsupp.cooee.api.CompletionItem
 import com.baulsupp.cooee.api.Completions
-import com.baulsupp.cooee.mongo.ProviderInstance
 import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
 import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.okurl.kotlin.moshi
@@ -75,16 +74,21 @@ class ApplicationTest {
   fun testCommandCompletion() {
     runBlocking {
       services.providerConfigStore.store("yuri@coo.ee", "google", mapOf())
-      services.providerConfigStore.store("yuri@coo.ee", "bookmarks", mapOf("bookmarks" to BookmarksProvider.defaultBookmarks))
+      services.providerConfigStore.store(
+        "yuri@coo.ee",
+        "bookmarks",
+        mapOf("bookmarks" to BookmarksProvider.defaultBookmarks)
+      )
     }
 
     testRequest("/api/v0/completion?q=g", user = "yuri") {
       assertEquals(
         "{\"completions\":[" +
-          "{\"word\":\"g\",\"line\":\"g\",\"description\":\"Command for 'g'\"}," +
-          "{\"word\":\"gl\",\"line\":\"gl\",\"description\":\"Command for 'gl'\"}," +
-          "{\"word\":\"google\",\"line\":\"google\",\"description\":\"Command for 'google'\"}," +
-          "{\"word\":\"gmail\",\"line\":\"gmail\",\"description\":\"Command for 'gmail'\"}]}", response.content
+          "{\"word\":\"g\",\"line\":\"g\",\"description\":\"Command for 'g'\",\"provider\":\"google\"}," +
+          "{\"word\":\"gl\",\"line\":\"gl\",\"description\":\"Command for 'gl'\",\"provider\":\"google\"}," +
+          "{\"word\":\"google\",\"line\":\"google\",\"description\":\"Command for 'google'\",\"provider\":\"bookmarks\"}," +
+          "{\"word\":\"gmail\",\"line\":\"gmail\",\"description\":\"Command for 'gmail'\",\"provider\":\"bookmarks\"}]}",
+        response.content
       )
     }
   }
@@ -109,7 +113,7 @@ class ApplicationTest {
     testRequest("/api/v0/completion?q=test ", user = "yuri") {
       assertEquals(HttpStatusCode.OK, response.status())
       assertEquals(
-        "{\"completions\":[{\"word\":\"test\",\"line\":\"test\",\"description\":\"Command for 'test'\"}]}",
+        "{\"completions\":[{\"word\":\"test\",\"line\":\"test\",\"description\":\"Command for 'test'\",\"provider\":\"test\"}]}",
         response.content
       )
     }
@@ -133,7 +137,10 @@ class ApplicationTest {
   @Test
   fun testBookmarkCompletion() {
     testCompletion("gm") {
-      assertEquals(Completions(listOf(CompletionItem("gmail", "gmail", "Command for 'gmail'"))), it)
+      assertEquals(
+        Completions(listOf(CompletionItem("gmail", "gmail", "Command for 'gmail'", provider = "bookmarks"))),
+        it
+      )
     }
   }
 

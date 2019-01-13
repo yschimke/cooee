@@ -1,5 +1,6 @@
 package com.baulsupp.cooee.api
 
+import com.baulsupp.cooee.completion.Completion
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
@@ -79,18 +80,25 @@ data class Authorize(
   val tokenSet: String? = null
 )
 
-data class CompletionItem(val word: String, val line: String, val description: String)
+data class CompletionItem(val word: String, val line: String, val description: String, val provider: String)
 
 @KtorExperimentalLocationsAPI
 data class Completions(val completions: List<CompletionItem>) {
   companion object {
-    fun complete(command: CompletionRequest, commands: List<String>): Completions {
+    fun complete(command: CompletionRequest, commands: List<Completion>): Completions {
       val query = command.q ?: ""
 
       // TODO improve or test logic
       val prefix = query.substring(0, query.lastIndexOf(" ") + 1)
 
-      return Completions(commands.map { s -> CompletionItem(s, prefix + s, "Description for '$s'") })
+      return Completions(commands.map { s ->
+        CompletionItem(
+          s.completion,
+          prefix + s.completion,
+          "Description for '${s.completion}'",
+          provider = s.provider ?: "unknown"
+        )
+      })
     }
   }
 }

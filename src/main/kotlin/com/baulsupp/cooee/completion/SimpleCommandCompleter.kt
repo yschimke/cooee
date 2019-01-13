@@ -5,5 +5,6 @@ class SimpleCommandCompleter(private val commands: List<String>) : CommandComple
 
   override suspend fun matches(command: String): Boolean = commands.contains(command)
 
-  override suspend fun suggestCommands(command: String): List<String> = commands.filter { it.startsWith(command) }
+  override suspend fun suggestCommands(command: String): List<Completion> =
+    commands.filter { it.startsWith(command) }.map { Completion(it) }
 }

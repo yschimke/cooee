@@ -3,6 +3,7 @@ package com.baulsupp.cooee.providers.twitter
 import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.completion.CommandCompleter
+import com.baulsupp.cooee.completion.Completion
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.okurl.kotlin.query
 
@@ -27,7 +28,7 @@ class TwitterProvider : BaseProvider() {
   }
 
   override fun commandCompleter(): CommandCompleter = object : CommandCompleter {
-    override suspend fun suggestCommands(command: String): List<String> {
+    override suspend fun suggestCommands(command: String): List<Completion> {
       return try {
         val friends =
           appServices.client.query<FriendsList>(
@@ -36,14 +37,14 @@ class TwitterProvider : BaseProvider() {
           )
 
         if (command == "") {
-          return friends.users.map { "@" + it.screen_name.substring(0, 1) }.distinct()
+          return friends.users.map { "@" + it.screen_name.substring(0, 1) }.distinct().map { Completion(it) }
         }
 
         friends.users.map { "@" + it.screen_name }.filter { it.startsWith(command, ignoreCase = true) }
       } catch (e: Exception) {
         log.warn("Failed to suggest completions", e)
-        listOf()
-      }
+        listOf<String>()
+      }.map { Completion(it) }
     }
 
     override suspend fun matches(command: String): Boolean {

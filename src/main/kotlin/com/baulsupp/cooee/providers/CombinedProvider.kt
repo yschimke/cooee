@@ -5,6 +5,7 @@ import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.ArgumentCompleter
 import com.baulsupp.cooee.completion.CommandCompleter
+import com.baulsupp.cooee.completion.Completion
 import com.baulsupp.cooee.users.UserEntry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
@@ -23,19 +24,19 @@ class CombinedProvider(val providers: List<Provider>) : ProviderFunctions {
 
   override fun argumentCompleter(): ArgumentCompleter {
     return object : ArgumentCompleter {
-      override suspend fun suggestArguments(command: String, arguments: List<String>?): List<String>? {
+      override suspend fun suggestArguments(command: String, arguments: List<String>?): List<Completion> {
         return coroutineScope {
           providers.map { provider ->
             async {
               try {
                 if (provider.matches(command)) {
-                  provider.argumentCompleter().suggestArguments(command).orEmpty()
+                  provider.argumentCompleter().suggestArguments(command).map { it.copy(provider = provider.name) }
                 } else {
                   listOf()
                 }
               } catch (e: Exception) {
                 log.warn("suggestArguments failed: " + provider.name, e)
-                listOf<String>()
+                listOf<Completion>()
               }
             }
           }.awaitAll().flatten()
@@ -46,15 +47,16 @@ class CombinedProvider(val providers: List<Provider>) : ProviderFunctions {
 
   override fun commandCompleter(): CommandCompleter {
     return object : CommandCompleter {
-      override suspend fun suggestCommands(command: String): List<String> {
+      override suspend fun suggestCommands(command: String): List<Completion> {
         return coroutineScope {
-          providers.map {
+          providers.map { provider ->
             async {
               try {
-                it.commandCompleter().suggestCommands(command).filter { s -> s.startsWith(command) }
+                provider.commandCompleter().suggestCommands(command).filter { s -> s.startsWith(command) }
+                  .map { it.copy(provider = provider.name) }
               } catch (e: Exception) {
-                log.warn("suggestCommands failed: " + it.name, e)
-                listOf<String>()
+                log.warn("suggestCommands failed: " + provider.name, e)
+                listOf<Completion>()
               }
             }
           }.awaitAll().flatten()

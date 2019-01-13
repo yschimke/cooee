@@ -6,6 +6,7 @@ import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.ArgumentCompleter
 import com.baulsupp.cooee.completion.CommandCompleter
+import com.baulsupp.cooee.completion.Completion
 import com.baulsupp.cooee.completion.SimpleArgumentCompleter
 import com.baulsupp.cooee.providers.BaseProvider
 
@@ -55,8 +56,8 @@ class BookmarksProvider : BaseProvider() {
   }
 
   override fun commandCompleter(): CommandCompleter = object : CommandCompleter {
-    override suspend fun suggestCommands(command: String): List<String> {
-      return knownCommands().filter { it.startsWith(command) }
+    override suspend fun suggestCommands(command: String): List<Completion> {
+      return knownCommands().filter { it.startsWith(command) }.map { Completion(it) }
     }
 
     override suspend fun matches(command: String): Boolean {
@@ -71,7 +72,7 @@ class BookmarksProvider : BaseProvider() {
       null
     }
 
-    return SimpleArgumentCompleter(suggestions)
+    return SimpleArgumentCompleter(suggestions.orEmpty())
   }
 
   private fun knownCommands() = configuredBookmarks.keys + "bookmarks"

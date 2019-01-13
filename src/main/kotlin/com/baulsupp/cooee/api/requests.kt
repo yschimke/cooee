@@ -1,6 +1,6 @@
-package com.baulsupp.cooee
+package com.baulsupp.cooee.api
 
-import com.baulsupp.cooee.api.*
+import com.baulsupp.cooee.AppServices
 import com.baulsupp.cooee.mongo.StringService
 import com.baulsupp.cooee.providers.CombinedProvider
 import com.baulsupp.cooee.users.UserEntry
@@ -72,7 +72,14 @@ private suspend fun commandCompletion(
   command: CompletionRequest
 ): Completions {
   val commands = providers.commandCompleter().suggestCommands(command.command)
-  return Completions(commands.map { CompletionItem(it, it, "Command for '$it'") })
+  return Completions(commands.map {
+    CompletionItem(
+      word = it.completion,
+      line = it.completion,
+      description = "Command for '${it.completion}'",
+      provider = it.provider ?: "unknown"
+    )
+  })
 }
 
 @KtorExperimentalLocationsAPI
@@ -81,8 +88,7 @@ private suspend fun argumentCompletion(
   command: CompletionRequest
 ): Completions {
   val suggestArguments = providers.argumentCompleter().suggestArguments(command.command, command.args)
-  val commands = suggestArguments.orEmpty()
-  return Completions.complete(command, commands)
+  return Completions.complete(command, suggestArguments)
 }
 
 @KtorExperimentalLocationsAPI

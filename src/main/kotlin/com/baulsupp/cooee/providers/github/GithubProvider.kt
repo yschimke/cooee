@@ -4,6 +4,8 @@ import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.CommandCompleter
+import com.baulsupp.cooee.completion.Completion
+import com.baulsupp.cooee.completion.Completion.Companion.completions
 import com.baulsupp.cooee.providers.BaseProvider
 
 class GithubProvider : BaseProvider() {
@@ -29,8 +31,8 @@ class GithubProvider : BaseProvider() {
 
   // TODO
   override fun commandCompleter(): CommandCompleter = object : CommandCompleter {
-    override suspend fun suggestCommands(command: String): List<String> {
-      return listOf("yschimke/cooee", "yschimke/cooee-cli", "square/okhttp", "tgmcclen/cooee-web")
+    override suspend fun suggestCommands(command: String): List<Completion> {
+      return completions("yschimke/cooee", "yschimke/cooee-cli", "square/okhttp", "tgmcclen/cooee-web")
     }
 
     override suspend fun matches(command: String): Boolean {

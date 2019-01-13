@@ -51,7 +51,7 @@ class TwitterProviderTest {
     setLocalCredentials()
 
     assertThat(
-      p.commandCompleter().suggestCommands("@s"),
+      p.commandCompleter().suggestCommands("@s").map { it.completion },
       hasItem("@shoutcooee")
     )
   }
@@ -61,7 +61,7 @@ class TwitterProviderTest {
     setLocalCredentials()
 
     assertThat(
-      p.commandCompleter().suggestCommands(""),
+      p.commandCompleter().suggestCommands("").map { it.completion },
       hasItem("@s")
     )
   }

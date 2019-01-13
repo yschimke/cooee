@@ -1,11 +1,6 @@
-package com.baulsupp.cooee
+package com.baulsupp.cooee.api
 
-import com.baulsupp.cooee.api.Authorize
-import com.baulsupp.cooee.api.CompletionRequest
-import com.baulsupp.cooee.api.Go
-import com.baulsupp.cooee.api.GoInfo
-import com.baulsupp.cooee.api.SearchSuggestion
-import com.baulsupp.cooee.api.UserInfo
+import com.baulsupp.cooee.AppServices
 import io.jsonwebtoken.JwtException
 import io.ktor.application.application
 import io.ktor.application.call

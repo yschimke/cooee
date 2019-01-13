@@ -1,9 +1,10 @@
 package com.baulsupp.cooee.providers.jira
 
 import com.baulsupp.cooee.completion.CommandCompleter
+import com.baulsupp.cooee.completion.Completion
 
 class JiraCommandCompleter(val provider: JiraProvider) : CommandCompleter {
-  override suspend fun suggestCommands(command: String): List<String> {
+  override suspend fun suggestCommands(command: String): List<Completion> {
     val visibleProjects = provider.allprojects()
 
     val projectKeys = visibleProjects.map { it.projectKey }
@@ -11,15 +12,12 @@ class JiraCommandCompleter(val provider: JiraProvider) : CommandCompleter {
     return when {
       command == "" -> listOf()
       command.isProjectOrPartialProject() -> projectKeys.filter { it.startsWith(command) }.flatMap {
-        listOf(
-          it,
-          "$it-"
-        )
+        listOf(it, "$it-")
       }
       command.isProjectIssueStart() -> provider.mostLikelyProjectIssues(command.projectCode()!!)
       command.isIssueOrPartialIssue() -> provider.mostLikelyIssueCompletions(command)
       else -> listOf()
-    }
+    }.map { Completion(it) }
   }
 
   override suspend fun matches(command: String): Boolean {
