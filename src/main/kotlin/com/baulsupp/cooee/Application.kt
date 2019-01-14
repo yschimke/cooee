@@ -11,6 +11,7 @@ import io.ktor.application.Application
 import io.ktor.application.ApplicationStopped
 import io.ktor.application.install
 import io.ktor.application.log
+import io.ktor.http.HttpHeaders
 import io.ktor.features.AutoHeadResponse
 import io.ktor.features.CORS
 import io.ktor.features.CallLogging
@@ -52,6 +53,7 @@ fun Application.module(appServices: AppServices, cloud: Boolean) {
   }
 
   install(CORS) {
+    header(HttpHeaders.Authorization)
     anyHost()
   }
   install(CallLogging)
