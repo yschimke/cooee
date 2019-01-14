@@ -4,8 +4,17 @@
 
 API website deployment (currently WWW also)
 
-To test locally, run Application in Intellij and head to http://localhost:8080
+##  Setup
 
-To deploy "./gradlew appengineDeploy"
+* Use IntelliJ Community
+* Run `./gradlew build` or press the refresh icon in the Gradle menu in IntelliJ"
+* Run class `src/test/kotlin/com/baulsupp/cooee/main.kt`
+* Browse to http://localhost:8080
+
+NOTE: Do not to run with `./gradelw appengineRun` or equivalent as it will try and apply environment parameters that are only suitable for GCP deployment (e.g. redirect from http to https) 
+
+## Deployment
+
+* `./gradlew appengineDeploy`
 
 ![Coo.ee Boomerang](https://coo.ee/images/boomerang.ico/android-icon-192x192.png)
