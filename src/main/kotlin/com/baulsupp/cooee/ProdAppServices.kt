@@ -2,6 +2,7 @@ package com.baulsupp.cooee
 
 import com.baulsupp.cooee.cache.LocalCache
 import com.baulsupp.cooee.cache.MoshiTypedCache
+import com.baulsupp.cooee.mongo.MongoCache
 import com.baulsupp.cooee.mongo.MongoCredentialsStore
 import com.baulsupp.cooee.mongo.MongoFactory
 import com.baulsupp.cooee.mongo.MongoProviderConfigStore
@@ -15,6 +16,7 @@ import com.mongodb.reactivestreams.client.MongoDatabase
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.application.log
+import io.ktor.util.InternalAPI
 import io.netty.channel.nio.NioEventLoopGroup
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
@@ -49,7 +51,7 @@ class ProdAppServices(application: Application) : AppServices {
   override val providerRegistry = ProviderRegistry(this)
 
   // TODO remote cache
-  override val cache = MoshiTypedCache(LocalCache())
+  override val cache = MoshiTypedCache(MongoCache(mongoDb))
 
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
     eventListenerFactory(LoggingEventListener.Factory { s -> logger.info(s) })
