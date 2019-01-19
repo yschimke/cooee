@@ -18,7 +18,11 @@ import org.slf4j.LoggerFactory
 class CombinedProvider(val providers: List<Provider>) : ProviderFunctions {
   suspend fun init(appServices: AppServices, user: UserEntry?) {
     coroutineScope {
-      providers.map { async { it.init(appServices, user) } }.awaitAll()
+      providers.map {
+        async {
+          it.init(appServices, user)
+        }
+      }.awaitAll()
     }
   }
 

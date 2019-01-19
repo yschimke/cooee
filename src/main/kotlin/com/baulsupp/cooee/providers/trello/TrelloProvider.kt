@@ -11,13 +11,10 @@ import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.kotlin.queryList
 import com.baulsupp.okurl.services.trello.model.BoardResponse
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
 data class Boards(val list: List<BoardResponse>)
 data class Cards(val list: List<Card>)
@@ -36,7 +33,11 @@ class TrelloProvider : BaseProvider() {
 
     coroutineScope {
       boards = readBoards()
-      cards = boards.map { async { it.id to readCards(it.id) } }.awaitAll().toMap()
+      cards = boards.map {
+        async {
+          it.id to readCards(it.id)
+        }
+      }.awaitAll().toMap()
     }
   }
 
