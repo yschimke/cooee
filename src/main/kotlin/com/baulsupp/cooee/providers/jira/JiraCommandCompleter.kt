@@ -5,7 +5,7 @@ import com.baulsupp.cooee.completion.Completion
 
 class JiraCommandCompleter(val provider: JiraProvider) : CommandCompleter {
   override suspend fun suggestCommands(command: String): List<Completion> {
-    val visibleProjects = provider.allprojects()
+    val visibleProjects = provider.projects
 
     val projectKeys = visibleProjects.map { it.projectKey }
 
@@ -21,7 +21,7 @@ class JiraCommandCompleter(val provider: JiraProvider) : CommandCompleter {
   }
 
   override suspend fun matches(command: String): Boolean {
-    return (command.isProjectOrIssue()) && provider.allprojects().any {
+    return (command.isProjectOrIssue()) && provider.projects.any {
       command == it.projectKey || command.startsWith("${it.projectKey}-")
     }
   }

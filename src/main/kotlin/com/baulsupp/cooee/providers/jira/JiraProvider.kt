@@ -1,10 +1,12 @@
 package com.baulsupp.cooee.providers.jira
 
+import com.baulsupp.cooee.AppServices
 import com.baulsupp.cooee.api.Completed
 import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.providers.BaseProvider
+import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.kotlin.JSON
 import com.baulsupp.okurl.kotlin.execute
 import com.baulsupp.okurl.kotlin.postJsonBody
@@ -32,8 +34,12 @@ class JiraProvider : BaseProvider() {
 
   override fun associatedServices(): Set<String> = setOf("atlassian")
 
-  // TODO cache with extreme prejudice
-  private lateinit var knownProjects: KnownProjects
+  lateinit var projects: List<ProjectReference>
+
+  override suspend fun init(appServices: AppServices, user: UserEntry?) {
+    super.init(appServices, user)
+    projects = listProjects()
+  }
 
   override suspend fun go(command: String, vararg args: String): GoResult {
     if (command.isProjectOrIssue()) {
@@ -58,7 +64,7 @@ class JiraProvider : BaseProvider() {
   private suspend fun issueProjectPair(command: String): IssueReference? {
     val projectKey = command.projectCode()
 
-    return allprojects().find { projectKey == it.projectKey }?.let { IssueReference(it, command) }
+    return projects.find { projectKey == it.projectKey }?.let { IssueReference(it, command) }
   }
 
   private suspend fun instances(): List<AccessibleResource> {
@@ -73,7 +79,7 @@ class JiraProvider : BaseProvider() {
   }
 
   private suspend fun issues(projectKey: String): Issues? {
-    allprojects().forEach { (project, server) ->
+    projects.forEach { (project, server) ->
       if (project.key == projectKey) {
         return appServices.client.query(
           request(
@@ -89,20 +95,16 @@ class JiraProvider : BaseProvider() {
     return null
   }
 
-  suspend fun allprojects(): List<ProjectReference> {
-    if (!this::knownProjects.isInitialized) {
-      val cachedProjects = appServices.cache.get<KnownProjects>(user?.email, name, "projects")
+  suspend fun listProjects(): List<ProjectReference> {
+    val cachedProjects = appServices.cache.get<KnownProjects>(user?.email, name, "projects")
 
-      if (cachedProjects == null) {
-        knownProjects = KnownProjects(
-          instances().flatMap { instance -> projects(instance.id).values.map { ProjectReference(it, instance) } })
-        appServices.cache.set(user?.email, name, "projects", knownProjects)
-      } else {
-        knownProjects = cachedProjects
-      }
+    return when (cachedProjects) {
+      null -> instances().flatMap { instance -> projects(instance.id).values.map { ProjectReference(it, instance) } }
+        .also {
+          appServices.cache.set(user?.email, name, "projects", KnownProjects(it))
+        }
+      else -> cachedProjects.list
     }
-
-    return knownProjects.list
   }
 
   private suspend fun IssueReference.vote() {

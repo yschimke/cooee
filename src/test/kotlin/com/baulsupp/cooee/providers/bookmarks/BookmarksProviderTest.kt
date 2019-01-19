@@ -13,8 +13,8 @@ class BookmarksProviderTest {
   val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
   val userBookmarks =
     BookmarksProvider().apply {
-      init(services, userEntry)
       configure(mapOf("bookmarks" to mapOf<String, String>()))
+      runBlocking { init(services, userEntry) }
     }
 
   @Test

@@ -6,7 +6,7 @@ import com.baulsupp.cooee.users.UserEntry
 interface Provider : ProviderFunctions {
   val name: String
 
-  fun init(appServices: AppServices, user: UserEntry?)
+  suspend fun init(appServices: AppServices, user: UserEntry?)
 
   fun configure(config: Map<String, Any>)
 }

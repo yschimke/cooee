@@ -19,7 +19,7 @@ class GmailProviderTest {
   val appServices = TestAppServices()
   val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
   val p = GmailProvider().apply {
-    init(this@GmailProviderTest.appServices, userEntry)
+    runBlocking { init(this@GmailProviderTest.appServices, userEntry) }
   }
 
   @Test

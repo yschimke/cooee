@@ -7,6 +7,7 @@ import com.baulsupp.cooee.test.setLocalCredentials
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.services.atlassian.AtlassianAuthInterceptor
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.hasItem
 import org.junit.Assert.assertThat
@@ -16,10 +17,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class JiraProviderTest {
-  val appServices = TestAppServices()
-  val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
+  private val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
   val p = JiraProvider().apply {
-    init(this@JiraProviderTest.appServices, userEntry)
+    runBlocking {
+      setLocalCredentials(AtlassianAuthInterceptor(), JiraProviderTest.appServices)
+      init(JiraProviderTest.appServices, userEntry)
+    }
   }
 
   @Test
@@ -29,8 +32,6 @@ class JiraProviderTest {
 
   @Test
   fun redirectProject() = runBlocking {
-    p.setLocalCredentials(AtlassianAuthInterceptor(), appServices)
-
     val result = p.go("COOEE")
 
     assertTrue(result is RedirectResult)
@@ -39,8 +40,6 @@ class JiraProviderTest {
 
   @Test
   fun redirectIssue() = runBlocking {
-    p.setLocalCredentials(AtlassianAuthInterceptor(), appServices)
-
     val result = p.go("COOEE-1")
 
     assertTrue(result is RedirectResult)
@@ -49,8 +48,6 @@ class JiraProviderTest {
 
   @Test
   fun completeCommandProjects() = runBlocking {
-    p.setLocalCredentials(AtlassianAuthInterceptor(), appServices)
-
     assertThat(
       p.commandCompleter().suggestCommands("COOE").map { it.completion },
       equalTo(listOf("COOEE", "COOEE-"))
@@ -59,20 +56,16 @@ class JiraProviderTest {
 
   @Test
   fun completeCommandIssues() = runBlocking {
-    p.setLocalCredentials(AtlassianAuthInterceptor(), appServices)
-
     assertThat(
-      p.commandCompleter().suggestCommands("COOEE-"),
+      p.commandCompleter().suggestCommands("COOEE-").map { it.completion },
       hasItem(equalTo("COOEE-1"))
     )
   }
 
   @Test
   fun completeArgumentsOnIssues() = runBlocking {
-    p.setLocalCredentials(AtlassianAuthInterceptor(), appServices)
-
     assertThat(
-      p.argumentCompleter().suggestArguments("COOEE-1"),
+      p.argumentCompleter().suggestArguments("COOEE-1").map { it.completion },
       hasItem(equalTo("comment"))
     )
   }
@@ -80,15 +73,15 @@ class JiraProviderTest {
   @Test
   @Ignore("can't vote on own issues")
   fun completeVoteCommand() = runBlocking {
-    p.setLocalCredentials(AtlassianAuthInterceptor(), appServices)
-
     assertEquals(Completed("voted for COOEE-1"), p.go("COOEE-1", "vote"))
   }
 
   @Test
   fun completeCommentCommand() = runBlocking {
-    p.setLocalCredentials(AtlassianAuthInterceptor(), appServices)
-
     assertEquals(Completed("comments on COOEE-1"), p.go("COOEE-1", "comment", "hello"))
+  }
+
+  companion object {
+    val appServices by lazy { TestAppServices() }
   }
 }

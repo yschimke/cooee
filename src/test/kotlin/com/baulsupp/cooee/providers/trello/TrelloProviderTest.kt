@@ -6,6 +6,7 @@ import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.cooee.test.setLocalCredentials
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.services.trello.TrelloAuthInterceptor
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
@@ -13,11 +14,14 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@ExperimentalCoroutinesApi
 class TrelloProviderTest {
-  val appServices = TestAppServices()
-  val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
+  private val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
   val p = TrelloProvider().apply {
-    init(this@TrelloProviderTest.appServices, userEntry)
+    runBlocking {
+      setLocalCredentials(TrelloAuthInterceptor(), TrelloProviderTest.appServices)
+      init(TrelloProviderTest.appServices, userEntry)
+    }
   }
 
   @Test
@@ -27,8 +31,6 @@ class TrelloProviderTest {
 
   @Test
   fun trelloHomepage() = runBlocking {
-    p.setLocalCredentials(TrelloAuthInterceptor(), appServices)
-
     val result = p.go("trello")
 
     assertTrue(result is RedirectResult)
@@ -37,8 +39,6 @@ class TrelloProviderTest {
 
   @Test
   fun trelloBoard() = runBlocking {
-    p.setLocalCredentials(TrelloAuthInterceptor(), appServices)
-
     val result = p.go("cooee-dev")
 
     assertTrue(result is RedirectResult)
@@ -47,8 +47,6 @@ class TrelloProviderTest {
 
   @Test
   fun boards() = runBlocking {
-    p.setLocalCredentials(TrelloAuthInterceptor(), appServices)
-
     val result = p.go("trello", "boards")
 
     assertTrue(result is Completed)
@@ -57,8 +55,6 @@ class TrelloProviderTest {
 
   @Test
   fun basicCommandCompletion() = runBlocking {
-    p.setLocalCredentials(TrelloAuthInterceptor(), appServices)
-
     assertThat(
       p.commandCompleter().suggestCommands("trell").map { it.completion },
       equalTo(listOf("trello"))
@@ -67,8 +63,6 @@ class TrelloProviderTest {
 
   @Test
   fun boardsCommandCompletion() = runBlocking {
-    p.setLocalCredentials(TrelloAuthInterceptor(), appServices)
-
     assertThat(
       p.commandCompleter().suggestCommands("cooee-d").map { it.completion },
       hasItem("cooee-dev")
@@ -81,5 +75,9 @@ class TrelloProviderTest {
       p.argumentCompleter().suggestArguments("trello").map { it.completion },
       equalTo(listOf("boards"))
     )
+  }
+
+  companion object {
+    val appServices by lazy { TestAppServices() }
   }
 }

@@ -5,6 +5,10 @@ data class Completion(val completion: String, val provider: String? = null, val 
     return completion.startsWith(command)
   }
 
+  fun contains(command: String): Boolean {
+    return completion.contains(command)
+  }
+
   companion object {
     fun completions(vararg strings: String) = strings.map { Completion(it) }
   }

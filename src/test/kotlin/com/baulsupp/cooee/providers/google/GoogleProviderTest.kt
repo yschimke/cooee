@@ -14,7 +14,7 @@ class GoogleProviderTest {
   val appServices = TestAppServices()
   val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
   val p = GoogleProvider().apply {
-    init(this@GoogleProviderTest.appServices, userEntry)
+    runBlocking { init(this@GoogleProviderTest.appServices, userEntry) }
   }
 
   @Test

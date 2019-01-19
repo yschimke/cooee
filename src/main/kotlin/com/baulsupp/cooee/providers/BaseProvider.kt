@@ -21,7 +21,7 @@ abstract class BaseProvider : Provider {
   val client
     get() = appServices.client
 
-  override fun init(appServices: AppServices, user: UserEntry?) {
+  override suspend fun init(appServices: AppServices, user: UserEntry?) {
     this.appServices = appServices
     this.user = user
   }

@@ -17,7 +17,7 @@ class StravaProviderTest {
   val appServices = TestAppServices()
   val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
   val p = StravaProvider().apply {
-    init(this@StravaProviderTest.appServices, userEntry)
+    runBlocking { init(this@StravaProviderTest.appServices, userEntry) }
   }
 
   @Test

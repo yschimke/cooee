@@ -18,7 +18,7 @@ class CooeeProviderTest {
   val userEntry = UserEntry("token", "Yuri Schimke", "yuri@coo.ee")
 
   fun login() {
-    p.init(appServices, userEntry)
+    runBlocking { p.init(appServices, userEntry) }
   }
 
   @Test

@@ -18,7 +18,7 @@ class TwitterProviderTest {
   val appServices = TestAppServices()
   val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
   val p = TwitterProvider().apply {
-    init(this@TwitterProviderTest.appServices, userEntry)
+    runBlocking { init(this@TwitterProviderTest.appServices, userEntry) }
   }
 
   @Test
