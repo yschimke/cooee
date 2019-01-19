@@ -9,7 +9,6 @@ import io.ktor.application.Application
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpMethod.Companion.Get
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.HttpStatusCode.Companion.Found
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.server.testing.TestApplicationCall
@@ -19,10 +18,11 @@ import io.ktor.server.testing.withTestApplication
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.debug.DebugProbes
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers.containsString
+import org.junit.Assert.assertThat
 import org.junit.BeforeClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class ApplicationTest {
   val services = TestAppServices()
@@ -30,23 +30,16 @@ class ApplicationTest {
   fun Application.test() = module(services, false)
 
   @Test
-  fun testRoot() {
-    testRequest("/") {
-      assertTrue(response.content?.contains("<title>cooee") ?: false)
-    }
-  }
-
-  @Test
   fun testGoCommandWithSpaces() {
-    testRequest("/go?q=g abc", expectedCode = Found) {
-      assertEquals("https://www.google.com/search?q=abc", response.headers["Location"])
+    testRequest("/api/v0/goinfo?q=g abc") {
+      assertThat(response.content, containsString("https://www.google.com/search?q=abc"))
     }
   }
 
   @Test
   fun testGoCommandWithPlus() {
-    testRequest("/go?q=g+yriu", expectedCode = Found) {
-      assertEquals("https://www.google.com/search?q=yriu", response.headers["Location"])
+    testRequest("/api/v0/goinfo?q=g+yriu") {
+      assertThat(response.content, containsString("https://www.google.com/search?q=yriu"))
     }
   }
 
@@ -121,15 +114,15 @@ class ApplicationTest {
 
   @Test
   fun testGitHubProject() {
-    testRequest("/go?q=yschimke/okurl", expectedCode = Found) {
-      assertEquals("https://github.com/yschimke/okurl", response.headers["Location"])
+    testRequest("/api/v0/goinfo?q=yschimke/okurl") {
+      assertThat(response.content, containsString("https://github.com/yschimke/okurl"))
     }
   }
 
   @Test
   fun testGitHubIssue() {
-    testRequest("/go?q=square/okhttp#4421", expectedCode = Found) {
-      assertEquals("https://github.com/square/okhttp/issues/4421", response.headers["Location"])
+    testRequest("/api/v0/goinfo?q=square/okhttp#4421") {
+      assertThat(response.content, containsString("https://github.com/square/okhttp/issues/4421"))
     }
   }
 
@@ -146,11 +139,8 @@ class ApplicationTest {
 
   @Test
   fun testGmailBookmark() {
-    testRequest("/go?q=gmail", expectedCode = Found) {
-      assertEquals(
-        "https://mail.google.com",
-        response.headers["Location"]
-      )
+    testRequest("/api/v0/goinfo?q=gmail") {
+      assertThat(response.content, containsString("https://mail.google.com"))
     }
   }
 
@@ -165,7 +155,7 @@ class ApplicationTest {
 
   @Test
   fun testAddBookmarkProvider() {
-    testRequest("/go?q=add test", user = "yuri")
+    testRequest("/api/v0/goinfo?q=add test", user = "yuri")
 
     assertEquals(1, services.providerConfigStore.providerInstances.size)
   }
@@ -176,7 +166,7 @@ class ApplicationTest {
       services.providerConfigStore.store("yuri@coo.ee", "bookmarks", mapOf())
     }
 
-    testRequest("/go?q=bookmarks add nb https://newbookmark", user = "yuri")
+    testRequest("/api/v0/goinfo?q=bookmarks add nb https://newbookmark")
   }
 
   @Test

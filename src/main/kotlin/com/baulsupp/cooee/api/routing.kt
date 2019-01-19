@@ -19,7 +19,6 @@ import io.ktor.routing.Routing
 
 @KtorExperimentalLocationsAPI
 fun Routing.root(appServices: AppServices) {
-  get<Go> { bounceWeb(it, appServices.providers(call)) }
   get<GoInfo> { bounceApi(it, appServices.providers(call)) }
   get<UserInfo> { userApi(appServices.userAuthenticator.userForRequest(call)) }
   get<CompletionRequest> { completionApi(it, appServices.providers(call)) }
@@ -47,6 +46,5 @@ fun Routing.root(appServices: AppServices) {
 
   static {
     resources("static")
-    defaultResource("static/index.html")
   }
 }
