@@ -5,7 +5,7 @@ plugins {
   kotlin("jvm") version Versions.kotlin
   war
   id("com.github.ben-manes.versions") version "0.20.0"
-  id("com.google.cloud.tools.appengine") version "2.0.0-rc4"
+  id("com.google.cloud.tools.appengine") version "2.0.0-rc5"
   id("org.jlleitschuh.gradle.ktlint") version "6.3.1"
 }
 
