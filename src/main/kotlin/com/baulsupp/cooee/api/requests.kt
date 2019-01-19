@@ -38,21 +38,6 @@ suspend fun PipelineContext<Unit, ApplicationCall>.userApi(
 }
 
 @KtorExperimentalLocationsAPI
-suspend fun PipelineContext<Unit, ApplicationCall>.bounceWeb(
-  go: Go,
-  providers: CombinedProvider
-) {
-  val r =
-    go.command?.let { providers.go(it, *go.args.toTypedArray()) } ?: Unmatched
-
-  when (r) {
-    is RedirectResult -> call.respondRedirect(r.location, permanent = false)
-    is Unmatched -> call.respond("Not Found Page")
-    is Completed -> call.respond(r)
-  }
-}
-
-@KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.completionApi(
   commandQuery: CompletionRequest,
   providers: CombinedProvider
@@ -117,7 +102,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.searchSuggestion(
     else -> argumentCompletion(providers, query)
   }
 
-  val response: SearchSuggestionsResults =
+  val response =
     SearchSuggestionsResults(
       it.q ?: "",
       results.completions.map { it.line },
