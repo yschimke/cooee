@@ -17,10 +17,10 @@ class TwitterProvider : BaseProvider() {
 
   override suspend fun go(command: String, vararg args: String): GoResult {
     val text = if (args.isNotEmpty()) "&text=" + args.joinToString(" ") else ""
-    val screen_name = command.substring(1)
+    val screenName = command.substring(1)
 
     val friend = appServices.client.query<Friend>(
-      "https://api.twitter.com/1.1/users/show.json?screen_name=$screen_name",
+      "https://api.twitter.com/1.1/users/show.json?screen_name=$screenName",
       userToken
     )
 

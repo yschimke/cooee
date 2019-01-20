@@ -1,7 +1,6 @@
 package com.baulsupp.cooee.providers.twitter
 
 import com.baulsupp.cooee.api.RedirectResult
-import com.baulsupp.cooee.mongo.ProviderInstance
 import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.credentials.CredentialFactory

@@ -8,7 +8,6 @@ import com.baulsupp.cooee.providers.google.GmailProvider
 import com.baulsupp.cooee.providers.google.GoogleProvider
 import com.baulsupp.cooee.providers.jira.JiraProvider
 import com.baulsupp.cooee.providers.providers.ProvidersProvider
-import com.baulsupp.cooee.providers.strava.StravaProvider
 import com.baulsupp.cooee.providers.trello.TrelloProvider
 import com.baulsupp.cooee.providers.twitter.TwitterProvider
 import com.baulsupp.cooee.users.UserEntry
@@ -36,7 +35,7 @@ class ProviderRegistry(val appServices: AppServices, val registered: Map<String,
     return CombinedProvider(providers)
   }
 
-  fun byName(name: String): BaseProvider? = registered[name]?.createInstance()
+  private fun byName(name: String): BaseProvider? = registered[name]?.createInstance()
 
   companion object {
     val known = mapOf(

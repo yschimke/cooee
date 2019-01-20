@@ -40,4 +40,3 @@ data class Card(
   val desc: String?
 )
 
-

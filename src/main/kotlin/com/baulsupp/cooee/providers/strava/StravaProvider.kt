@@ -14,7 +14,7 @@ import com.baulsupp.okurl.services.strava.model.ActivitySummary
 class StravaProvider : BaseProvider() {
   override val name = "strava"
 
-  fun Double.format(digits: Int) = java.lang.String.format("%.${digits}f", this)
+  private fun Double.format(digits: Int): String = java.lang.String.format("%.${digits}f", this)
 
   override fun associatedServices(): Set<String> = setOf("strava")
 
@@ -26,14 +26,20 @@ class StravaProvider : BaseProvider() {
 
   private suspend fun lastRun(): GoResult {
     val activities =
-      appServices.client.queryList<ActivitySummary>("https://www.strava.com/api/v3/athlete/activities?page=1&per_page=1", userToken)
+      appServices.client.queryList<ActivitySummary>(
+        "https://www.strava.com/api/v3/athlete/activities?page=1&per_page=1",
+        userToken
+      )
 
     if (activities.isEmpty()) {
       return Completed("No Activities Found")
     }
 
     val lastActivity =
-      appServices.client.query<ActivitySummary>("https://www.strava.com/api/v3/activities/${activities.first().id}", userToken)
+      appServices.client.query<ActivitySummary>(
+        "https://www.strava.com/api/v3/activities/${activities.first().id}",
+        userToken
+      )
 
     val map = staticMap {
       route(lastActivity.map.polyline)

@@ -8,7 +8,7 @@ import com.baulsupp.cooee.completion.SimpleArgumentCompleter
 import com.baulsupp.cooee.completion.SimpleCommandCompleter
 import com.baulsupp.cooee.providers.BaseProvider
 
-class TestProvider: BaseProvider() {
+class TestProvider : BaseProvider() {
   override val name = "test"
 
   override suspend fun go(command: String, vararg args: String): GoResult {

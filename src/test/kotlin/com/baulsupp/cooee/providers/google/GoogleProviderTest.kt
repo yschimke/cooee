@@ -4,8 +4,8 @@ import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.cooee.users.UserEntry
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.CoreMatchers
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.hasItem
 import org.junit.Assert.assertThat
 import org.junit.Test
 import kotlin.test.assertEquals

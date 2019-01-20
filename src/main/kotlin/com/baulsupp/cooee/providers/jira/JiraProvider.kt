@@ -46,14 +46,16 @@ class JiraProvider : BaseProvider() {
       val ipp = issueProjectPair(command)
 
       if (ipp != null) {
-        if (args.firstOrNull() == "vote") {
-          ipp.vote()
-          return Completed("voted for $command")
-        } else if (args.firstOrNull() == "comment") {
-          ipp.comment(args.drop(1).joinToString(" "))
-          return Completed("comments on $command")
-        } else {
-          return RedirectResult(ipp.url(command))
+        return when {
+          args.firstOrNull() == "vote" -> {
+            ipp.vote()
+            Completed("voted for $command")
+          }
+          args.firstOrNull() == "comment" -> {
+            ipp.comment(args.drop(1).joinToString(" "))
+            Completed("comments on $command")
+          }
+          else -> RedirectResult(ipp.url(command))
         }
       }
     }
@@ -61,7 +63,7 @@ class JiraProvider : BaseProvider() {
     return Unmatched
   }
 
-  private suspend fun issueProjectPair(command: String): IssueReference? {
+  private fun issueProjectPair(command: String): IssueReference? {
     val projectKey = command.projectCode()
 
     return projects.find { projectKey == it.projectKey }?.let { IssueReference(it, command) }
@@ -95,7 +97,7 @@ class JiraProvider : BaseProvider() {
     return null
   }
 
-  suspend fun listProjects(): List<ProjectReference> {
+  private suspend fun listProjects(): List<ProjectReference> {
     val cachedProjects = appServices.cache.get<KnownProjects>(user?.email, name, "projects")
 
     return when (cachedProjects) {

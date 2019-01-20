@@ -3,11 +3,9 @@ package com.baulsupp.cooee.providers.trello
 import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.completion.Completion
 import com.baulsupp.okurl.services.trello.model.BoardResponse
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 val TrelloHomepage = Completion("trello", description = "Trello Homepage")
 
-@ExperimentalCoroutinesApi
 class TrelloCommandCompleter(val provider: TrelloProvider) : CommandCompleter {
   override suspend fun suggestCommands(command: String): List<Completion> {
     val boards = provider.boards.map { boardCompletion(it) }

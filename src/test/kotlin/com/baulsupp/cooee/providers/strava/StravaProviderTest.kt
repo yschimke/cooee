@@ -6,7 +6,8 @@ import com.baulsupp.cooee.test.setLocalCredentials
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.services.strava.StravaAuthInterceptor
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.startsWith
 import org.junit.Assert.assertThat
 import org.junit.Ignore
 import org.junit.Test

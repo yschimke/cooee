@@ -6,10 +6,12 @@ import com.baulsupp.cooee.completion.SimpleCommandCompleter
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.credentials.DefaultToken
 import com.baulsupp.okurl.credentials.TokenSet
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 abstract class BaseProvider : Provider {
-  val log = LoggerFactory.getLogger(this::class.java)
+  @Suppress("LeakingThis")
+  val log: Logger = LoggerFactory.getLogger(this::class.java)
 
   var config: MutableMap<String, Any> = mutableMapOf()
   lateinit var appServices: AppServices

@@ -16,7 +16,7 @@ class JwtUserAuthenticator : UserAuthenticator {
     }
   }
 
-  fun parseToken(token: String?): UserEntry? {
+  private fun parseToken(token: String?): UserEntry? {
     if (token != null) {
       val jwt = Jwts.parser().setSigningKey("baulsupp4evabaulsupp4evabaulsupp4eva".toByteArray()).parseClaimsJws(token)
 

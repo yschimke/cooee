@@ -3,7 +3,6 @@ package com.baulsupp.cooee
 import com.baulsupp.cooee.api.SearchSuggestionsResults
 import com.baulsupp.cooee.api.SearchSuggestionsResultsAdapter
 import com.baulsupp.cooee.api.root
-import com.baulsupp.okurl.kotlin.moshi
 import com.ryanharter.ktor.moshi.moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -11,7 +10,6 @@ import io.ktor.application.Application
 import io.ktor.application.ApplicationStopped
 import io.ktor.application.install
 import io.ktor.application.log
-import io.ktor.http.HttpHeaders
 import io.ktor.features.AutoHeadResponse
 import io.ktor.features.CORS
 import io.ktor.features.CallLogging
@@ -20,17 +18,15 @@ import io.ktor.features.ContentNegotiation
 import io.ktor.features.DataConversion
 import io.ktor.features.HttpsRedirect
 import io.ktor.features.gzip
-import io.ktor.locations.KtorExperimentalLocationsAPI
+import io.ktor.http.HttpHeaders
 import io.ktor.locations.Locations
 import io.ktor.routing.routing
 import java.util.*
 
-@KtorExperimentalLocationsAPI
 fun Application.cloud() {
   module(ProdAppServices(this), cloud = true)
 }
 
-@KtorExperimentalLocationsAPI
 fun Application.module(appServices: AppServices, cloud: Boolean) {
   this.environment.monitor.subscribe(ApplicationStopped) {
     appServices.close()
@@ -44,6 +40,7 @@ fun Application.module(appServices: AppServices, cloud: Boolean) {
     }
   }
 
+  @Suppress("EXPERIMENTAL_API_USAGE")
   install(Locations)
 
   install(Compression) {

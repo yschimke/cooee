@@ -11,7 +11,6 @@ import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.kotlin.queryList
 import com.baulsupp.okurl.services.trello.model.BoardResponse
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -19,7 +18,6 @@ import kotlinx.coroutines.coroutineScope
 data class Boards(val list: List<BoardResponse>)
 data class Cards(val list: List<Card>)
 
-@ExperimentalCoroutinesApi
 class TrelloProvider : BaseProvider() {
   override val name = "trello"
 

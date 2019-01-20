@@ -2,12 +2,12 @@ package com.baulsupp.cooee.providers.cooee
 
 import com.baulsupp.cooee.api.Completed
 import com.baulsupp.cooee.api.RedirectResult
-import com.baulsupp.cooee.mongo.ProviderInstance
 import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.cooee.users.UserEntry
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.CoreMatchers.*
-import org.junit.Assert.*
+import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.CoreMatchers.startsWith
+import org.junit.Assert.assertThat
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

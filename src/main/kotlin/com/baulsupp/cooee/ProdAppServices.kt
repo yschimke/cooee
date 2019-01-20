@@ -1,6 +1,5 @@
 package com.baulsupp.cooee
 
-import com.baulsupp.cooee.cache.LocalCache
 import com.baulsupp.cooee.cache.MoshiTypedCache
 import com.baulsupp.cooee.mongo.MongoCache
 import com.baulsupp.cooee.mongo.MongoCredentialsStore
@@ -9,17 +8,14 @@ import com.baulsupp.cooee.mongo.MongoProviderConfigStore
 import com.baulsupp.cooee.okhttp.close
 import com.baulsupp.cooee.providers.ProviderRegistry
 import com.baulsupp.cooee.users.JwtUserAuthenticator
-import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
 import com.baulsupp.okurl.authenticator.RenewingInterceptor
 import com.mongodb.reactivestreams.client.MongoDatabase
 import io.ktor.application.Application
-import io.ktor.application.ApplicationCall
-import io.ktor.application.log
-import io.ktor.util.InternalAPI
 import io.netty.channel.nio.NioEventLoopGroup
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class ProdAppServices(application: Application) : AppServices {
@@ -60,6 +56,6 @@ class ProdAppServices(application: Application) : AppServices {
   }.build()
 
   companion object {
-      val logger = LoggerFactory.getLogger(ProdAppServices::class.java)
+    val logger: Logger = LoggerFactory.getLogger(ProdAppServices::class.java)
   }
 }

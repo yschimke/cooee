@@ -23,7 +23,7 @@ object MongoFactory {
     cloudMongo(eventLoopGroup)
   }
 
-  fun localhostMongo(): MongoClient {
+  private fun localhostMongo(): MongoClient {
     val settings = MongoClientSettings.builder()
       .streamFactoryFactory(NettyStreamFactoryFactory.builder().build())
       .codecRegistry(codecRegistry())
@@ -32,7 +32,7 @@ object MongoFactory {
     return MongoClients.create(settings)
   }
 
-  fun cloudMongo(eventLoopGroup: NioEventLoopGroup): MongoClient {
+  private fun cloudMongo(eventLoopGroup: NioEventLoopGroup): MongoClient {
     val settings = MongoClientSettings.builder()
       .streamFactoryFactory(NettyStreamFactoryFactory.builder().eventLoopGroup(eventLoopGroup).build())
       .applyConnectionString(ConnectionString("mongodb://cooee:br4PA4HyGabAkN0c@cooeedb-shard-00-00-bnhzn.gcp.mongodb.net:27017,cooeedb-shard-00-01-bnhzn.gcp.mongodb.net:27017,cooeedb-shard-00-02-bnhzn.gcp.mongodb.net:27017/cooee?ssl=true&replicaSet=CooeeDB-shard-0&authSource=admin&retryWrites=true"))

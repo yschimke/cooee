@@ -3,15 +3,11 @@ package com.baulsupp.cooee.test
 import com.baulsupp.cooee.AppServices
 import com.baulsupp.cooee.cache.LocalCache
 import com.baulsupp.cooee.cache.MoshiTypedCache
-import com.baulsupp.cooee.cache.ServiceCache
 import com.baulsupp.cooee.providers.ProviderRegistry
 import com.baulsupp.cooee.users.JwtUserAuthenticator
-import com.baulsupp.cooee.users.UserEntry
-import com.baulsupp.okurl.authenticator.AuthInterceptor
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
 import com.baulsupp.okurl.authenticator.RenewingInterceptor
 import com.baulsupp.okurl.credentials.InMemoryCredentialsStore
-import io.ktor.application.ApplicationCall
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
 import org.slf4j.LoggerFactory
