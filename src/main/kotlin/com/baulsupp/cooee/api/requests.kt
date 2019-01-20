@@ -110,3 +110,42 @@ suspend fun PipelineContext<Unit, ApplicationCall>.searchSuggestion(
 
   call.respond(response)
 }
+
+data class ProviderList(val providers: List<ProviderStatus>)
+data class ProviderStatus(val name: String, val installed: Boolean, val config: Map<String, Any>?)
+
+@KtorExperimentalLocationsAPI
+suspend fun PipelineContext<Unit, ApplicationCall>.providersList(
+  appServices: AppServices,
+  providers: CombinedProvider
+) {
+  val list = appServices.providerRegistry.registered.map { (name, _) ->
+    providerStatus(providers, name)
+  }
+
+  call.respond(ProviderList(list))
+}
+
+@KtorExperimentalLocationsAPI
+suspend fun PipelineContext<Unit, ApplicationCall>.providerRequest(
+  providerRequest: ProviderRequest,
+  appServices: AppServices,
+  providers: CombinedProvider
+) {
+  val klazz = appServices.providerRegistry.registered[providerRequest.name]
+
+  if (klazz == null) {
+    call.respond(HttpStatusCode.NotFound)
+  } else {
+    call.respond(providerStatus(providers, providerRequest.name))
+  }
+}
+
+private fun providerStatus(
+  providers: CombinedProvider,
+  name: String
+): ProviderStatus {
+  val userStatus = providers.providers.find { it.name == name }
+
+  return ProviderStatus(name, userStatus != null, userStatus?.config)
+}

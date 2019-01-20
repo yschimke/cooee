@@ -9,6 +9,7 @@ import io.ktor.application.Application
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpMethod.Companion.Get
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.server.testing.TestApplicationCall
@@ -231,6 +232,51 @@ class ApplicationTest {
     }.apply {
       assertEquals(expectedCode, response.status())
       fn(this)
+    }
+  }
+
+  @Test
+  fun testProviders() {
+    testRequest("/api/v0/providers", user = "yuri") {
+      assertEquals(
+        "{\"providers\":[" +
+          "{\"name\":\"cooee\",\"installed\":true,\"config\":{}}," +
+          "{\"name\":\"google\",\"installed\":false}," +
+          "{\"name\":\"github\",\"installed\":false}," +
+          "{\"name\":\"twitter\",\"installed\":false}," +
+          "{\"name\":\"bookmarks\",\"installed\":false}," +
+          "{\"name\":\"gmail\",\"installed\":false}," +
+          "{\"name\":\"trello\",\"installed\":false}," +
+          "{\"name\":\"jira\",\"installed\":false}," +
+          "{\"name\":\"test\",\"installed\":false}" +
+          "]}",
+        response.content
+      )
+    }
+  }
+
+  @Test
+  fun testProviderRequest() {
+    testRequest("/api/v0/provider/cooee", user = "yuri") {
+      assertEquals(
+        "{\"name\":\"cooee\",\"installed\":true,\"config\":{}}",
+        response.content
+      )
+    }
+  }
+
+  @Test
+  fun testProviderRequestNotFound() {
+    testRequest("/api/v0/provider/cooee2", user = "yuri", expectedCode = NotFound)
+  }
+
+  @Test
+  fun testProviderRequestNotInstalled() {
+    testRequest("/api/v0/provider/test", user = "yuri") {
+      assertEquals(
+        "{\"name\":\"test\",\"installed\":false}",
+        response.content
+      )
     }
   }
 

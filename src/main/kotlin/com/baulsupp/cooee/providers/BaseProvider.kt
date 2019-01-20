@@ -13,7 +13,7 @@ abstract class BaseProvider : Provider {
   @Suppress("LeakingThis")
   val log: Logger = LoggerFactory.getLogger(this::class.java)
 
-  var config: MutableMap<String, Any> = mutableMapOf()
+  override var config: MutableMap<String, Any> = mutableMapOf()
   lateinit var appServices: AppServices
   var user: UserEntry? = null
 

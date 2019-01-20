@@ -28,6 +28,12 @@ fun Routing.root(appServices: AppServices) {
   get<SearchSuggestion> {
     searchSuggestion(it, appServices.providers(call))
   }
+  get<ProvidersRequest> {
+    providersList(appServices, appServices.providers(call))
+  }
+  get<ProviderRequest> {
+    providerRequest(it, appServices, appServices.providers(call))
+  }
 
   install(StatusPages) {
     exception<JwtException> { cause ->

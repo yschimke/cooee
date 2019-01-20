@@ -40,6 +40,14 @@ data class SearchSuggestionsResults(
   val links: List<String>
 )
 
+@KtorExperimentalLocationsAPI
+@Location("/api/v0/providers")
+class ProvidersRequest
+
+@KtorExperimentalLocationsAPI
+@Location("/api/v0/provider/{name}")
+data class ProviderRequest(val name: String)
+
 class SearchSuggestionsResultsAdapter : JsonAdapter<SearchSuggestionsResults>() {
   override fun fromJson(reader: JsonReader): SearchSuggestionsResults? = TODO()
 
