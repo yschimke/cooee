@@ -11,8 +11,11 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.resources
 import io.ktor.http.content.static
 import io.ktor.locations.KtorExperimentalLocationsAPI
+import io.ktor.locations.delete
 import io.ktor.locations.get
 import io.ktor.locations.post
+import io.ktor.locations.put
+import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Routing
 
@@ -33,6 +36,15 @@ fun Routing.root(appServices: AppServices) {
   }
   get<ProviderRequest> {
     providerRequest(it, appServices, appServices.providers(call))
+  }
+  delete<ProviderRequest> {
+    val user = appServices.userAuthenticator.userForRequest(call) ?: throw AuthenticationException()
+    providerDeleteRequest(it, appServices, user)
+  }
+  put<ProviderRequest> {
+    val config = call.receive<ProviderConfig>()
+    val user = appServices.userAuthenticator.userForRequest(call) ?: throw AuthenticationException()
+    providerConfigRequest(it, config, appServices, user)
   }
 
   install(StatusPages) {

@@ -4,10 +4,15 @@ import com.baulsupp.cooee.api.CompletionItem
 import com.baulsupp.cooee.api.Completions
 import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
 import com.baulsupp.cooee.test.TestAppServices
+import com.baulsupp.okurl.kotlin.JSON
 import com.baulsupp.okurl.kotlin.moshi
 import io.ktor.application.Application
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpMethod.Companion.Delete
 import io.ktor.http.HttpMethod.Companion.Get
+import io.ktor.http.HttpMethod.Companion.Put
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.http.HttpStatusCode.Companion.OK
@@ -15,6 +20,7 @@ import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.server.testing.TestApplicationCall
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
+import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.debug.DebugProbes
@@ -263,6 +269,41 @@ class ApplicationTest {
         response.content
       )
     }
+  }
+
+  @Test
+  fun testProviderDeleteRequest() {
+    runBlocking {
+      services.providerConfigStore.store(
+        "yuri@coo.ee",
+        "bookmarks",
+        mapOf("bookmarks" to BookmarksProvider.defaultBookmarks)
+      )
+    }
+
+    assertEquals(1, services.providerConfigStore.providerInstances.size)
+
+    testRequest("/api/v0/provider/bookmarks", user = "yuri", method = Delete)
+
+    assertEquals(0, services.providerConfigStore.providerInstances.size)
+  }
+
+  @Test
+  fun testProviderPutRequest() {
+    assertEquals(0, services.providerConfigStore.providerInstances.size)
+
+    withTestApplication({ test() }) {
+      handleRequest(HttpMethod.Put, "/api/v0/provider/bookmarks") {
+        addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+        setBody("{\"config\":{\"bookmarks\":{\"a\": \"http://a.com\"}}}")
+        val token = services.userAuthenticator.tokenFor("yuri")
+        addHeader("Authorization", "Bearer $token")
+      }.apply {
+        assertEquals(HttpStatusCode.OK, response.status())
+      }
+    }
+
+    assertEquals(1, services.providerConfigStore.providerInstances.size)
   }
 
   @Test

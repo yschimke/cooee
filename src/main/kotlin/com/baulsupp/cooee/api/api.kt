@@ -48,6 +48,8 @@ class ProvidersRequest
 @Location("/api/v0/provider/{name}")
 data class ProviderRequest(val name: String)
 
+data class ProviderConfig(val config: Map<String, Any>?)
+
 class SearchSuggestionsResultsAdapter : JsonAdapter<SearchSuggestionsResults>() {
   override fun fromJson(reader: JsonReader): SearchSuggestionsResults? = TODO()
 

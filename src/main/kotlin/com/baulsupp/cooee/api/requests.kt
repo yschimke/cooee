@@ -141,6 +141,29 @@ suspend fun PipelineContext<Unit, ApplicationCall>.providerRequest(
   }
 }
 
+@KtorExperimentalLocationsAPI
+suspend fun PipelineContext<Unit, ApplicationCall>.providerDeleteRequest(
+  providerRequest: ProviderRequest,
+  appServices: AppServices,
+  user: UserEntry
+) {
+  appServices.providerConfigStore.remove(user.email, providerRequest.name)
+
+  call.respond(HttpStatusCode.OK)
+}
+
+@KtorExperimentalLocationsAPI
+suspend fun PipelineContext<Unit, ApplicationCall>.providerConfigRequest(
+  providerRequest: ProviderRequest,
+  providerConfig: ProviderConfig,
+  appServices: AppServices,
+  user: UserEntry
+) {
+  appServices.providerConfigStore.store(user.email, providerRequest.name, providerConfig.config.orEmpty())
+
+  call.respond(HttpStatusCode.OK)
+}
+
 private fun providerStatus(
   providers: CombinedProvider,
   name: String
