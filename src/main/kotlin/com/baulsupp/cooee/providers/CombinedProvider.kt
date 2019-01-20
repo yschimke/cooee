@@ -15,7 +15,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 // TODO add exception handling for individual items and log errors
-class CombinedProvider(val providers: List<Provider>) : ProviderFunctions {
+class CombinedProvider(val providers: List<BaseProvider>) : ProviderFunctions {
   suspend fun init(appServices: AppServices, user: UserEntry?) {
     coroutineScope {
       providers.map {

@@ -2,6 +2,7 @@ package com.baulsupp.cooee.api
 
 import com.baulsupp.cooee.AppServices
 import com.baulsupp.cooee.mongo.StringService
+import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.providers.CombinedProvider
 import com.baulsupp.cooee.users.UserEntry
 import io.ktor.application.ApplicationCall
@@ -10,6 +11,8 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.response.respond
 import io.ktor.util.pipeline.PipelineContext
+import kotlin.reflect.KClass
+import kotlin.reflect.full.createInstance
 
 @KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.bounceApi(
@@ -112,15 +115,15 @@ suspend fun PipelineContext<Unit, ApplicationCall>.searchSuggestion(
 }
 
 data class ProviderList(val providers: List<ProviderStatus>)
-data class ProviderStatus(val name: String, val installed: Boolean, val config: Map<String, Any>?)
+data class ProviderStatus(val name: String, val installed: Boolean, val config: Map<String, Any>?, val services: List<String>?)
 
 @KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.providersList(
   appServices: AppServices,
   providers: CombinedProvider
 ) {
-  val list = appServices.providerRegistry.registered.map { (name, _) ->
-    providerStatus(providers, name)
+  val list = appServices.providerRegistry.registered.map { (name, providerClass) ->
+    providerStatus(providers, name, providerClass)
   }
 
   call.respond(ProviderList(list))
@@ -137,7 +140,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.providerRequest(
   if (klazz == null) {
     call.respond(HttpStatusCode.NotFound)
   } else {
-    call.respond(providerStatus(providers, providerRequest.name))
+    call.respond(providerStatus(providers, providerRequest.name, klazz))
   }
 }
 
@@ -166,9 +169,12 @@ suspend fun PipelineContext<Unit, ApplicationCall>.providerConfigRequest(
 
 private fun providerStatus(
   providers: CombinedProvider,
-  name: String
+  name: String,
+  providerClass: KClass<out BaseProvider>
 ): ProviderStatus {
   val userStatus = providers.providers.find { it.name == name }
 
-  return ProviderStatus(name, userStatus != null, userStatus?.config)
+  val services = userStatus?.associatedServices() ?: providerClass.createInstance().associatedServices()
+
+  return ProviderStatus(name, userStatus != null, userStatus?.config, services.sorted())
 }

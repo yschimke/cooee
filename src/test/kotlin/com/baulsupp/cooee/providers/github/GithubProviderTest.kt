@@ -9,5 +9,6 @@ class GithubProviderTest {
   @Test
   fun basic() {
     assertEquals("github", p.name)
+    assertEquals(setOf("github"), p.associatedServices())
   }
 }

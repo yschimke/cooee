@@ -161,13 +161,6 @@ class ApplicationTest {
   }
 
   @Test
-  fun testAddBookmarkProvider() {
-    testRequest("/api/v0/goinfo?q=add test", user = "yuri")
-
-    assertEquals(1, services.providerConfigStore.providerInstances.size)
-  }
-
-  @Test
   fun testAddBookmarkName() {
     runBlocking {
       services.providerConfigStore.store("yuri@coo.ee", "bookmarks", mapOf())
@@ -246,15 +239,15 @@ class ApplicationTest {
     testRequest("/api/v0/providers", user = "yuri") {
       assertEquals(
         "{\"providers\":[" +
-          "{\"name\":\"cooee\",\"installed\":true,\"config\":{}}," +
-          "{\"name\":\"google\",\"installed\":false}," +
-          "{\"name\":\"github\",\"installed\":false}," +
-          "{\"name\":\"twitter\",\"installed\":false}," +
-          "{\"name\":\"bookmarks\",\"installed\":false}," +
-          "{\"name\":\"gmail\",\"installed\":false}," +
-          "{\"name\":\"trello\",\"installed\":false}," +
-          "{\"name\":\"jira\",\"installed\":false}," +
-          "{\"name\":\"test\",\"installed\":false}" +
+          "{\"name\":\"cooee\",\"installed\":true,\"config\":{},\"services\":[]}," +
+          "{\"name\":\"google\",\"installed\":false,\"services\":[]}," +
+          "{\"name\":\"github\",\"installed\":false,\"services\":[\"github\"]}," +
+          "{\"name\":\"twitter\",\"installed\":false,\"services\":[\"twitter\"]}," +
+          "{\"name\":\"bookmarks\",\"installed\":false,\"services\":[]}," +
+          "{\"name\":\"gmail\",\"installed\":false,\"services\":[\"google\"]}," +
+          "{\"name\":\"trello\",\"installed\":false,\"services\":[\"trello\"]}," +
+          "{\"name\":\"jira\",\"installed\":false,\"services\":[\"atlassian\"]}," +
+          "{\"name\":\"test\",\"installed\":false,\"services\":[]}" +
           "]}",
         response.content
       )
@@ -265,7 +258,7 @@ class ApplicationTest {
   fun testProviderRequest() {
     testRequest("/api/v0/provider/cooee", user = "yuri") {
       assertEquals(
-        "{\"name\":\"cooee\",\"installed\":true,\"config\":{}}",
+        "{\"name\":\"cooee\",\"installed\":true,\"config\":{},\"services\":[]}",
         response.content
       )
     }
@@ -315,7 +308,7 @@ class ApplicationTest {
   fun testProviderRequestNotInstalled() {
     testRequest("/api/v0/provider/test", user = "yuri") {
       assertEquals(
-        "{\"name\":\"test\",\"installed\":false}",
+        "{\"name\":\"test\",\"installed\":false,\"services\":[]}",
         response.content
       )
     }
