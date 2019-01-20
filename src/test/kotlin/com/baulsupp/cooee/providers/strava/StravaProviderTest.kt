@@ -15,10 +15,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class StravaProviderTest {
-  val appServices = TestAppServices()
   val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
   val p = StravaProvider().apply {
-    runBlocking { init(this@StravaProviderTest.appServices, userEntry) }
+    runBlocking { init(StravaProviderTest.appServices, userEntry) }
   }
 
   @Test
@@ -29,8 +28,6 @@ class StravaProviderTest {
   @Test
   @Ignore("strava having issues")
   fun lastrun() = runBlocking {
-    p.setLocalCredentials(StravaAuthInterceptor(), appServices)
-
     val result = p.go("strava", "lastrun")
 
     assertTrue(result is Completed)
@@ -51,5 +48,15 @@ class StravaProviderTest {
       p.argumentCompleter().suggestArguments("strava").map { it.completion },
       equalTo(listOf("lastrun"))
     )
+  }
+
+  companion object {
+    val appServices by lazy {
+      TestAppServices().also {
+        runBlocking {
+          setLocalCredentials(StravaAuthInterceptor(), it)
+        }
+      }
+    }
   }
 }

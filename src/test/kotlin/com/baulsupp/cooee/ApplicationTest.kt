@@ -25,7 +25,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ApplicationTest {
-  val services = TestAppServices()
+  private val services = TestAppServices()
 
   fun Application.test() = module(services, false)
 

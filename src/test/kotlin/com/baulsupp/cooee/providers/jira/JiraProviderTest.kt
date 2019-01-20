@@ -19,7 +19,6 @@ class JiraProviderTest {
   private val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
   val p = JiraProvider().apply {
     runBlocking {
-      setLocalCredentials(AtlassianAuthInterceptor(), JiraProviderTest.appServices)
       init(JiraProviderTest.appServices, userEntry)
     }
   }
@@ -70,7 +69,6 @@ class JiraProviderTest {
   }
 
   @Test
-  @Ignore("can't vote on own issues")
   fun completeVoteCommand() = runBlocking {
     assertEquals(Completed("voted for COOEE-1"), p.go("COOEE-1", "vote"))
   }
@@ -81,6 +79,12 @@ class JiraProviderTest {
   }
 
   companion object {
-    val appServices by lazy { TestAppServices() }
+    val appServices by lazy {
+      TestAppServices().also {
+        runBlocking {
+          setLocalCredentials(AtlassianAuthInterceptor(), it)
+        }
+      }
+    }
   }
 }

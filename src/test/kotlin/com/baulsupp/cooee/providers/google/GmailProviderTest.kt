@@ -6,6 +6,7 @@ import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.cooee.test.setLocalCredentials
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.services.google.GoogleAuthInterceptor
+import com.baulsupp.okurl.services.trello.TrelloAuthInterceptor
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Assert.assertThat
@@ -14,10 +15,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class GmailProviderTest {
-  val appServices = TestAppServices()
   val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
   val p = GmailProvider().apply {
-    runBlocking { init(this@GmailProviderTest.appServices, userEntry) }
+    runBlocking { init(GmailProviderTest.appServices, userEntry) }
   }
 
   @Test
@@ -35,8 +35,6 @@ class GmailProviderTest {
 
   @Test
   fun inbox() = runBlocking {
-    p.setLocalCredentials(GoogleAuthInterceptor(), appServices)
-
     val result = p.go("gmail", "label:inbox")
 
     assertTrue(result is Completed)
@@ -56,5 +54,15 @@ class GmailProviderTest {
       p.argumentCompleter().suggestArguments("gmail").map { it.completion },
       equalTo(listOf("label:unread", "label:inbox"))
     )
+  }
+
+  companion object {
+    val appServices by lazy {
+      TestAppServices().also {
+        runBlocking {
+          setLocalCredentials(GoogleAuthInterceptor(), it)
+        }
+      }
+    }
   }
 }

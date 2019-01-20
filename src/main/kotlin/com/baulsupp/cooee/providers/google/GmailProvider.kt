@@ -23,7 +23,7 @@ class GmailProvider : BaseProvider() {
     // requires scope = https://www.googleapis.com/auth/cloud-platform,plus.login,plus.profile.emails.read,https://www.googleapis.com/auth/gmail.readonly
     val results = appServices.client.query<ThreadList>("https://www.googleapis.com/gmail/v1/users/me/threads?q=$q")
 
-    return Completed(results.threads.take(5).joinToString("\n") { it.snippet.substring(0, 10) })
+    return Completed(results.threads.orEmpty().take(5).joinToString("\n") { it.snippet.substring(0, 10) })
   }
 
   override fun commandCompleter(): CommandCompleter {

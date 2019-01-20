@@ -69,6 +69,7 @@ fun Application.module(appServices: AppServices, cloud: Boolean) {
       trace { application.log.trace(it.buildText()) }
     }
 
+    @Suppress("EXPERIMENTAL_API_USAGE")
     root(appServices)
   }
 }

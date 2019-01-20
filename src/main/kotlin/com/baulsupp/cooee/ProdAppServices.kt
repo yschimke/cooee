@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_PARAMETER")
+
 package com.baulsupp.cooee
 
 import com.baulsupp.cooee.cache.MoshiTypedCache

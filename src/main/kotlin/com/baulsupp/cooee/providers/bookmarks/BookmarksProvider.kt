@@ -13,6 +13,7 @@ import com.baulsupp.cooee.providers.BaseProvider
 class BookmarksProvider : BaseProvider() {
   override val name = "bookmarks"
 
+  @Suppress("UNCHECKED_CAST")
   private val configuredBookmarks
     get() = config["bookmarks"] as? Map<String, String>? ?: mapOf()
 

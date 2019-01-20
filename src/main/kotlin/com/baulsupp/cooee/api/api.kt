@@ -1,3 +1,5 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package com.baulsupp.cooee.api
 
 import com.baulsupp.cooee.completion.Completion
@@ -75,7 +77,6 @@ data class Authorize(
 
 data class CompletionItem(val word: String, val line: String, val description: String, val provider: String)
 
-@KtorExperimentalLocationsAPI
 data class Completions(val completions: List<CompletionItem>) {
   companion object {
     fun complete(command: CompletionRequest, commands: List<Completion>): Completions {

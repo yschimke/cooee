@@ -19,7 +19,6 @@ class TrelloProviderTest {
   private val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
   val p = TrelloProvider().apply {
     runBlocking {
-      setLocalCredentials(TrelloAuthInterceptor(), TrelloProviderTest.appServices)
       init(TrelloProviderTest.appServices, userEntry)
     }
   }
@@ -78,6 +77,12 @@ class TrelloProviderTest {
   }
 
   companion object {
-    val appServices by lazy { TestAppServices() }
+    val appServices by lazy {
+      TestAppServices().also {
+        runBlocking {
+          setLocalCredentials(TrelloAuthInterceptor(), it)
+        }
+      }
+    }
   }
 }

@@ -110,7 +110,7 @@ class JiraProvider : BaseProvider() {
   }
 
   private suspend fun IssueReference.vote() {
-    return appServices.client.query(
+    appServices.client.execute(
       request(
         "https://api.atlassian.com/ex/jira/${project.serverId}/rest/api/3/issue/$issue/votes",
         userToken
