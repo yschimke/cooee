@@ -119,20 +119,6 @@ class ApplicationTest {
     }
   }
 
-  @Test
-  fun testGitHubProject() {
-    testRequest("/api/v0/goinfo?q=yschimke/okurl") {
-      assertThat(response.content, containsString("https://github.com/yschimke/okurl"))
-    }
-  }
-
-  @Test
-  fun testGitHubIssue() {
-    testRequest("/api/v0/goinfo?q=square/okhttp#4421") {
-      assertThat(response.content, containsString("https://github.com/square/okhttp/issues/4421"))
-    }
-  }
-
   @KtorExperimentalLocationsAPI
   @Test
   fun testBookmarkCompletion() {

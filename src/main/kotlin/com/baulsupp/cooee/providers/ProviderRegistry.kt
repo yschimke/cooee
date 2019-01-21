@@ -24,7 +24,6 @@ class ProviderRegistry(val appServices: AppServices, val registered: Map<String,
     } else {
       providers.add(BookmarksProvider.loggedOut())
       providers.add(GoogleProvider())
-      providers.add(GithubProvider())
     }
 
     providers.add(CooeeProvider())
