@@ -42,7 +42,7 @@ class GithubProvider : BaseProvider() {
     return when (cachedProjects) {
       null -> userRepositories()
         .also {
-          appServices.cache.set(user?.email, name, "projects", Repos(it))
+          appServices.cache.set(user?.email, name, "userRepositories", Repos(it))
         }
       else -> cachedProjects.list
     }
@@ -54,12 +54,12 @@ class GithubProvider : BaseProvider() {
 
 
   private suspend fun fetchUser(): User {
-    val cachedUser = appServices.cache.get<User>(user?.email, name, "userRepositories")
+    val cachedUser = appServices.cache.get<User>(user?.email, name, "user")
 
     return when (cachedUser) {
       null -> user()
         .also {
-          appServices.cache.set(user?.email, name, "projects", it)
+          appServices.cache.set(user?.email, name, "user", it)
         }
       else -> cachedUser
     }
