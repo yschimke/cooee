@@ -89,12 +89,12 @@ class GithubProvider : BaseProvider() {
 
   override fun commandCompleter(): CommandCompleter = object : CommandCompleter {
     override suspend fun suggestCommands(command: String): List<Completion> {
-      return userRepositories().filter { it.full_name.startsWith(command) }
+      return projects.filter { it.full_name.startsWith(command) }
         .map { Completion(it.full_name, name, it.description ?: "Github: ${it.full_name}") }
     }
 
     override suspend fun matches(command: String): Boolean {
-      return userRepositories().any { it.full_name == command }
+      return projects.any { it.full_name == command }
     }
   }
 
