@@ -14,7 +14,7 @@ class TrelloCommandCompleter(val provider: TrelloProvider) : CommandCompleter {
   }
 
   private fun boardCompletion(it: BoardResponse) =
-    Completion(it.url.split("/").last(), "Trello: ${it.name}")
+    Completion(it.url.split("/").last(), description = "Trello Board: ${it.name}")
 
   override suspend fun matches(command: String): Boolean {
     return command == TrelloHomepage.completion || provider.boards.any {

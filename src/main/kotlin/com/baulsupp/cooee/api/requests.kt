@@ -63,7 +63,7 @@ private suspend fun commandCompletion(
     CompletionItem(
       word = it.completion,
       line = it.completion,
-      description = "Command for '${it.completion}'",
+      description = it.description ?: "Command for '${it.completion}'",
       provider = it.provider ?: "unknown"
     )
   })
@@ -115,7 +115,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.searchSuggestion(
 }
 
 data class ProviderList(val providers: List<ProviderStatus>)
-data class ProviderStatus(val name: String, val installed: Boolean, val config: Map<String, Any>?, val services: List<String>?)
+data class ProviderStatus(val name: String, val installed: Boolean, val config: Map<String, Any>?, val services: List<String>)
 
 @KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.providersList(
