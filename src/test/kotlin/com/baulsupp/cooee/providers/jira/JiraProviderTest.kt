@@ -48,7 +48,7 @@ class JiraProviderTest {
   fun completeCommandProjects() = runBlocking {
     assertThat(
       p.commandCompleter().suggestCommands("COOE").map { it.completion },
-      equalTo(listOf("COOEE", "COOEE-"))
+      equalTo(listOf("COOEE-3", "COOEE-2", "COOEE-1", "COOEE"))
     )
   }
 

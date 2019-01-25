@@ -12,12 +12,12 @@ class JiraCommandCompleter(val provider: JiraProvider) : CommandCompleter {
     return when {
       command == "" -> listOf()
       command.isProjectOrPartialProject() -> projectKeys.filter { it.startsWith(command) }.flatMap {
-        listOf(it, "$it-")
+        provider.mostLikelyProjectIssues(it) + listOfNotNull(provider.projectCompletion(it))
       }
       command.isProjectIssueStart() -> provider.mostLikelyProjectIssues(command.projectCode()!!)
       command.isIssueOrPartialIssue() -> provider.mostLikelyIssueCompletions(command)
       else -> listOf()
-    }.map { Completion(it) }
+    }
   }
 
   override suspend fun matches(command: String): Boolean {

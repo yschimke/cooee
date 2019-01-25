@@ -43,6 +43,6 @@ class MongoCache(private val mongoDb: MongoDatabase) : ServiceCache {
   }
 
   suspend fun createTTLIndex() {
-    cacheDb.createIndex(eq("lastUpdated", 1), IndexOptions().expireAfter(10, MINUTES)).awaitLast()
+    cacheDb.createIndex(eq("lastUpdated", 1), IndexOptions().expireAfter(60, MINUTES)).awaitLast()
   }
 }

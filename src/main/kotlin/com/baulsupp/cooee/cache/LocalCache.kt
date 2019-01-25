@@ -13,7 +13,5 @@ class LocalCache : ServiceCache {
 
   override suspend fun set(email: String?, providerName: String?, key: String, value: String) {
     map["$email:$providerName:$key"] = value
-
-    println(map)
   }
 }

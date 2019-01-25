@@ -5,6 +5,7 @@ import com.baulsupp.cooee.api.Completed
 import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
+import com.baulsupp.cooee.completion.Completion
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.kotlin.JSON
@@ -14,7 +15,11 @@ import com.baulsupp.okurl.kotlin.query
 import com.baulsupp.okurl.kotlin.queryList
 import com.baulsupp.okurl.kotlin.request
 import com.baulsupp.okurl.services.atlassian.model.AccessibleResource
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import okhttp3.RequestBody
+import java.util.concurrent.ConcurrentHashMap
 
 data class ProjectReference(val project: Project, val server: AccessibleResource) {
   val projectKey = project.key
@@ -27,18 +32,27 @@ data class IssueReference(val project: ProjectReference, val issue: String) {
   }
 }
 
+data class KnownInstances(val list: List<AccessibleResource>)
 data class KnownProjects(val list: List<ProjectReference>)
+data class KnownIssues(val list: List<Issue>)
 
 class JiraProvider : BaseProvider() {
   override val name = "jira"
 
   override fun associatedServices(): Set<String> = setOf("atlassian")
 
+  lateinit var instances: List<AccessibleResource>
   lateinit var projects: List<ProjectReference>
+  // TODO cache lazily per project
+  var issues: MutableMap<String, List<Issue>> = ConcurrentHashMap()
+
+  val issueFields = listOf("summary")
 
   override suspend fun init(appServices: AppServices, user: UserEntry?) {
     super.init(appServices, user)
+    instances = instances()
     projects = listProjects()
+    loadKnownIssues()
   }
 
   override suspend fun go(command: String, vararg args: String): GoResult {
@@ -70,7 +84,18 @@ class JiraProvider : BaseProvider() {
   }
 
   private suspend fun instances(): List<AccessibleResource> {
-    return appServices.client.queryList("https://api.atlassian.com/oauth/token/accessible-resources", userToken)
+    val cachedInstances = appServices.cache.get<KnownInstances>(user?.email, name, "instances")
+
+    return when (cachedInstances) {
+      null -> appServices.client.queryList<AccessibleResource>(
+        "https://api.atlassian.com/oauth/token/accessible-resources",
+        userToken
+      )
+        .also {
+          appServices.cache.set(user?.email, name, "instances", KnownInstances(it))
+        }
+      else -> cachedInstances.list
+    }
   }
 
   private suspend fun projects(instanceId: String): Projects {
@@ -83,29 +108,64 @@ class JiraProvider : BaseProvider() {
   private suspend fun issues(projectKey: String): Issues? {
     projects.forEach { (project, server) ->
       if (project.key == projectKey) {
-        return appServices.client.query(
-          request(
-            "https://api.atlassian.com/ex/jira/${server.id}/rest/api/3/search",
-            userToken
-          ) {
-            postJsonBody(IssueQuery("project = $projectKey order by created DESC", fields = listOf("summary")))
-          }
-        )
+        return projectIssues(server, projectKey)
       }
     }
 
     return null
   }
 
+  private suspend fun projectIssues(
+    server: AccessibleResource,
+    projectKey: String
+  ): Issues {
+    return appServices.client.query(
+      request(
+        "https://api.atlassian.com/ex/jira/${server.id}/rest/api/3/search",
+        userToken
+      ) {
+        postJsonBody(IssueQuery("project = $projectKey order by created DESC", fields = issueFields))
+      }
+    )
+  }
+
+  private suspend fun fetchIssue(
+    server: AccessibleResource,
+    issueKey: String
+  ): Issue? {
+    return appServices.client.query(
+      "https://api.atlassian.com/ex/jira/${server.id}/rest/api/3/issue/$issueKey?fields=${issueFields.joinToString(",")}",
+      userToken
+    )
+  }
+
   private suspend fun listProjects(): List<ProjectReference> {
     val cachedProjects = appServices.cache.get<KnownProjects>(user?.email, name, "projects")
 
     return when (cachedProjects) {
-      null -> instances().flatMap { instance -> projects(instance.id).values.map { ProjectReference(it, instance) } }
+      null -> instances.flatMap { instance -> projects(instance.id).values.map { ProjectReference(it, instance) } }
         .also {
           appServices.cache.set(user?.email, name, "projects", KnownProjects(it))
         }
       else -> cachedProjects.list
+    }
+  }
+
+  private suspend fun loadKnownIssues() {
+    coroutineScope {
+      projects.map { async { queryProjectIssues(it) } }.awaitAll()
+    }
+  }
+
+  private suspend fun queryProjectIssues(pr: ProjectReference): KnownIssues {
+    val cachedIssues = appServices.cache.get<KnownIssues>(user?.email, name, pr.projectKey)
+
+    return when (cachedIssues) {
+      null -> KnownIssues(projectIssues(pr.server, pr.projectKey).issues)
+        .also {
+          appServices.cache.set(user?.email, name, pr.projectKey, it)
+        }
+      else -> cachedIssues
     }
   }
 
@@ -136,14 +196,27 @@ class JiraProvider : BaseProvider() {
     )
   }
 
-  suspend fun mostLikelyProjectIssues(project: String): List<String> =
-    issues(project)?.issues?.map { it.key }.orEmpty()
+  suspend fun mostLikelyProjectIssues(project: String): List<Completion> =
+    issues(project)?.issues?.map { issueToCompletion(it) }.orEmpty()
 
-  fun mostLikelyIssueCompletions(issue: String): List<String> =
-    when {
-      issue.issueNumber()!!.length > 4 -> listOf(issue)
-      else -> listOf(issue) + (0..9).map { issue + it }
-    }
+  private fun issueToCompletion(it: Issue) =
+    Completion(it.key, description = it.fields["summary"].toString())
+
+  suspend fun mostLikelyIssueCompletions(issueKey: String): List<Completion> {
+    val project = projects.find { it.projectKey == issueKey.projectCode() } ?: return listOf()
+    val issue = issue(project, issueKey) ?: return listOf()
+    val issueCompletion = issueToCompletion(issue)
+
+    return listOf(issueCompletion)
+  }
+
+  private suspend fun JiraProvider.issue(
+    project: ProjectReference,
+    issueKey: String
+  ) = fetchIssue(project.server, issueKey)
+
+  fun projectCompletion(projectKey: String): Completion? =
+    projects.find { it.projectKey == projectKey }?.let { Completion(it.projectKey, "JIRA: " + it.project.name) }
 
   override fun commandCompleter() = JiraCommandCompleter(this)
 
