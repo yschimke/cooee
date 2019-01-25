@@ -19,6 +19,7 @@ import io.ktor.features.DataConversion
 import io.ktor.features.HttpsRedirect
 import io.ktor.features.gzip
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import io.ktor.locations.Locations
 import io.ktor.routing.routing
 import java.util.*
@@ -51,6 +52,11 @@ fun Application.module(appServices: AppServices, cloud: Boolean) {
 
   install(CORS) {
     header(HttpHeaders.Authorization)
+    method(HttpMethod.Get)
+    method(HttpMethod.Head)
+    method(HttpMethod.Put)
+    method(HttpMethod.Post)
+    method(HttpMethod.Delete)
     anyHost()
   }
   install(CallLogging)
