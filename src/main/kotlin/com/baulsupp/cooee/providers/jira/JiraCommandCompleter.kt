@@ -1,10 +1,10 @@
 package com.baulsupp.cooee.providers.jira
 
 import com.baulsupp.cooee.completion.CommandCompleter
-import com.baulsupp.cooee.completion.Completion
+import com.baulsupp.cooee.suggester.Suggestion
 
 class JiraCommandCompleter(val provider: JiraProvider) : CommandCompleter {
-  override suspend fun suggestCommands(command: String): List<Completion> {
+  override suspend fun suggestCommands(command: String): List<Suggestion> {
     val visibleProjects = provider.projects
 
     val projectKeys = visibleProjects.map { it.projectKey }

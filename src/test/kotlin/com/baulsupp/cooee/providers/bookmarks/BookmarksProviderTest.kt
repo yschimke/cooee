@@ -35,14 +35,14 @@ class BookmarksProviderTest {
     assertEquals(listOf("bookmarks"), userBookmarks.commandCompleter().suggestCommands("").map { it.completion })
     assertEquals(
       listOf("add", "remove"),
-      userBookmarks.argumentCompleter().suggestArguments("bookmarks").map { it.completion })
+      userBookmarks.argumentCompleter().suggestArguments("bookmarks"))
 
     configureBookmarks("t" to "https://test.com/")
 
     assertEquals(listOf("t", "bookmarks"), userBookmarks.commandCompleter().suggestCommands("").map { it.completion })
     assertEquals(
       listOf("remove t", "add", "remove"),
-      userBookmarks.argumentCompleter().suggestArguments("bookmarks").map { it.completion })
+      userBookmarks.argumentCompleter().suggestArguments("bookmarks"))
   }
 
   @Test

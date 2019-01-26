@@ -51,7 +51,7 @@ class GmailProviderTest {
   @Test
   fun basicArgumentsCompletion() = runBlocking {
     assertThat(
-      p.argumentCompleter().suggestArguments("gmail").map { it.completion },
+      p.argumentCompleter().suggestArguments("gmail"),
       equalTo(listOf("label:unread", "label:inbox"))
     )
   }

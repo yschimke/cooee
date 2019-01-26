@@ -1,16 +1,12 @@
 package com.baulsupp.cooee.providers
 
 import com.baulsupp.cooee.api.GoResult
-import com.baulsupp.cooee.completion.ArgumentCompleter
-import com.baulsupp.cooee.completion.CommandCompleter
-import com.baulsupp.cooee.completion.SimpleArgumentCompleter
+import com.baulsupp.cooee.suggester.Suggestion
 
 interface ProviderFunctions {
   suspend fun go(command: String, vararg args: String): GoResult
 
-  suspend fun matches(command: String): Boolean = commandCompleter().matches(command)
+  suspend fun matches(command: String): Boolean
 
-  fun argumentCompleter(): ArgumentCompleter = SimpleArgumentCompleter()
-
-  fun commandCompleter(): CommandCompleter
+  suspend fun suggest(command: String): List<Suggestion>
 }

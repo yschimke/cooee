@@ -44,11 +44,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.completionApi(
   commandQuery: CompletionRequest,
   providers: CombinedProvider
 ) {
-  val completions = if (commandQuery.isCommand()) {
-    commandCompletion(providers, commandQuery)
-  } else {
-    argumentCompletion(providers, commandQuery)
-  }
+  val completions = commandCompletion(providers, commandQuery)
 
   call.respond(completions)
 }
@@ -58,7 +54,7 @@ private suspend fun commandCompletion(
   providers: CombinedProvider,
   command: CompletionRequest
 ): Completions {
-  val commands = providers.commandCompleter().suggestCommands(command.command)
+  val commands = providers.suggest(command.q ?: "")
   return Completions(commands.map {
     CompletionItem(
       word = it.completion,
@@ -67,15 +63,6 @@ private suspend fun commandCompletion(
       provider = it.provider ?: "unknown"
     )
   })
-}
-
-@KtorExperimentalLocationsAPI
-private suspend fun argumentCompletion(
-  providers: CombinedProvider,
-  command: CompletionRequest
-): Completions {
-  val suggestArguments = providers.argumentCompleter().suggestArguments(command.command, command.args)
-  return Completions.complete(command, suggestArguments)
 }
 
 @KtorExperimentalLocationsAPI
@@ -99,10 +86,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.searchSuggestion(
 ) {
   val query = CompletionRequest(it.q ?: "")
 
-  val results = when {
-    query.isCommand() -> commandCompletion(providers, query)
-    else -> argumentCompletion(providers, query)
-  }
+  val results = commandCompletion(providers, query)
 
   val response =
     SearchSuggestionsResults(
@@ -115,7 +99,12 @@ suspend fun PipelineContext<Unit, ApplicationCall>.searchSuggestion(
 }
 
 data class ProviderList(val providers: List<ProviderStatus>)
-data class ProviderStatus(val name: String, val installed: Boolean, val config: Map<String, Any>?, val services: List<String>)
+data class ProviderStatus(
+  val name: String,
+  val installed: Boolean,
+  val config: Map<String, Any>?,
+  val services: List<String>
+)
 
 @KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.providersList(

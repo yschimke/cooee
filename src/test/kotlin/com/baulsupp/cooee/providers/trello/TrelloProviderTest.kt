@@ -71,7 +71,7 @@ class TrelloProviderTest {
   @Test
   fun basicArgumentsCompletion() = runBlocking {
     assertThat(
-      p.argumentCompleter().suggestArguments("trello").map { it.completion },
+      p.argumentCompleter().suggestArguments("trello"),
       equalTo(listOf("boards"))
     )
   }

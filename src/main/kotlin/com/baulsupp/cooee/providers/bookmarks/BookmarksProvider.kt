@@ -6,9 +6,9 @@ import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.ArgumentCompleter
 import com.baulsupp.cooee.completion.CommandCompleter
-import com.baulsupp.cooee.completion.Completion
 import com.baulsupp.cooee.completion.SimpleArgumentCompleter
 import com.baulsupp.cooee.providers.BaseProvider
+import com.baulsupp.cooee.suggester.Suggestion
 
 class BookmarksProvider : BaseProvider() {
   override val name = "bookmarks"
@@ -57,8 +57,8 @@ class BookmarksProvider : BaseProvider() {
   }
 
   override fun commandCompleter(): CommandCompleter = object : CommandCompleter {
-    override suspend fun suggestCommands(command: String): List<Completion> {
-      return knownCommands().filter { it.startsWith(command) }.map { Completion(it) }
+    override suspend fun suggestCommands(command: String): List<Suggestion> {
+      return knownCommands().filter { it.startsWith(command) }.map { Suggestion(it) }
     }
 
     override suspend fun matches(command: String): Boolean {

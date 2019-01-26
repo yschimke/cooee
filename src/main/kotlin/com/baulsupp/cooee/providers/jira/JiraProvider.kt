@@ -5,8 +5,8 @@ import com.baulsupp.cooee.api.Completed
 import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
-import com.baulsupp.cooee.completion.Completion
 import com.baulsupp.cooee.providers.BaseProvider
+import com.baulsupp.cooee.suggester.Suggestion
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.kotlin.JSON
 import com.baulsupp.okurl.kotlin.execute
@@ -196,13 +196,13 @@ class JiraProvider : BaseProvider() {
     )
   }
 
-  suspend fun mostLikelyProjectIssues(project: String): List<Completion> =
+  suspend fun mostLikelyProjectIssues(project: String): List<Suggestion> =
     issues(project)?.issues?.map { issueToCompletion(it) }.orEmpty()
 
   private fun issueToCompletion(it: Issue) =
-    Completion(it.key, description = it.fields["summary"].toString())
+    Suggestion(it.key, description = it.fields["summary"].toString())
 
-  suspend fun mostLikelyIssueCompletions(issueKey: String): List<Completion> {
+  suspend fun mostLikelyIssueCompletions(issueKey: String): List<Suggestion> {
     val project = projects.find { it.projectKey == issueKey.projectCode() } ?: return listOf()
     val issue = issue(project, issueKey) ?: return listOf()
     val issueCompletion = issueToCompletion(issue)
@@ -215,8 +215,13 @@ class JiraProvider : BaseProvider() {
     issueKey: String
   ) = fetchIssue(project.server, issueKey)
 
-  fun projectCompletion(projectKey: String): Completion? =
-    projects.find { it.projectKey == projectKey }?.let { Completion(it.projectKey, "JIRA: " + it.project.name) }
+  fun projectCompletion(projectKey: String): Suggestion? =
+    projects.find { it.projectKey == projectKey }?.let {
+      Suggestion(
+        it.projectKey,
+        description = "JIRA: " + it.project.name
+      )
+    }
 
   override fun commandCompleter() = JiraCommandCompleter(this)
 

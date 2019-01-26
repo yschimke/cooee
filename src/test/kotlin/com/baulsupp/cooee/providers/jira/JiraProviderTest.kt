@@ -63,7 +63,7 @@ class JiraProviderTest {
   @Test
   fun completeArgumentsOnIssues() = runBlocking {
     assertThat(
-      p.argumentCompleter().suggestArguments("COOEE-1").map { it.completion },
+      p.argumentCompleter().suggestArguments("COOEE-1"),
       hasItem(equalTo("comment"))
     )
   }

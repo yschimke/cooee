@@ -45,7 +45,7 @@ class StravaProviderTest {
   @Test
   fun basicArgumentsCompletion() = runBlocking {
     assertThat(
-      p.argumentCompleter().suggestArguments("strava").map { it.completion },
+      p.argumentCompleter().suggestArguments("strava"),
       equalTo(listOf("lastrun"))
     )
   }

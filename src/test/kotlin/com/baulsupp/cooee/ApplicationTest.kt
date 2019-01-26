@@ -4,7 +4,6 @@ import com.baulsupp.cooee.api.CompletionItem
 import com.baulsupp.cooee.api.Completions
 import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
 import com.baulsupp.cooee.test.TestAppServices
-import com.baulsupp.okurl.kotlin.JSON
 import com.baulsupp.okurl.kotlin.moshi
 import io.ktor.application.Application
 import io.ktor.http.ContentType
@@ -12,7 +11,6 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpMethod.Companion.Delete
 import io.ktor.http.HttpMethod.Companion.Get
-import io.ktor.http.HttpMethod.Companion.Put
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.http.HttpStatusCode.Companion.OK
@@ -182,7 +180,7 @@ class ApplicationTest {
       assertEquals(
         "[\"test \"," +
           "[\"test aaa\",\"test bbb\"]," +
-          "[\"Description for 'aaa'\",\"Description for 'bbb'\"]," +
+          "[\"Command for 'test aaa'\",\"Command for 'test bbb'\"]," +
           "[\"https://coo.ee/go?q=test+aaa\",\"https://coo.ee/go?q=test+bbb\"]]",
         response.content
       )

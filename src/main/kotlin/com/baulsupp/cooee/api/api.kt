@@ -2,7 +2,7 @@
 
 package com.baulsupp.cooee.api
 
-import com.baulsupp.cooee.completion.Completion
+import com.baulsupp.cooee.suggester.Suggestion
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
@@ -23,8 +23,6 @@ class UserInfo
 @KtorExperimentalLocationsAPI
 @Location("/api/v0/completion")
 data class CompletionRequest(val q: String? = "") {
-  fun isCommand(): Boolean = args.isEmpty()
-
   val command: String = q?.split(" ")?.firstOrNull() ?: ""
   val args: List<String> = q?.split(" ")?.drop(1).orEmpty()
 }
@@ -89,7 +87,7 @@ data class CompletionItem(val word: String, val line: String, val description: S
 
 data class Completions(val completions: List<CompletionItem>) {
   companion object {
-    fun complete(command: CompletionRequest, commands: List<Completion>): Completions {
+    fun complete(command: CompletionRequest, commands: List<Suggestion>): Completions {
       val query = command.q ?: ""
 
       // TODO improve or test logic

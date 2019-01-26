@@ -57,7 +57,7 @@ class CooeeProviderTest {
   @Test
   fun basicArgumentsCompletion() = runBlocking {
     assertThat(
-      p.argumentCompleter().suggestArguments("cooee").map { it.completion },
+      p.argumentCompleter().suggestArguments("cooee"),
       equalTo(listOf("me", "home", "auth", "renew"))
     )
   }

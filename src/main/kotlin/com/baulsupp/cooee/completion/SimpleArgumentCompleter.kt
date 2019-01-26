@@ -4,5 +4,5 @@ class SimpleArgumentCompleter(private val fixedArguments: List<String>) : Argume
   constructor(vararg arguments: String) : this(listOf(*arguments))
 
   override suspend fun suggestArguments(command: String, arguments: List<String>?) =
-    fixedArguments.map { Completion(it) }
+    fixedArguments
 }

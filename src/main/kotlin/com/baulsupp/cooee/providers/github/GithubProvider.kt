@@ -5,8 +5,8 @@ import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.CommandCompleter
-import com.baulsupp.cooee.completion.Completion
 import com.baulsupp.cooee.providers.BaseProvider
+import com.baulsupp.cooee.suggester.Suggestion
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.kotlin.query
 import com.baulsupp.okurl.kotlin.queryList
@@ -88,9 +88,15 @@ class GithubProvider : BaseProvider() {
   }
 
   override fun commandCompleter(): CommandCompleter = object : CommandCompleter {
-    override suspend fun suggestCommands(command: String): List<Completion> {
+    override suspend fun suggestCommands(command: String): List<Suggestion> {
       return projects.filter { it.full_name.startsWith(command) }
-        .map { Completion(it.full_name, name, it.description ?: "Github: ${it.full_name}") }
+        .map {
+          Suggestion(
+            it.full_name,
+            name,
+            it.description ?: "Github: ${it.full_name}"
+          )
+        }
     }
 
     override suspend fun matches(command: String): Boolean {

@@ -46,7 +46,7 @@ class GoogleProviderTest {
   @Test
   fun googleSuggest() = runBlocking {
     assertThat(
-      p.argumentCompleter().suggestArguments("gl", "how to convert to".split(" ")).map { it.completion },
+      p.argumentCompleter().suggestArguments("gl", "how to convert to".split(" ")),
       hasItem(containsString("how to convert to pdf"))
     )
   }
