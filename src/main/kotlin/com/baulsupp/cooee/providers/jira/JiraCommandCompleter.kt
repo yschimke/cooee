@@ -31,11 +31,7 @@ class JiraCommandCompleter(val provider: JiraProvider) : Suggester {
       command == "" -> listOf()
       command.isProjectOrPartialProject() -> {
         provider.projects.filter { it.projectKey.startsWith(command) }.flatMap {
-          mostLikelyProjectIssues(it) + provider.projects.filter { it.projectKey.startsWith(command) }.mapNotNull {
-            projectCompletion(
-              it
-            )
-          }
+          mostLikelyProjectIssues(it) + listOfNotNull(projectCompletion(it))
         }
       }
       command.isProjectIssueStart() -> {
@@ -47,19 +43,19 @@ class JiraCommandCompleter(val provider: JiraProvider) : Suggester {
     }
   }
 
-  fun projectCompletion(project: ProjectReference): Suggestion? =
+  private fun projectCompletion(project: ProjectReference): Suggestion? =
     Suggestion(
       project.projectKey,
       description = "JIRA: " + project.project.name
     )
 
-  suspend fun mostLikelyProjectIssues(project: ProjectReference): List<Suggestion> =
+  private suspend fun mostLikelyProjectIssues(project: ProjectReference): List<Suggestion> =
     provider.projectIssues(project).issues.map { issueToCompletion(it) }
 
-  fun issueToCompletion(it: Issue) =
-    Suggestion(it.key, description = it.fields["url"].toString(), type = SuggestionType.LINK)
+  private fun issueToCompletion(it: Issue) =
+    Suggestion(it.key, description = it.fields["summary"].toString(), url = it.fields["url"].toString(), type = SuggestionType.LINK)
 
-  suspend fun mostLikelyIssueCompletions(issueKey: String): List<Suggestion> {
+  private suspend fun mostLikelyIssueCompletions(issueKey: String): List<Suggestion> {
     val project = provider.projects.find { it.projectKey == issueKey.projectCode() } ?: return listOf()
     val issue = provider.issue(project, issueKey)
     val issueCompletion = issueToCompletion(issue)

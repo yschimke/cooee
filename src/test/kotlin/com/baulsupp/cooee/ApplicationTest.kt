@@ -79,7 +79,7 @@ class ApplicationTest {
       )
     }
 
-    testRequest("/api/v0/line?q=g", user = "yuri") {
+    testRequest("/api/v0/completion?q=g", user = "yuri") {
       assertEquals(
         "{\"completions\":[" +
           "{\"word\":\"g\",\"line\":\"g\",\"description\":\"Command for 'g'\",\"provider\":\"google\"}," +
@@ -93,7 +93,7 @@ class ApplicationTest {
 
   private fun testCompletion(prefix: String, check: (Completions) -> Unit = {}) {
     withTestApplication({ test() }) {
-      handleRequest(HttpMethod.Get, "/api/v0/line?q=$prefix").apply {
+      handleRequest(HttpMethod.Get, "/api/v0/completion?q=$prefix").apply {
         assertEquals(HttpStatusCode.OK, response.status())
         val completions: Completions = moshi.adapter(Completions::class.java).fromJson(response.content!!)!!
 
@@ -108,7 +108,7 @@ class ApplicationTest {
       services.providerConfigStore.store("yuri@coo.ee", "test", mapOf())
     }
 
-    testRequest("/api/v0/line?q=test ", user = "yuri") {
+    testRequest("/api/v0/completion?q=test ", user = "yuri") {
       assertEquals(HttpStatusCode.OK, response.status())
       assertEquals(
         "{\"completions\":[{\"word\":\"test\",\"line\":\"test\",\"description\":\"Command for 'test'\",\"provider\":\"test\"}]}",
