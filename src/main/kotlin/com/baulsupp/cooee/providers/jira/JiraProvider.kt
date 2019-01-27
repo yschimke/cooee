@@ -7,7 +7,6 @@ import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.suggester.Suggestion
-import com.baulsupp.cooee.suggester.SuggestionType
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.kotlin.JSON
 import com.baulsupp.okurl.kotlin.execute
@@ -86,10 +85,12 @@ class JiraProvider : BaseProvider() {
 
   private suspend fun instances(): List<AccessibleResource> =
     appServices.cache.get(user?.email, name, "instances") {
-      KnownInstances(appServices.client.queryList<AccessibleResource>(
-        "https://api.atlassian.com/oauth/token/accessible-resources",
-        userToken
-      ))
+      KnownInstances(
+        appServices.client.queryList<AccessibleResource>(
+          "https://api.atlassian.com/oauth/token/accessible-resources",
+          userToken
+        )
+      )
     }.list
 
   private suspend fun projects(instanceId: String): Projects {
@@ -109,7 +110,7 @@ class JiraProvider : BaseProvider() {
     return null
   }
 
-  private suspend fun projectIssues(
+  suspend fun projectIssues(
     project: ProjectReference
   ): Issues {
     return appServices.client.query(
@@ -119,16 +120,6 @@ class JiraProvider : BaseProvider() {
       ) {
         postJsonBody(IssueQuery("project = ${project.projectKey} order by created DESC", fields = issueFields))
       }
-    )
-  }
-
-  private suspend fun fetchIssue(
-    server: AccessibleResource,
-    issueKey: String
-  ): Issue? {
-    return appServices.client.query(
-      "https://api.atlassian.com/ex/jira/${server.id}/rest/api/3/issue/$issueKey?fields=${issueFields.joinToString(",")}",
-      userToken
     )
   }
 
@@ -174,30 +165,13 @@ class JiraProvider : BaseProvider() {
     )
   }
 
-  suspend fun mostLikelyProjectIssues(project: ProjectReference): List<Suggestion> =
-    projectIssues(project).issues.map { issueToCompletion(it) }
-
-  fun issueToCompletion(it: Issue) =
-    Suggestion(it.key, description = it.fields["url"].toString(), type = SuggestionType.LINK)
-
-  suspend fun mostLikelyIssueCompletions(issueKey: String): List<Suggestion> {
-    val project = projects.find { it.projectKey == issueKey.projectCode() } ?: return listOf()
-    val issue = issue(project, issueKey) ?: return listOf()
-    val issueCompletion = issueToCompletion(issue)
-
-    return listOf(issueCompletion)
-  }
-
-  private suspend fun issue(
-    project: ProjectReference,
-    issueKey: String
-  ) = fetchIssue(project.server, issueKey)
-
-  fun projectCompletion(projectKey: String): Suggestion? =
-    projects.find { it.projectKey == projectKey }?.let {
-      Suggestion(
-        it.projectKey,
-        description = "JIRA: " + it.project.name
+  suspend fun issue(project: ProjectReference, issueKey: String): Issue =
+    appServices.cache.get(user?.email, name, issueKey) {
+      appServices.client.query(
+        "https://api.atlassian.com/ex/jira/${project.server.id}/rest/api/3/issue/$issueKey?fields=${issueFields.joinToString(
+          ","
+        )}",
+        userToken
       )
     }
 

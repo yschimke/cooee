@@ -60,7 +60,7 @@ tasks.create("downloadDependencies") {
 dependencies {
   implementation("ch.qos.logback:logback-classic:${Versions.logback}")
   implementation("com.baulsupp:okurl:${Versions.okurl}")
-  implementation("com.google.cloud:google-cloud-logging-logback:0.73.0-alpha")
+  implementation("com.google.cloud:google-cloud-logging-logback:0.79.0-alpha")
   implementation("com.google.appengine:appengine-api-1.0-sdk:1.9.71")
   implementation("org.springframework.data:spring-data-redis:2.1.4.RELEASE")
   implementation("io.lettuce:lettuce-core:5.1.3.RELEASE")
@@ -111,7 +111,7 @@ dependencies {
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:${Versions.kotlinCoroutines}")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${Versions.kotlinCoroutines}")
-  implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.66-kotlin-1.3.11")
+  implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.67-kotlin-1.3.20")
   implementation("org.mongodb:mongodb-driver-reactivestreams:1.10.0")
   implementation("org.webjars:jquery:3.2.1")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:${Versions.kotlinCoroutines}")

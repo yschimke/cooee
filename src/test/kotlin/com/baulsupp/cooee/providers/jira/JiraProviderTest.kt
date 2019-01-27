@@ -2,6 +2,7 @@ package com.baulsupp.cooee.providers.jira
 
 import com.baulsupp.cooee.api.Completed
 import com.baulsupp.cooee.api.RedirectResult
+import com.baulsupp.cooee.suggester.Suggestion
 import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.cooee.test.setLocalCredentials
 import com.baulsupp.cooee.users.UserEntry
@@ -62,7 +63,7 @@ class JiraProviderTest {
 
   @Test
   fun completeArgumentsOnIssues() = runBlocking {
-    val suggestArguments = p.suggest("COOEE-1 ")
+    val suggestArguments = p.suggest("COOEE-1 ").map(Suggestion::line)
     assertThat(
       suggestArguments,
       hasItem(equalTo("COOEE-1 comment"))
