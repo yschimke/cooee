@@ -84,20 +84,13 @@ class JiraProvider : BaseProvider() {
     return projects.find { projectKey == it.projectKey }?.let { IssueReference(it, command) }
   }
 
-  private suspend fun instances(): List<AccessibleResource> {
-    val cachedInstances = appServices.cache.get<KnownInstances>(user?.email, name, "instances")
-
-    return when (cachedInstances) {
-      null -> appServices.client.queryList<AccessibleResource>(
+  private suspend fun instances(): List<AccessibleResource> =
+    appServices.cache.get(user?.email, name, "instances") {
+      KnownInstances(appServices.client.queryList<AccessibleResource>(
         "https://api.atlassian.com/oauth/token/accessible-resources",
         userToken
-      )
-        .also {
-          appServices.cache.set(user?.email, name, "instances", KnownInstances(it))
-        }
-      else -> cachedInstances.list
-    }
-  }
+      ))
+    }.list
 
   private suspend fun projects(instanceId: String): Projects {
     return appServices.client.query(
@@ -139,17 +132,9 @@ class JiraProvider : BaseProvider() {
     )
   }
 
-  private suspend fun listProjects(): List<ProjectReference> {
-    val cachedProjects = appServices.cache.get<KnownProjects>(user?.email, name, "projects")
-
-    return when (cachedProjects) {
-      null -> instances.flatMap { instance -> projects(instance.id).values.map { ProjectReference(it, instance) } }
-        .also {
-          appServices.cache.set(user?.email, name, "projects", KnownProjects(it))
-        }
-      else -> cachedProjects.list
-    }
-  }
+  private suspend fun listProjects(): List<ProjectReference> = appServices.cache.get(user?.email, name, "projects") {
+    KnownProjects(instances.flatMap { instance -> projects(instance.id).values.map { ProjectReference(it, instance) } })
+  }.list
 
   private suspend fun loadKnownIssues() {
     coroutineScope {
@@ -157,17 +142,10 @@ class JiraProvider : BaseProvider() {
     }
   }
 
-  private suspend fun queryProjectIssues(pr: ProjectReference): KnownIssues {
-    val cachedIssues = appServices.cache.get<KnownIssues>(user?.email, name, pr.projectKey)
-
-    return when (cachedIssues) {
-      null -> KnownIssues(projectIssues(pr).issues)
-        .also {
-          appServices.cache.set(user?.email, name, pr.projectKey, it)
-        }
-      else -> cachedIssues
-    }
-  }
+  private suspend fun queryProjectIssues(pr: ProjectReference): List<Issue> =
+    appServices.cache.get(user?.email, name, pr.projectKey) {
+      KnownIssues(projectIssues(pr).issues)
+    }.list
 
   private suspend fun IssueReference.vote() {
     appServices.client.execute(

@@ -39,27 +39,14 @@ class TrelloProvider : BaseProvider() {
     }
   }
 
-  private suspend fun readBoards(): List<BoardResponse> {
-    val cachedBoards = appServices.cache.get<Boards>(user?.email, name, "boards")
+  private suspend fun readBoards(): List<BoardResponse> = appServices.cache.get(user?.email, name, "boards") {
+    Boards(client.queryList("https://api.trello.com/1/members/me/boards", userToken))
+  }.list
 
-    return when (cachedBoards) {
-      null -> client.queryList<BoardResponse>("https://api.trello.com/1/members/me/boards", userToken).also {
-        appServices.cache.set(user?.email, name, "boards", Boards(it))
-      }
-      else -> cachedBoards.list
-    }
-  }
-
-  private suspend fun readCards(boardId: String): List<Card> {
-    val cachedCards = appServices.cache.get<Cards>(user?.email, name, boardId)
-
-    return when (cachedCards) {
-      null -> client.queryList<Card>("https://api.trello.com/1/boards/$boardId/cards/open", userToken).also {
-        appServices.cache.set(user?.email, name, boardId, Cards(it))
-      }
-      else -> cachedCards.list
-    }
-  }
+  private suspend fun readCards(boardId: String): List<Card> =
+    appServices.cache.get<Cards>(user?.email, name, boardId) {
+      Cards(client.queryList<Card>("https://api.trello.com/1/boards/$boardId/cards/open", userToken))
+    }.list
 
   override suspend fun go(command: String, vararg args: String): GoResult {
     if (command == name) {
