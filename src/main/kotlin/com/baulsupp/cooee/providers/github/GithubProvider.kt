@@ -7,6 +7,7 @@ import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.suggester.Suggestion
+import com.baulsupp.cooee.suggester.SuggestionType
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.kotlin.query
 import com.baulsupp.okurl.kotlin.queryList
@@ -36,37 +37,13 @@ class GithubProvider : BaseProvider() {
     }
   }
 
-  private suspend fun listUserRepositories(): List<Repository> {
-    val cachedProjects = appServices.cache.get<Repos>(user?.email, name, "userRepositories")
+  private suspend fun listUserRepositories(): List<Repository> =
+    appServices.cache.get(user?.email, name, "userRepositories") {
+      Repos(appServices.client.queryList("https://api.github.com/user/repos?affiliation=owner,collaborator", userToken))
+    }.list
 
-    return when (cachedProjects) {
-      null -> userRepositories()
-        .also {
-          appServices.cache.set(user?.email, name, "userRepositories", Repos(it))
-        }
-      else -> cachedProjects.list
-    }
-  }
-
-  private suspend fun userRepositories(): List<Repository> {
-    return appServices.client.queryList("https://api.github.com/user/repos?affiliation=owner,collaborator", userToken)
-  }
-
-
-  private suspend fun fetchUser(): User {
-    val cachedUser = appServices.cache.get<User>(user?.email, name, "user")
-
-    return when (cachedUser) {
-      null -> user()
-        .also {
-          appServices.cache.set(user?.email, name, "user", it)
-        }
-      else -> cachedUser
-    }
-  }
-
-  private suspend fun user(): User {
-    return appServices.client.query("https://api.github.com/user", userToken)
+  private suspend fun fetchUser(): User = appServices.cache.get<User>(user?.email, name, "user") {
+    appServices.client.query("https://api.github.com/user", userToken)
   }
 
   override suspend fun go(command: String, vararg args: String): GoResult {
@@ -89,18 +66,26 @@ class GithubProvider : BaseProvider() {
 
   override fun commandCompleter(): CommandCompleter = object : CommandCompleter {
     override suspend fun suggestCommands(command: String): List<Suggestion> {
-      return projects.filter { it.full_name.startsWith(command) }
+      return projects
         .map {
           Suggestion(
             it.full_name,
-            name,
-            it.description ?: "Github: ${it.full_name}"
+            provider = name,
+            description = it.description ?: "Github: ${it.full_name}",
+            type = SuggestionType.LINK,
+            url = "https://github.com/${it.full_name}"
           )
-        }
+        } + Suggestion(
+        "github",
+        provider = name,
+        description = "Github",
+        type = SuggestionType.LINK,
+        url = "https://github.com"
+      )
     }
 
     override suspend fun matches(command: String): Boolean {
-      return projects.any { it.full_name == command }
+      return projects.any { it.full_name == command } || command == "github"
     }
   }
 

@@ -21,7 +21,7 @@ data class GoInfo(val q: String? = null) {
 class UserInfo
 
 @KtorExperimentalLocationsAPI
-@Location("/api/v0/completion")
+@Location("/api/v0/line")
 data class CompletionRequest(val q: String? = "") {
   val command: String = q?.split(" ")?.firstOrNull() ?: ""
   val args: List<String> = q?.split(" ")?.drop(1).orEmpty()
@@ -95,9 +95,9 @@ data class Completions(val completions: List<CompletionItem>) {
 
       return Completions(commands.map { s ->
         CompletionItem(
-          s.completion,
-          prefix + s.completion,
-          "Description for '${s.completion}'",
+          s.line,
+          prefix + s.line,
+          "Description for '${s.line}'",
           provider = s.provider ?: "unknown"
         )
       })

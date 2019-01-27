@@ -57,9 +57,9 @@ private suspend fun commandCompletion(
   val commands = providers.suggest(command.q ?: "")
   return Completions(commands.map {
     CompletionItem(
-      word = it.completion,
-      line = it.completion,
-      description = it.description ?: "Command for '${it.completion}'",
+      word = it.line,
+      line = it.line,
+      description = it.description ?: "Command for '${it.line}'",
       provider = it.provider ?: "unknown"
     )
   })

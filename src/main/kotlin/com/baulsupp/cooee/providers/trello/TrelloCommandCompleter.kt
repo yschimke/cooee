@@ -17,7 +17,7 @@ class TrelloCommandCompleter(val provider: TrelloProvider) : CommandCompleter {
     Suggestion(it.url.split("/").last(), description = "Trello Board: ${it.name}")
 
   override suspend fun matches(command: String): Boolean {
-    return command == TrelloHomepage.completion || provider.boards.any {
+    return command == TrelloHomepage.line || provider.boards.any {
       it.url.split("/").last() == command
     }
   }

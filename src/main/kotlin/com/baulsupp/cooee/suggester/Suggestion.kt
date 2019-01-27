@@ -1,21 +1,19 @@
 package com.baulsupp.cooee.suggester
 
 data class Suggestion(
-  val completion: String,
+  val line: String,
   val provider: String? = null,
   val description: String? = null,
-  val type: SuggestionType? = SuggestionType.LINK,
-  val list: List<Suggestion>? = null
+  val type: SuggestionType? = null,
+  val list: List<Suggestion>? = null,
+  val url: String? = null,
+  val message: String? = null
 ) {
   fun startsWith(command: String): Boolean {
-    return completion.startsWith(command)
+    return line.startsWith(command)
   }
 
   fun contains(command: String): Boolean {
-    return completion.contains(command)
-  }
-
-  companion object {
-    fun completions(vararg strings: String) = strings.map { Suggestion(it) }
+    return line.contains(command)
   }
 }

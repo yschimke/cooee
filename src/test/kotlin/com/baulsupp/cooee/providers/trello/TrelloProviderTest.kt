@@ -55,7 +55,7 @@ class TrelloProviderTest {
   @Test
   fun basicCommandCompletion() = runBlocking {
     assertThat(
-      p.commandCompleter().suggestCommands("trell").map { it.completion },
+      p.commandCompleter().suggestCommands("trell").map { it.line },
       equalTo(listOf("trello"))
     )
   }
@@ -63,7 +63,7 @@ class TrelloProviderTest {
   @Test
   fun boardsCommandCompletion() = runBlocking {
     assertThat(
-      p.commandCompleter().suggestCommands("cooee-d").map { it.completion },
+      p.commandCompleter().suggestCommands("cooee-d").map { it.line },
       hasItem("cooee-dev")
     )
   }

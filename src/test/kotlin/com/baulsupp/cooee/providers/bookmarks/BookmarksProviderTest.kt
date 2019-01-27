@@ -26,20 +26,20 @@ class BookmarksProviderTest {
   fun defaultBookmarks() = runBlocking {
     assertEquals(
       listOf("google", "facebook", "twitter", "gmail", "bookmarks"),
-      defaultBookmarks.commandCompleter().suggestCommands("").map { it.completion }
+      defaultBookmarks.commandCompleter().suggestCommands("").map { it.line }
     )
   }
 
   @Test
   fun userBookmarks() = runBlocking {
-    assertEquals(listOf("bookmarks"), userBookmarks.commandCompleter().suggestCommands("").map { it.completion })
+    assertEquals(listOf("bookmarks"), userBookmarks.commandCompleter().suggestCommands("").map { it.line })
     assertEquals(
       listOf("add", "remove"),
       userBookmarks.argumentCompleter().suggestArguments("bookmarks"))
 
     configureBookmarks("t" to "https://test.com/")
 
-    assertEquals(listOf("t", "bookmarks"), userBookmarks.commandCompleter().suggestCommands("").map { it.completion })
+    assertEquals(listOf("t", "bookmarks"), userBookmarks.commandCompleter().suggestCommands("").map { it.line })
     assertEquals(
       listOf("remove t", "add", "remove"),
       userBookmarks.argumentCompleter().suggestArguments("bookmarks"))

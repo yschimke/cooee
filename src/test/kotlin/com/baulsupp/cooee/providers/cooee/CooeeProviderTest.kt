@@ -49,7 +49,7 @@ class CooeeProviderTest {
   @Test
   fun basicCommandCompletion() = runBlocking {
     assertThat(
-      p.commandCompleter().suggestCommands("cooe").map { it.completion },
+      p.commandCompleter().suggestCommands("cooe").map { it.line },
       equalTo(listOf("cooee"))
     )
   }
