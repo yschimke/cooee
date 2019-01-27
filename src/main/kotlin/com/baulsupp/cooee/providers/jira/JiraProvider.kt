@@ -179,6 +179,20 @@ class JiraProvider : BaseProvider() {
 
   override fun argumentCompleter() = TODO()
 
+  override suspend fun matches(command: String): Boolean {
+    val parts = command.split("\\s+".toPattern())
+
+    val projectOrIssue = parts.first()
+
+    if (!projectOrIssue.isProjectOrIssue()) {
+      return false
+    }
+
+    val projectCode = projectOrIssue.projectCode()
+
+    return projects.any { it.projectKey == projectCode }
+  }
+
   override suspend fun suggest(command: String): List<Suggestion> {
     return JiraCommandCompleter(this).suggest(command)
   }

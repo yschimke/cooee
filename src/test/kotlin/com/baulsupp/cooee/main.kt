@@ -10,7 +10,7 @@ import kotlinx.coroutines.debug.DebugProbes
 
 @KtorExperimentalLocationsAPI
 @ExperimentalCoroutinesApi
-fun main(args: Array<String>) {
+fun main() {
   DebugProbes.install()
 
   val env = applicationEngineEnvironment {

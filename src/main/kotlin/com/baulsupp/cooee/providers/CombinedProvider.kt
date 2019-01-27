@@ -33,10 +33,11 @@ class CombinedProvider(val providers: List<BaseProvider>) : ProviderFunctions {
   }
 
   private suspend fun provider(command: String): Provider? = coroutineScope {
+    // TODO log multiple results
     providers.map {
       async {
         try {
-          if (it.commandCompleter().matches(command)) it else null
+          if (it.matches(command)) it else null
         } catch (e: Exception) {
           log.warn("provider search failed: " + it.name, e)
           null
