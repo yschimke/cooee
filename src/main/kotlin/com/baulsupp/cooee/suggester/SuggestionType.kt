@@ -8,7 +8,7 @@ enum class SuggestionType {
   COMMAND,
 
   /** Returns a command prefix that allows further comment */
-  COMMENT,
+  PREFIX,
 
   /** Returns subcommands */
   LIST,

@@ -3,9 +3,17 @@ package com.baulsupp.cooee.cache
 import com.baulsupp.okurl.kotlin.moshi
 
 class MoshiTypedCache(val cache: ServiceCache) {
-  suspend inline fun <reified T> get(email: String?, providerName: String?, key: String): T? {
+  suspend inline fun <reified T> get(
+    email: String?,
+    providerName: String?,
+    key: String,
+    readThrough: (String) -> T? = { null }
+  ): T? {
     val valueString = cache.get(email, providerName, key)
-    return if (valueString != null) moshi.adapter(T::class.java).fromJson(valueString) else null
+    return when {
+        valueString != null -> moshi.adapter(T::class.java).fromJson(valueString)
+        else -> null
+    }
   }
 
   suspend inline fun <reified T> set(email: String?, providerName: String?, key: String, value: T) {

@@ -9,6 +9,7 @@ import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.completion.SimpleArgumentCompleter
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.suggester.Suggestion
+import com.baulsupp.cooee.suggester.SuggestionType
 
 class BookmarksProvider : BaseProvider() {
   override val name = "bookmarks"
@@ -58,7 +59,8 @@ class BookmarksProvider : BaseProvider() {
 
   override fun commandCompleter(): CommandCompleter = object : CommandCompleter {
     override suspend fun suggestCommands(command: String): List<Suggestion> {
-      return knownCommands().filter { it.startsWith(command) }.map { Suggestion(it) }
+      val bookmarks = configuredBookmarks.map { (k, v) -> Suggestion(k, name, type = SuggestionType.LINK, url = v) }
+      return bookmarks + Suggestion("bookmarks", name, description = "Bookmark Options", type = SuggestionType.PREFIX)
     }
 
     override suspend fun matches(command: String): Boolean {

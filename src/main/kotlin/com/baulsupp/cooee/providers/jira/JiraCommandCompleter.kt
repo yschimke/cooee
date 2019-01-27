@@ -1,28 +1,23 @@
 package com.baulsupp.cooee.providers.jira
 
-import com.baulsupp.cooee.completion.CommandCompleter
+import com.baulsupp.cooee.suggester.Suggester
 import com.baulsupp.cooee.suggester.Suggestion
 
-class JiraCommandCompleter(val provider: JiraProvider) : CommandCompleter {
-  override suspend fun suggestCommands(command: String): List<Suggestion> {
-    val visibleProjects = provider.projects
-
-    val projectKeys = visibleProjects.map { it.projectKey }
-
+class JiraCommandCompleter(val provider: JiraProvider) : Suggester {
+  override suspend fun suggest(command: String): List<Suggestion> {
     return when {
       command == "" -> listOf()
-      command.isProjectOrPartialProject() -> projectKeys.filter { it.startsWith(command) }.flatMap {
-        provider.mostLikelyProjectIssues(it) + listOfNotNull(provider.projectCompletion(it))
+      command.isProjectOrPartialProject() -> {
+        provider.projects.filter { it.projectKey.startsWith(command) }.flatMap {
+          provider.mostLikelyProjectIssues(it) + listOfNotNull(provider.projectCompletion(command))
+        }
       }
-      command.isProjectIssueStart() -> provider.mostLikelyProjectIssues(command.projectCode()!!)
+      command.isProjectIssueStart() -> {
+        val projectCode = command.projectCode()!!
+        provider.issues(projectCode)?.issues?.map { provider.issueToCompletion(it) }.orEmpty()
+      }
       command.isIssueOrPartialIssue() -> provider.mostLikelyIssueCompletions(command)
       else -> listOf()
-    }
-  }
-
-  override suspend fun matches(command: String): Boolean {
-    return (command.isProjectOrIssue()) && provider.projects.any {
-      command == it.projectKey || command.startsWith("${it.projectKey}-")
     }
   }
 }

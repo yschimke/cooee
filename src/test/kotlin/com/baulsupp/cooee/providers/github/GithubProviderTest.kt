@@ -5,7 +5,6 @@ import com.baulsupp.cooee.test.setLocalCredentials
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.services.github.GithubAuthInterceptor
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.*
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -34,7 +33,7 @@ class GithubProviderTest {
   @Test
   fun completeUserRepos() = runBlocking {
     assertThat(
-      p.commandCompleter().suggestCommands("yschimke/cooe").map { it.completion },
+      p.commandCompleter().suggestCommands("yschimke/cooe").map { it.line },
       hasItem(equalTo("yschimke/cooee"))
     )
   }

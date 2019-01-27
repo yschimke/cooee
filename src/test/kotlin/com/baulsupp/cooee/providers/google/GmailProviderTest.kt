@@ -6,7 +6,6 @@ import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.cooee.test.setLocalCredentials
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.services.google.GoogleAuthInterceptor
-import com.baulsupp.okurl.services.trello.TrelloAuthInterceptor
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.Assert.assertThat
@@ -43,7 +42,7 @@ class GmailProviderTest {
   @Test
   fun basicCommandCompletion() = runBlocking {
     assertThat(
-      p.commandCompleter().suggestCommands("gmai").map { it.completion },
+      p.commandCompleter().suggestCommands("gmai").map { it.line },
       equalTo(listOf("gmail"))
     )
   }

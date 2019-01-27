@@ -26,7 +26,7 @@ class GoogleProviderTest {
   fun defaultBookmarks() = runBlocking {
     assertEquals(
       listOf("g", "gl"),
-      p.commandCompleter().suggestCommands("").map { it.completion }
+      p.commandCompleter().suggestCommands("").map { it.line }
     )
   }
 

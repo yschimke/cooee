@@ -7,6 +7,7 @@ import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.suggester.Suggestion
+import com.baulsupp.cooee.suggester.SuggestionType
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.kotlin.JSON
 import com.baulsupp.okurl.kotlin.execute
@@ -46,7 +47,7 @@ class JiraProvider : BaseProvider() {
   // TODO cache lazily per project
   var issues: MutableMap<String, List<Issue>> = ConcurrentHashMap()
 
-  val issueFields = listOf("summary")
+  val issueFields = listOf("summary", "url")
 
   override suspend fun init(appServices: AppServices, user: UserEntry?) {
     super.init(appServices, user)
@@ -105,10 +106,10 @@ class JiraProvider : BaseProvider() {
     )
   }
 
-  private suspend fun issues(projectKey: String): Issues? {
+  suspend fun issues(projectKey: String): Issues? {
     projects.forEach { (project, server) ->
       if (project.key == projectKey) {
-        return projectIssues(server, projectKey)
+        return projectIssues(ProjectReference(project, server))
       }
     }
 
@@ -116,15 +117,14 @@ class JiraProvider : BaseProvider() {
   }
 
   private suspend fun projectIssues(
-    server: AccessibleResource,
-    projectKey: String
+    project: ProjectReference
   ): Issues {
     return appServices.client.query(
       request(
-        "https://api.atlassian.com/ex/jira/${server.id}/rest/api/3/search",
+        "https://api.atlassian.com/ex/jira/${project.serverId}/rest/api/3/search",
         userToken
       ) {
-        postJsonBody(IssueQuery("project = $projectKey order by created DESC", fields = issueFields))
+        postJsonBody(IssueQuery("project = ${project.projectKey} order by created DESC", fields = issueFields))
       }
     )
   }
@@ -161,7 +161,7 @@ class JiraProvider : BaseProvider() {
     val cachedIssues = appServices.cache.get<KnownIssues>(user?.email, name, pr.projectKey)
 
     return when (cachedIssues) {
-      null -> KnownIssues(projectIssues(pr.server, pr.projectKey).issues)
+      null -> KnownIssues(projectIssues(pr).issues)
         .also {
           appServices.cache.set(user?.email, name, pr.projectKey, it)
         }
@@ -196,11 +196,11 @@ class JiraProvider : BaseProvider() {
     )
   }
 
-  suspend fun mostLikelyProjectIssues(project: String): List<Suggestion> =
-    issues(project)?.issues?.map { issueToCompletion(it) }.orEmpty()
+  suspend fun mostLikelyProjectIssues(project: ProjectReference): List<Suggestion> =
+    projectIssues(project).issues.map { issueToCompletion(it) }
 
-  private fun issueToCompletion(it: Issue) =
-    Suggestion(it.key, description = it.fields["summary"].toString())
+  fun issueToCompletion(it: Issue) =
+    Suggestion(it.key, description = it.fields["url"].toString(), type = SuggestionType.LINK)
 
   suspend fun mostLikelyIssueCompletions(issueKey: String): List<Suggestion> {
     val project = projects.find { it.projectKey == issueKey.projectCode() } ?: return listOf()
@@ -210,7 +210,7 @@ class JiraProvider : BaseProvider() {
     return listOf(issueCompletion)
   }
 
-  private suspend fun JiraProvider.issue(
+  private suspend fun issue(
     project: ProjectReference,
     issueKey: String
   ) = fetchIssue(project.server, issueKey)
@@ -223,7 +223,11 @@ class JiraProvider : BaseProvider() {
       )
     }
 
-  override fun commandCompleter() = JiraCommandCompleter(this)
+  override fun commandCompleter() = TODO()
 
-  override fun argumentCompleter() = JiraArgumentCompleter(this)
+  override fun argumentCompleter() = TODO()
+
+  override suspend fun suggest(command: String): List<Suggestion> {
+    return JiraCommandCompleter(this).suggest(command)
+  }
 }
