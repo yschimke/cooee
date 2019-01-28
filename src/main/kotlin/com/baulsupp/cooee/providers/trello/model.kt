@@ -31,12 +31,35 @@ data class Card(
   val url: String = "",
   val badges: Badges?,
   val idMembers: List<String>?,
-  val idShort: Int,
+  val idShort: Int?,
   val due: String?,
   val idAttachmentCover: Any?,
   val name: String,
-  val closed: Boolean,
+  val closed: Boolean?,
   val manualCoverAttachment: Boolean?,
   val desc: String?
 )
 
+data class BoardResponse(
+  val descData: Any?,
+  val pinned: Any?,
+  val labelNames: Map<String, String>?,
+  val shortUrl: String?,
+  val invited: Boolean?,
+  val dateLastActivity: String?,
+  val datePluginDisable: Any?,
+  val shortLink: String?,
+  val url: String,
+  val memberships: List<Any>?,
+  val prefs: Map<String, Any>?,
+  val subscribed: Boolean?,
+  val starred: Boolean?,
+  val invitations: Any?,
+  val name: String,
+  val idOrganization: Any?,
+  val dateLastView: String?,
+  val closed: Boolean?,
+  val id: String,
+  val limits: Any?,
+  val desc: String?
+)
