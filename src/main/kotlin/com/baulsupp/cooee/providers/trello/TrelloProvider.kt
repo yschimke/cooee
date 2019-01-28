@@ -50,6 +50,10 @@ class TrelloProvider : BaseProvider() {
       Cards(client.queryList<Card>("https://api.trello.com/1/boards/$boardId/cards?filter=open&fields=id,name,idBoard,shortUrl", userToken))
     }.list
 
+  override suspend fun matches(command: String): Boolean {
+    return (command == name) || boards.any { it.url.endsWith("/$command") }
+  }
+
   override suspend fun go(command: String, vararg args: String): GoResult {
     if (command == name) {
       if (args.contentEquals(arrayOf("boards"))) {
