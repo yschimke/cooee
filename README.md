@@ -11,7 +11,7 @@ API website deployment (currently WWW also)
 * Run class `src/test/kotlin/com/baulsupp/cooee/main.kt`
 * Browse to http://localhost:8080
 
-NOTE: Do not to run with `./gradelw appengineRun` or equivalent as it will try and apply environment parameters that are only suitable for GCP deployment (e.g. redirect from http to https) 
+NOTE: Do not to run with `./gradlew appengineRun` or equivalent as it will try and apply environment parameters that are only suitable for GCP deployment (e.g. redirect from http to https) 
 
 ## Deployment
 
