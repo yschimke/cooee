@@ -46,11 +46,12 @@ class TwitterProvider : BaseProvider() {
       return when {
           command.isEmpty() || !command.startsWith("@") -> listOf()
           else -> try {
-            friends.map { "@" + it.screen_name }.filter { it.startsWith(command, ignoreCase = true) }
+            val screenName = command.substring(1)
+            friends.filter { it.screen_name.startsWith(screenName, ignoreCase = true) }
           } catch (e: Exception) {
             log.warn("Failed to suggest completions", e)
-            listOf<String>()
-          }.map { Suggestion(it, type = SuggestionType.COMMAND, description = "DM $it") }
+            listOf<Friend>()
+          }.map { Suggestion("@${it.screen_name}", type = SuggestionType.COMMAND, description = "DM ${it.name}") }
       }
     }
 
