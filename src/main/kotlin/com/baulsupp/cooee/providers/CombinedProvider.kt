@@ -13,18 +13,15 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 // TODO add exception handling for individual items and log errors
+// log multiple conflicts etc
 class CombinedProvider(val providers: List<BaseProvider>) : ProviderFunctions {
   override suspend fun suggest(command: String): List<Suggestion> {
     return CombinedSuggester(providers).suggest(command)
   }
 
-  suspend fun init(appServices: AppServices, user: UserEntry?) {
-    coroutineScope {
-      providers.map {
-        async {
-          it.init(appServices, user)
-        }
-      }.awaitAll()
+  suspend fun init(appServices: AppServices, user: UserEntry?) = coroutineScope {
+    forEachProvider {
+      it.init(appServices, user)
     }
   }
 
@@ -33,31 +30,31 @@ class CombinedProvider(val providers: List<BaseProvider>) : ProviderFunctions {
   }
 
   private suspend fun provider(command: String): Provider? = coroutineScope {
-    // TODO log multiple results
-    providers.map {
-      async {
-        try {
-          if (it.matches(command)) it else null
-        } catch (e: Exception) {
-          log.warn("provider search failed: " + it.name, e)
-          null
-        }
-      }
-    }.awaitAll().filterNotNull().firstOrNull()
+    forEachProvider {
+      if (it.matches(command)) it else null
+    }.filterNotNull().firstOrNull()
   }
 
   override suspend fun matches(command: String): Boolean = coroutineScope {
+    forEachProvider {
+      it.matches(command)
+    }.any()
+  }
+
+  private suspend inline fun <T> forEachProvider(
+    crossinline fn: suspend (BaseProvider) -> T
+  ): List<T?> = coroutineScope {
     providers.map {
       async {
         try {
-          it.matches(command)
+          fn(it)
         } catch (e: Exception) {
-          log.warn("matches failed: " + it.name, e)
-          false
+          log.warn("provider failed: " + it.name, e)
+          null
         }
       }
-    }
-  }.awaitAll().any()
+    }.awaitAll()
+  }
 
 
   companion object {
