@@ -3,6 +3,8 @@ package com.baulsupp.cooee
 import com.baulsupp.cooee.api.CompletionItem
 import com.baulsupp.cooee.api.Completions
 import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
+import com.baulsupp.cooee.suggester.Suggestion
+import com.baulsupp.cooee.suggester.SuggestionType
 import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.okurl.kotlin.moshi
 import io.ktor.application.Application
@@ -82,10 +84,10 @@ class ApplicationTest {
     testRequest("/api/v0/completion?q=g", user = "yuri") {
       assertEquals(
         "{\"completions\":[" +
-          "{\"word\":\"g\",\"line\":\"g\",\"description\":\"Command for 'g'\",\"provider\":\"google\"}," +
-          "{\"word\":\"gl\",\"line\":\"gl\",\"description\":\"Command for 'gl'\",\"provider\":\"google\"}," +
-          "{\"word\":\"google\",\"line\":\"google\",\"description\":\"Command for 'google'\",\"provider\":\"bookmarks\"}," +
-          "{\"word\":\"gmail\",\"line\":\"gmail\",\"description\":\"Command for 'gmail'\",\"provider\":\"bookmarks\"}]}",
+          "{\"word\":\"g\",\"line\":\"g\",\"description\":\"Command for 'g'\",\"provider\":\"google\",\"suggestion\":{\"line\":\"g\",\"provider\":\"google\",\"description\":\"Command for 'g'\",\"type\":\"UNKNOWN\"}}," +
+          "{\"word\":\"gl\",\"line\":\"gl\",\"description\":\"Command for 'gl'\",\"provider\":\"google\",\"suggestion\":{\"line\":\"gl\",\"provider\":\"google\",\"description\":\"Command for 'gl'\",\"type\":\"UNKNOWN\"}}," +
+          "{\"word\":\"google\",\"line\":\"google\",\"description\":\"https://google.com\",\"provider\":\"bookmarks\",\"suggestion\":{\"line\":\"google\",\"provider\":\"bookmarks\",\"description\":\"https://google.com\",\"type\":\"LINK\",\"url\":\"https://google.com\"}}," +
+          "{\"word\":\"gmail\",\"line\":\"gmail\",\"description\":\"https://mail.google.com\",\"provider\":\"bookmarks\",\"suggestion\":{\"line\":\"gmail\",\"provider\":\"bookmarks\",\"description\":\"https://mail.google.com\",\"type\":\"LINK\",\"url\":\"https://mail.google.com\"}}]}",
         response.content
       )
     }
@@ -111,7 +113,7 @@ class ApplicationTest {
     testRequest("/api/v0/completion?q=test ", user = "yuri") {
       assertEquals(HttpStatusCode.OK, response.status())
       assertEquals(
-        "{\"completions\":[{\"word\":\"test\",\"line\":\"test\",\"description\":\"Command for 'test'\",\"provider\":\"test\"}]}",
+        "{\"completions\":[{\"word\":\"test\",\"line\":\"test\",\"description\":\"Command for 'test'\",\"provider\":\"test\",\"suggestion\":{\"line\":\"test\",\"provider\":\"test\",\"description\":\"Command for 'test'\",\"type\":\"UNKNOWN\"}}]}",
         response.content
       )
     }
@@ -122,7 +124,23 @@ class ApplicationTest {
   fun testBookmarkCompletion() {
     testCompletion("gm") {
       assertEquals(
-        Completions(listOf(CompletionItem("gmail", "gmail", "Command for 'gmail'", provider = "bookmarks"))),
+        Completions(
+          listOf(
+            CompletionItem(
+              "gmail",
+              "gmail",
+              "https://mail.google.com",
+              provider = "bookmarks",
+              suggestion = Suggestion(
+                "gmail",
+                "bookmarks",
+                "https://mail.google.com",
+                type = SuggestionType.LINK,
+                url = "https://mail.google.com"
+              )
+            )
+          )
+        ),
         it
       )
     }

@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap
 data class ProjectReference(val project: Project, val server: AccessibleResource) {
   val projectKey = project.key
   val serverId = server.id
+  val url = "https://${server.name}.atlassian.net/browse/$projectKey"
 }
 
 data class IssueReference(val project: ProjectReference, val issue: String) {

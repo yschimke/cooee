@@ -80,6 +80,16 @@ class JiraProviderTest {
     assertEquals(Completed("comments on COOEE-1"), p.go("COOEE-1", "comment", "hello"))
   }
 
+  @Test
+  fun matchesProject() = runBlocking {
+    assertTrue(p.matches("COOEE"))
+  }
+
+  @Test
+  fun matchesIssue() = runBlocking {
+    assertTrue(p.matches("COOEE-1"))
+  }
+
   companion object {
     val appServices by lazy {
       TestAppServices().also {

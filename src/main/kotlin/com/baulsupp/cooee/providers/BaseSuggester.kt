@@ -4,6 +4,7 @@ import com.baulsupp.cooee.completion.ArgumentCompleter
 import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.suggester.Suggester
 import com.baulsupp.cooee.suggester.Suggestion
+import com.baulsupp.cooee.suggester.SuggestionType
 
 class BaseSuggester(val commandCompleter: CommandCompleter, val argumentCompleter: ArgumentCompleter) : Suggester {
   override suspend fun suggest(command: String): List<Suggestion> {
@@ -23,7 +24,7 @@ class BaseSuggester(val commandCompleter: CommandCompleter, val argumentComplete
     val suggestions = argumentCompleter.suggestArguments(parts.first(), parts.drop(1))
     return suggestions.map {
       val line = command.substring(0, command.length - parts.last().length) + it
-      Suggestion(line)
+      Suggestion(line, description = "Command for '$line'", type=SuggestionType.UNKNOWN)
     }
   }
 }

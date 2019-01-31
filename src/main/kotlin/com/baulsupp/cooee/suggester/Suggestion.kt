@@ -3,8 +3,8 @@ package com.baulsupp.cooee.suggester
 data class Suggestion(
   val line: String,
   val provider: String? = null,
-  val description: String? = null,
-  val type: SuggestionType? = null,
+  val description: String,
+  val type: SuggestionType,
   val list: List<Suggestion>? = null,
   val url: String? = null,
   val message: String? = null

@@ -83,7 +83,7 @@ data class Authorize(
   val tokenSet: String? = null
 )
 
-data class CompletionItem(val word: String, val line: String, val description: String, val provider: String)
+data class CompletionItem(val word: String, val line: String, val description: String, val provider: String, val suggestion: Suggestion)
 
 data class Completions(val completions: List<CompletionItem>) {
   companion object {
@@ -98,7 +98,8 @@ data class Completions(val completions: List<CompletionItem>) {
           s.line,
           prefix + s.line,
           "Description for '${s.line}'",
-          provider = s.provider ?: "unknown"
+          provider = s.provider ?: "unknown",
+          suggestion = s
         )
       })
     }

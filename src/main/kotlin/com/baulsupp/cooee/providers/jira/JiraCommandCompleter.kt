@@ -46,7 +46,9 @@ class JiraCommandCompleter(val provider: JiraProvider) : Suggester {
   private fun projectCompletion(project: ProjectReference): Suggestion? =
     Suggestion(
       project.projectKey,
-      description = "JIRA: " + project.project.name
+      description = "JIRA: " + project.project.name,
+      type=SuggestionType.LINK,
+      url=project.url
     )
 
   private suspend fun mostLikelyProjectIssues(project: ProjectReference): List<Suggestion> =

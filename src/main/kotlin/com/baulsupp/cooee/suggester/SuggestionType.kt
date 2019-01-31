@@ -14,5 +14,7 @@ enum class SuggestionType {
   LIST,
 
   /** Shows a preview or information (link is secondary to message) */
-  INFO
+  INFO,
+
+  UNKNOWN
 }

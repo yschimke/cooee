@@ -6,6 +6,8 @@ import com.baulsupp.cooee.test.setLocalCredentials
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.services.twitter.TwitterAuthInterceptor
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.CoreMatchers
+import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.hasItem
 import org.junit.Assert.assertThat
 import org.junit.Test
@@ -42,7 +44,7 @@ class TwitterProviderTest {
   fun completeFriendsPrefix() = runBlocking {
     assertThat(
       p.commandCompleter().suggestCommands("").map { it.line },
-      hasItem("@s")
+      equalTo(listOf())
     )
   }
 

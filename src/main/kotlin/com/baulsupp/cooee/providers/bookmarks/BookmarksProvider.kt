@@ -59,7 +59,7 @@ class BookmarksProvider : BaseProvider() {
 
   override fun commandCompleter(): CommandCompleter = object : CommandCompleter {
     override suspend fun suggestCommands(command: String): List<Suggestion> {
-      val bookmarks = configuredBookmarks.map { (k, v) -> Suggestion(k, name, type = SuggestionType.LINK, url = v) }
+      val bookmarks = configuredBookmarks.map { (k, v) -> Suggestion(k, name, type = SuggestionType.LINK, url = v, description = v) }
       return bookmarks + Suggestion("bookmarks", name, description = "Bookmark Options", type = SuggestionType.PREFIX)
     }
 

@@ -59,8 +59,9 @@ private suspend fun commandCompletion(
     CompletionItem(
       word = it.line,
       line = it.line,
-      description = it.description ?: "Command for '${it.line}'",
-      provider = it.provider ?: "unknown"
+      description = it.description,
+      provider = it.provider ?: "unknown",
+      suggestion = it
     )
   })
 }
