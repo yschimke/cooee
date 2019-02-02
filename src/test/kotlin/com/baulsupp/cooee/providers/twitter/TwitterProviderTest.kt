@@ -25,10 +25,18 @@ class TwitterProviderTest {
   }
 
   @Test
-  fun sendUser() = runBlocking {
+  fun linkUser() = runBlocking {
     assertEquals(
       RedirectResult("https://m.twitter.com/messages/compose?recipient_id=735627895645691905"),
       p.go("@shoutcooee")
+    )
+  }
+
+  @Test
+  fun sendUserMessage() = runBlocking {
+    assertEquals(
+      RedirectResult("https://m.twitter.com/messages/compose?recipient_id=735627895645691905"),
+      p.go("@shoutcooee", "test message")
     )
   }
 

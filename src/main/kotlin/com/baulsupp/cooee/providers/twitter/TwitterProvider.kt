@@ -6,20 +6,9 @@ import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.suggester.Suggestion
 import com.baulsupp.cooee.users.UserEntry
-import com.baulsupp.okurl.kotlin.End
-import com.baulsupp.okurl.kotlin.Next
-import com.baulsupp.okurl.kotlin.query
-import com.baulsupp.okurl.kotlin.queryPages
+import com.baulsupp.okurl.kotlin.*
 import kotlinx.coroutines.coroutineScope
-
-data class Friend(val id_str: String, val screen_name: String, val name: String)
-
-data class FriendsList(
-  val users: List<Friend>,
-  val next_cursor_str: String
-)
-
-data class Friends(val users: List<Friend>)
+import okhttp3.OkHttpClient
 
 class TwitterProvider : BaseProvider() {
   override val name = "twitter"
@@ -35,7 +24,6 @@ class TwitterProvider : BaseProvider() {
   }
 
   override suspend fun go(command: String, vararg args: String): GoResult {
-    val text = if (args.isNotEmpty()) "&text=" + args.joinToString(" ") else ""
     val screenName = command.substring(1)
 
     val friend = appServices.client.query<Friend>(
@@ -43,16 +31,29 @@ class TwitterProvider : BaseProvider() {
       userToken
     )
 
-    return RedirectResult("https://m.twitter.com/messages/compose?recipient_id=${friend.id_str}$text")
+    if (args.isNotEmpty()) {
+      sendDm(client, friend.id_str, args.joinToString(" "))
+    }
+
+    return RedirectResult("https://m.twitter.com/messages/compose?recipient_id=${friend.id_str}")
   }
+
+  private suspend fun sendDm(client: OkHttpClient, id_str: String, text: String) {
+    client.execute(request("https://api.twitter.com/1.1/direct_messages/events/new.json", userToken) {
+      postJsonBody(DmRequest.simple(id_str, text))
+    })
+  }
+
 
   override suspend fun suggest(command: String): List<Suggestion> {
     return TwitterSuggester(this).suggest(command)
   }
 
   override suspend fun matches(command: String): Boolean {
+    val parts = command.split("\\s+".toRegex(), limit = 2)
+
     // TODO exact match twitter username pattern
-    return command.startsWith("@") && friends.any { it.screen_name == command.substring(1) }
+    return parts[0].startsWith("@") && friends.any { it.screen_name == parts[0].substring(1) }
   }
 
   private suspend fun queryFriends(): List<Friend> {
