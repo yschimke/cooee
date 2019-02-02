@@ -7,7 +7,7 @@ import com.baulsupp.cooee.suggester.SuggestionType
 class TwitterSuggester(val provider: TwitterProvider) : Suggester {
   override suspend fun suggest(command: String): List<Suggestion> {
     return when {
-      command.isEmpty() || !command.startsWith("@") -> listOf()
+      command.length < 2 || !command.startsWith("@") -> listOf()
       else -> try {
         val screenName = command.substring(1)
         provider.friends.filter { it.screen_name.startsWith(screenName, ignoreCase = true) }

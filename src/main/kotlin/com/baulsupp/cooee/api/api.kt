@@ -90,10 +90,12 @@ data class Completions(val completions: List<CompletionItem>) {
     fun complete(command: CompletionRequest, commands: List<Suggestion>): Completions {
       val query = command.q ?: ""
 
+      val distinctCommands = commands.distinctBy { it.line }
+
       // TODO improve or test logic
       val prefix = query.substring(0, query.lastIndexOf(" ") + 1)
 
-      return Completions(commands.map { s ->
+      return Completions(distinctCommands.map { s ->
         CompletionItem(
           s.line,
           prefix + s.line,
