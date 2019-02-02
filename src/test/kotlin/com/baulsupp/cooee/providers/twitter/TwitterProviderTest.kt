@@ -35,7 +35,7 @@ class TwitterProviderTest {
   @Test
   fun completeFriends() = runBlocking {
     assertThat(
-      p.commandCompleter().suggestCommands("@s").map { it.line },
+      p.suggest("@s").map { it.line },
       hasItem("@shoutcooee")
     )
   }
@@ -43,7 +43,7 @@ class TwitterProviderTest {
   @Test
   fun completeFriendsPrefix() = runBlocking {
     assertThat(
-      p.commandCompleter().suggestCommands("").map { it.line },
+      p.suggest("").map { it.line },
       equalTo(listOf())
     )
   }
