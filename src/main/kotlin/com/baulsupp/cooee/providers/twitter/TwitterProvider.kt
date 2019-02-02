@@ -3,6 +3,7 @@ package com.baulsupp.cooee.providers.twitter
 import com.baulsupp.cooee.AppServices
 import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
+import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.suggester.Suggestion
 import com.baulsupp.cooee.users.UserEntry
@@ -26,10 +27,7 @@ class TwitterProvider : BaseProvider() {
   override suspend fun go(command: String, vararg args: String): GoResult {
     val screenName = command.substring(1)
 
-    val friend = appServices.client.query<Friend>(
-      "https://api.twitter.com/1.1/users/show.json?screen_name=$screenName",
-      userToken
-    )
+    val friend = friends.find { it.screen_name == screenName } ?: return Unmatched
 
     if (args.isNotEmpty()) {
       sendDm(client, friend.id_str, args.joinToString(" "))
