@@ -1,6 +1,7 @@
 package com.baulsupp.cooee.providers.twitter
 
 import com.baulsupp.cooee.AppServices
+import com.baulsupp.cooee.api.Completed
 import com.baulsupp.cooee.api.GoResult
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
@@ -31,6 +32,7 @@ class TwitterProvider : BaseProvider() {
 
     if (args.isNotEmpty()) {
       sendDm(client, friend.id_str, args.joinToString(" "))
+      return Completed("dm sent")
     }
 
     return RedirectResult("https://m.twitter.com/messages/compose?recipient_id=${friend.id_str}")
