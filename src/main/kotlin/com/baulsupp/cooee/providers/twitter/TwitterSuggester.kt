@@ -14,7 +14,12 @@ class TwitterSuggester(val provider: TwitterProvider) : Suggester {
       } catch (e: Exception) {
         provider.log.warn("Failed to suggest completions", e)
         listOf<Friend>()
-      }.map { Suggestion("@${it.screen_name}", type = SuggestionType.COMMAND, description = "DM ${it.name}") }
+      }.map {
+        Suggestion(
+          "@${it.screen_name}",
+          provider = provider.name, type = SuggestionType.COMMAND, description = "DM ${it.name}"
+        )
+      }
     }
   }
 }

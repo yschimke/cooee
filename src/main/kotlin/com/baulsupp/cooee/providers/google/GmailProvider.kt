@@ -27,10 +27,10 @@ class GmailProvider : BaseProvider() {
   }
 
   override fun commandCompleter(): CommandCompleter {
-    return SimpleCommandCompleter("gmail")
+    return SimpleCommandCompleter(name, listOf("gmail"))
   }
 
-  override fun argumentCompleter() = SimpleArgumentCompleter("label:unread", "label:inbox")
+  override fun argumentCompleter() = SimpleArgumentCompleter(listOf("label:unread", "label:inbox"))
 
   override fun associatedServices() = setOf("google")
 }

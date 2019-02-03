@@ -19,7 +19,7 @@ class GoogleProvider : BaseProvider() {
   }
 
   override fun commandCompleter(): CommandCompleter {
-    return SimpleCommandCompleter("g", "gl")
+    return SimpleCommandCompleter(name, listOf("g", "gl"))
   }
 
   override fun argumentCompleter(): ArgumentCompleter {

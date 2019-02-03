@@ -55,15 +55,7 @@ private suspend fun commandCompletion(
   command: CompletionRequest
 ): Completions {
   val commands = providers.suggest(command.q ?: "")
-  return Completions(commands.map {
-    CompletionItem(
-      word = it.line,
-      line = it.line,
-      description = it.description,
-      provider = it.provider ?: "unknown",
-      suggestion = it
-    )
-  })
+  return Completions.complete(command, commands)
 }
 
 @KtorExperimentalLocationsAPI

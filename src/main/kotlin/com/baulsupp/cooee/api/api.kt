@@ -96,11 +96,13 @@ data class Completions(val completions: List<CompletionItem>) {
       val prefix = query.substring(0, query.lastIndexOf(" ") + 1)
 
       return Completions(distinctCommands.map { s ->
+        val word = s.line.split("\\s+".toRegex()).last()
+
         CompletionItem(
+          word,
           s.line,
-          prefix + s.line,
-          "Description for '${s.line}'",
-          provider = s.provider ?: "unknown",
+          s.description,
+          provider = s.provider,
           suggestion = s
         )
       })

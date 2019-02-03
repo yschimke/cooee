@@ -37,13 +37,13 @@ abstract class BaseProvider : Provider, Suggester {
   }
 
   open fun commandCompleter(): CommandCompleter {
-    return SimpleCommandCompleter(name)
+    return SimpleCommandCompleter(name, listOf(name))
   }
 
-  open fun argumentCompleter(): ArgumentCompleter = SimpleArgumentCompleter()
+  open fun argumentCompleter(): ArgumentCompleter = SimpleArgumentCompleter(listOf())
 
   override suspend fun suggest(command: String): List<Suggestion> {
-    return BaseSuggester(commandCompleter(), argumentCompleter()).suggest(command)
+    return BaseSuggester(name, commandCompleter(), argumentCompleter()).suggest(command)
   }
 
   override fun toString(): String {

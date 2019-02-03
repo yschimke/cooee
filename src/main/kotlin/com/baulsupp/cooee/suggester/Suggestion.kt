@@ -2,7 +2,7 @@ package com.baulsupp.cooee.suggester
 
 data class Suggestion(
   val line: String,
-  val provider: String? = null,
+  val provider: String,
   val description: String,
   val type: SuggestionType,
   val list: List<Suggestion>? = null,

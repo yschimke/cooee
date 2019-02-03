@@ -16,10 +16,10 @@ class TestProvider : BaseProvider() {
   }
 
   override fun commandCompleter(): CommandCompleter {
-    return SimpleCommandCompleter("test")
+    return SimpleCommandCompleter(name, listOf("test"))
   }
 
   override fun argumentCompleter(): ArgumentCompleter {
-    return SimpleArgumentCompleter("aaa", "bbb")
+    return SimpleArgumentCompleter(listOf("aaa", "bbb"))
   }
 }

@@ -49,7 +49,7 @@ class CooeeProviderTest {
   @Test
   fun basicCommandCompletion() = runBlocking {
     assertThat(
-      p.commandCompleter().suggestCommands("cooe").map { it.line },
+      p.suggest("cooe").map { it.line },
       equalTo(listOf("cooee"))
     )
   }
@@ -57,8 +57,8 @@ class CooeeProviderTest {
   @Test
   fun basicArgumentsCompletion() = runBlocking {
     assertThat(
-      p.argumentCompleter().suggestArguments("cooee"),
-      equalTo(listOf("me", "home", "auth", "renew"))
+      p.suggest("cooee ").map { it.line },
+      equalTo(listOf("cooee me", "cooee home", "cooee auth", "cooee renew"))
     )
   }
 }
