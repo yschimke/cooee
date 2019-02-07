@@ -6,7 +6,6 @@ import com.baulsupp.cooee.completion.ArgumentCompleter
 import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.completion.SimpleCommandCompleter
 import com.baulsupp.cooee.providers.BaseProvider
-import com.baulsupp.cooee.suggester.Suggestion
 import com.baulsupp.okurl.kotlin.query
 
 class GoogleProvider : BaseProvider() {

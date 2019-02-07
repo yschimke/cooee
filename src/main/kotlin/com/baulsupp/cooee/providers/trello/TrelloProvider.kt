@@ -9,8 +9,6 @@ import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.suggester.Suggestion
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.kotlin.queryList
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 
 data class Boards(val list: List<BoardResponse>)

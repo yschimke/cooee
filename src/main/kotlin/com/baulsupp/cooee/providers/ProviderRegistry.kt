@@ -19,7 +19,7 @@ class ProviderRegistry(val appServices: AppServices, val registered: Map<String,
 
     if (user != null) {
       val configs = appServices.providerConfigStore.forUser(user.email)
-      val p1 = configs.mapNotNull { pi -> byName(pi.providerName)?.apply { configure(pi.config) } }
+      val p1 = configs.mapNotNull { pi -> byName(pi.provider)?.apply { configure(pi.config) } }
       providers.addAll(p1)
     } else {
       providers.add(BookmarksProvider.loggedOut())

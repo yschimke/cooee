@@ -1,37 +1,36 @@
 package com.baulsupp.cooee.mongo
 
 import com.baulsupp.cooee.providers.ProviderConfigStore
-import com.baulsupp.cooee.reactor.awaitList
 import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.ReplaceOptions
-import com.mongodb.reactivestreams.client.MongoCollection
-import com.mongodb.reactivestreams.client.MongoDatabase
-import kotlinx.coroutines.reactive.awaitFirst
-import org.bson.Document
+import org.litote.kmongo.coroutine.CoroutineCollection
+import org.litote.kmongo.coroutine.CoroutineDatabase
 
 class MongoProviderConfigStore(
-  private val mongoDb: MongoDatabase
+  private val mongoDb: CoroutineDatabase
 ) : ProviderConfigStore {
-  private val providerDb: MongoCollection<Document> by lazy { mongoDb.getCollection("providers") }
+  private val providerDb: CoroutineCollection<ProviderInstance> by lazy {
+    mongoDb.getCollection<ProviderInstance>(
+      "providers"
+    )
+  }
 
   override suspend fun forUser(email: String): List<ProviderInstance> {
-    return providerDb.find(eq("email", email), ProviderInstance::class.java).awaitList()
+    return providerDb.find(eq("email", email)).toList()
   }
 
   override suspend fun store(email: String, providerName: String, config: Map<String, Any>) {
-    val doc =
-      Document().append("email", email).append("provider", providerName)
-        .append("config", config)
+    val doc = ProviderInstance(email = email, provider = providerName, config = config)
 
     providerDb.replaceOne(
       and(eq("email", email), eq("provider", providerName)),
       doc,
       ReplaceOptions().upsert(true)
-    ).awaitFirst()
+    )
   }
 
   override suspend fun remove(email: String, providerName: String) {
-    providerDb.deleteMany(and(eq("email", email), eq("provider", providerName))).awaitFirst()
+    providerDb.deleteMany(and(eq("email", email), eq("provider", providerName)))
   }
 }

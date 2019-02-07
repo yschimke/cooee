@@ -87,7 +87,7 @@ class JiraProvider : BaseProvider() {
   private suspend fun instances(): List<AccessibleResource> =
     appServices.cache.get(user?.email, name, "instances") {
       KnownInstances(
-        appServices.client.queryList<AccessibleResource>(
+        appServices.client.queryList(
           "https://api.atlassian.com/oauth/token/accessible-resources",
           userToken
         )

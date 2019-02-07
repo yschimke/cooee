@@ -10,20 +10,11 @@ import io.ktor.application.Application
 import io.ktor.application.ApplicationStopped
 import io.ktor.application.install
 import io.ktor.application.log
-import io.ktor.features.AutoHeadResponse
-import io.ktor.features.CORS
-import io.ktor.features.CallLogging
-import io.ktor.features.Compression
-import io.ktor.features.ContentNegotiation
-import io.ktor.features.DataConversion
-import io.ktor.features.HttpsRedirect
-import io.ktor.features.gzip
+import io.ktor.features.*
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.locations.Locations
 import io.ktor.routing.routing
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
 import java.util.*
 
 

@@ -5,17 +5,15 @@ import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.IndexOptions
 import com.mongodb.client.model.ReplaceOptions
-import com.mongodb.reactivestreams.client.MongoCollection
-import com.mongodb.reactivestreams.client.MongoDatabase
-import kotlinx.coroutines.reactive.awaitFirstOrNull
-import kotlinx.coroutines.reactive.awaitLast
 import org.bson.Document
+import org.litote.kmongo.coroutine.CoroutineCollection
+import org.litote.kmongo.coroutine.CoroutineDatabase
 import java.util.*
 import java.util.concurrent.TimeUnit.MINUTES
 
-class MongoCache(private val mongoDb: MongoDatabase) : ServiceCache {
-  private val cacheDb: MongoCollection<Document> by lazy {
-    mongoDb.getCollection("cache")
+class MongoCache(private val mongoDb: CoroutineDatabase) : ServiceCache {
+  private val cacheDb: CoroutineCollection<Document> by lazy {
+    mongoDb.getCollection<Document>("cache")
   }
 
   override suspend fun get(email: String?, providerName: String?, key: String): String? {
@@ -25,7 +23,7 @@ class MongoCache(private val mongoDb: MongoDatabase) : ServiceCache {
         eq("providerName", providerName),
         eq("key", key)
       )
-    ).awaitFirstOrNull()?.getString("value")
+    ).first()?.getString("value")
   }
 
   override suspend fun set(email: String?, providerName: String?, key: String, value: String) {
@@ -39,10 +37,10 @@ class MongoCache(private val mongoDb: MongoDatabase) : ServiceCache {
         eq("providerName", providerName),
         eq("key", key)
       ), doc, ReplaceOptions().upsert(true)
-    ).awaitLast()
+    )
   }
 
   suspend fun createTTLIndex() {
-    cacheDb.createIndex(eq("lastUpdated", 1), IndexOptions().expireAfter(60, MINUTES)).awaitLast()
+    cacheDb.createIndex(eq("lastUpdated", 1), IndexOptions().expireAfter(60, MINUTES))
   }
 }

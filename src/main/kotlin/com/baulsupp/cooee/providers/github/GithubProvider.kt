@@ -39,10 +39,14 @@ class GithubProvider : BaseProvider() {
 
   private suspend fun listUserRepositories(): List<Repository> =
     appServices.cache.get(user?.email, name, "userRepositories") {
-      Repos(appServices.client.queryList("https://api.github.com/user/repos?affiliation=owner,collaborator", userToken))
+      Repos(
+        appServices.client.queryList<Repository>(
+          "https://api.github.com/user/repos?affiliation=owner,collaborator",
+          userToken
+        ).filter { it.archived == false })
     }.list
 
-  private suspend fun fetchUser(): User = appServices.cache.get<User>(user?.email, name, "user") {
+  private suspend fun fetchUser(): User = appServices.cache.get(user?.email, name, "user") {
     appServices.client.query("https://api.github.com/user", userToken)
   }
 

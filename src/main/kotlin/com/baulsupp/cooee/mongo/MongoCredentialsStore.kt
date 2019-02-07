@@ -6,22 +6,23 @@ import com.baulsupp.okurl.services.AbstractServiceDefinition
 import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.ReplaceOptions
-import com.mongodb.reactivestreams.client.MongoCollection
-import com.mongodb.reactivestreams.client.MongoDatabase
-import kotlinx.coroutines.reactive.awaitFirstOrNull
-import kotlinx.coroutines.reactive.awaitLast
-import org.bson.Document
+import org.litote.kmongo.coroutine.CoroutineCollection
+import org.litote.kmongo.coroutine.CoroutineDatabase
 
-class MongoCredentialsStore(private val mongoDb: MongoDatabase) : CredentialsStore {
-  private val credentialsDb: MongoCollection<Document> by lazy { mongoDb.getCollection("credentials") }
+class MongoCredentialsStore(private val mongoDb: CoroutineDatabase) : CredentialsStore {
+  private val credentialsDb: CoroutineCollection<UserCredentials> by lazy {
+    mongoDb.getCollection<UserCredentials>(
+      "credentials"
+    )
+  }
 
   override suspend fun <T> get(serviceDefinition: ServiceDefinition<T>, tokenSet: String): T? {
     val token = credentialsDb.find(
       and(
         eq("user", tokenSet),
         eq("serviceName", serviceDefinition.shortName())
-      ), UserCredentials::class.java
-    ).awaitFirstOrNull()
+      )
+    ).first()
 
     return token?.let { serviceDefinition.parseCredentialsString(it.token) }
   }
@@ -38,16 +39,14 @@ class MongoCredentialsStore(private val mongoDb: MongoDatabase) : CredentialsSto
   override suspend fun <T> set(serviceDefinition: ServiceDefinition<T>, tokenSet: String, credentials: T) {
     val token = serviceDefinition.formatCredentialsString(credentials)
 
-    val doc =
-      Document().append("token", token).append("user", tokenSet)
-        .append("serviceName", serviceDefinition.shortName())
+    val doc = UserCredentials(token = token, user = tokenSet, serviceName = serviceDefinition.shortName())
 
     credentialsDb.replaceOne(
       and(
         eq("user", tokenSet),
         eq("serviceName", serviceDefinition.shortName())
       ), doc, ReplaceOptions().upsert(true)
-    ).awaitLast()
+    )
   }
 }
 

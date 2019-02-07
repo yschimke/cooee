@@ -12,11 +12,11 @@ import com.baulsupp.cooee.providers.ProviderRegistry
 import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
 import com.baulsupp.okurl.authenticator.RenewingInterceptor
-import com.mongodb.reactivestreams.client.MongoDatabase
 import io.ktor.application.Application
 import io.netty.channel.nio.NioEventLoopGroup
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
+import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -38,7 +38,7 @@ class ProdAppServices(application: Application) : AppServices {
   // TODO allow local
   private val mongo = MongoFactory.mongo(false, eventLoop)
 
-  private val mongoDb: MongoDatabase = mongo.getDatabase("cooee")
+  private val mongoDb: CoroutineDatabase = mongo.getDatabase("cooee")
 
   override val providerConfigStore = MongoProviderConfigStore(mongoDb)
 

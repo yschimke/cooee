@@ -18,6 +18,6 @@ class TestProviderStore(val appServices: AppServices) : ProviderConfigStore {
   }
 
   override suspend fun remove(email: String, providerName: String) {
-    providerInstances.removeIf { it.email == email && it.providerName == providerName }
+    providerInstances.removeIf { it.email == email && it.provider == providerName }
   }
 }
