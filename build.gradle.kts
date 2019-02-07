@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.dsl.Coroutines
+import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -6,7 +6,7 @@ plugins {
   war
   id("com.github.ben-manes.versions") version "0.20.0"
   id("com.google.cloud.tools.appengine") version "2.0.0-rc5"
-  id("org.jlleitschuh.gradle.ktlint") version "6.3.1"
+  id("org.jlleitschuh.gradle.ktlint") version "7.1.0"
 }
 
 group = "cooee"
@@ -111,8 +111,8 @@ dependencies {
   implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:${Versions.kotlinCoroutines}")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${Versions.kotlinCoroutines}")
-  implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.67-kotlin-1.3.20")
-  implementation("org.mongodb:mongodb-driver-reactivestreams:1.10.0")
+  implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.68-kotlin-1.3.20")
+  implementation("org.mongodb:mongodb-driver-reactivestreams:1.11.0")
   implementation("org.webjars:jquery:3.2.1")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:${Versions.kotlinCoroutines}")
   testCompile("io.ktor:ktor-server-tests:${Versions.ktor}")
@@ -125,3 +125,16 @@ sourceSets["main"].resources.srcDirs("src/main/resources")
 sourceSets["test"].resources.srcDirs("src/test/resources")
 
 war.webAppDirName = "src/main/webapp"
+
+val dependencyUpdates = tasks["dependencyUpdates"] as DependencyUpdatesTask
+dependencyUpdates.resolutionStrategy {
+  componentSelection {
+    all {
+      if (candidate.group == "io.netty" && candidate.version.startsWith("5.")) {
+        reject("Alpha")
+      } else if (candidate.version.contains("lpha")) {
+        reject("Alpha")
+      }
+    }
+  }
+}

@@ -1,5 +1,6 @@
 package com.baulsupp.cooee.providers.twitter
 
+import com.baulsupp.cooee.api.Completed
 import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.cooee.test.setLocalCredentials
@@ -35,7 +36,7 @@ class TwitterProviderTest {
   @Test
   fun sendUserMessage() = runBlocking {
     assertEquals(
-      RedirectResult("https://m.twitter.com/messages/compose?recipient_id=735627895645691905"),
+      Completed(message = "dm sent"),
       p.go("@shoutcooee", "test message")
     )
   }
