@@ -35,4 +35,9 @@ class GoogleProvider : BaseProvider() {
       }
     }
   }
+
+  override suspend fun matches(command: String): Boolean {
+    val commandName = command.split("\\s+".toRegex())[0]
+    return commandName == "g" || commandName == "gl"
+  }
 }

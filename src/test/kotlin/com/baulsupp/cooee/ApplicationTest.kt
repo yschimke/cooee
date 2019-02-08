@@ -249,6 +249,9 @@ class ApplicationTest {
           "{\"name\":\"gmail\",\"installed\":false,\"services\":[\"google\"]}," +
           "{\"name\":\"trello\",\"installed\":false,\"services\":[\"trello\"]}," +
           "{\"name\":\"jira\",\"installed\":false,\"services\":[\"atlassian\"]}," +
+          "{\"name\":\"opsgenie\",\"installed\":false,\"services\":[\"opsgenie\"]}," +
+          "{\"name\":\"gcp\",\"installed\":false,\"services\":[]}," +
+          "{\"name\":\"mongodb\",\"installed\":false,\"services\":[]}," +
           "{\"name\":\"test\",\"installed\":false,\"services\":[]}" +
           "]}",
         response.content

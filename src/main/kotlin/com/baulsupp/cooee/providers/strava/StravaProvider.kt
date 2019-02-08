@@ -2,6 +2,7 @@ package com.baulsupp.cooee.providers.strava
 
 import com.baulsupp.cooee.api.Completed
 import com.baulsupp.cooee.api.GoResult
+import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.ArgumentCompleter
 import com.baulsupp.cooee.completion.SimpleArgumentCompleter
@@ -18,10 +19,10 @@ class StravaProvider : BaseProvider() {
 
   override fun associatedServices(): Set<String> = setOf("strava")
 
-  override suspend fun go(command: String, vararg args: String): GoResult = if (args.firstOrNull() == "lastrun") {
-    lastRun()
-  } else {
-    Unmatched
+  override suspend fun go(command: String, vararg args: String): GoResult = when {
+    args.isEmpty() -> RedirectResult("https://www.strava.com/")
+    args.first() == "lastrun" -> lastRun()
+    else -> Unmatched
   }
 
   private suspend fun lastRun(): GoResult {

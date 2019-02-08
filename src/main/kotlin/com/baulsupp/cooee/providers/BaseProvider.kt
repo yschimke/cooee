@@ -51,7 +51,8 @@ abstract class BaseProvider : Provider, Suggester {
   }
 
   override suspend fun matches(command: String): Boolean {
-    return commandCompleter().matches(command)
+    val commandName = command.split("\\s+".toRegex())[0]
+    return commandName == name
   }
 
   open fun associatedServices() = setOf<String>()

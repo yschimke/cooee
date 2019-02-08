@@ -64,7 +64,7 @@ class BookmarksProvider : BaseProvider() {
     }
 
     override suspend fun matches(command: String): Boolean {
-      return command == "bookmarks" || knownCommands().contains(command)
+      return this@BookmarksProvider.matches(command)
     }
   }
 
@@ -79,6 +79,10 @@ class BookmarksProvider : BaseProvider() {
   }
 
   private fun knownCommands() = configuredBookmarks.keys + "bookmarks"
+
+  override suspend fun matches(command: String): Boolean {
+    return command == "bookmarks" || knownCommands().contains(command)
+  }
 
   companion object {
     fun loggedOut(): BaseProvider {

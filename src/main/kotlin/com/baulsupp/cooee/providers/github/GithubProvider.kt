@@ -89,9 +89,13 @@ class GithubProvider : BaseProvider() {
     }
 
     override suspend fun matches(command: String): Boolean {
-      return projects.any { it.full_name == command } || command == "github"
+      return this@GithubProvider.matches(command)
     }
   }
 
   override fun associatedServices(): Set<String> = setOf("github")
+
+  override suspend fun matches(command: String): Boolean {
+    return projects.any { it.full_name == command } || command == "github"
+  }
 }
