@@ -35,6 +35,10 @@ class TestAppServices : AppServices {
 
   override val cache = MoshiTypedCache(LocalCache())
 
+  override val authenticationFlow = TestAuthenticationFlow()
+
+  override val authenticationFlowCache = TestAuthenticationFlowCache()
+
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
     val services = AuthenticatingInterceptor.defaultServices()
 
