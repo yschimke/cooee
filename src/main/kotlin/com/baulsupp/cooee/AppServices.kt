@@ -29,12 +29,14 @@ interface AppServices : AutoCloseable {
 
   override fun close()
 
-  fun wwwUrl(path: String): String {
-    return if (wwwHost.startsWith("localhost:")) {
-      "http://$wwwHost$path"
-    } else {
-      "https://$wwwHost$path"
-    }
+  fun wwwUrl(path: String): String = when {
+    wwwHost.startsWith("localhost:") -> "http://$wwwHost$path"
+    else -> "https://$wwwHost$path"
+  }
+
+  fun apiUrl(path: String): String = when {
+    apiHost.startsWith("localhost:") -> "http://$apiHost$path"
+    else -> "https://$apiHost$path"
   }
 
   suspend fun userForCall(call: ApplicationCall): UserEntry? = userAuthenticator.userForRequest(call)

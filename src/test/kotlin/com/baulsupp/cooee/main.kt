@@ -1,5 +1,8 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package com.baulsupp.cooee
 
+import io.ktor.config.MapApplicationConfig
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
@@ -17,6 +20,11 @@ fun main() {
     module {
       module(ProdAppServices(this), cloud = false)
     }
+    config = MapApplicationConfig(
+      "apiHost" to "localhost:8080",
+      "wwwwHost" to "localhost:3000"
+    )
+    config.config("host")
     // Private API
     connector {
       host = "127.0.0.1"

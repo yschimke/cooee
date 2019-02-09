@@ -1,4 +1,4 @@
-@file:Suppress("UNUSED_PARAMETER")
+@file:Suppress("UNUSED_PARAMETER", "EXPERIMENTAL_API_USAGE")
 
 package com.baulsupp.cooee
 
@@ -25,9 +25,9 @@ class ProdAppServices(application: Application) : AppServices {
     eventLoop.shutdownGracefully()
   }
 
-  // TODO fix for localhost
-  override val apiHost = "api.coo.ee"
-  override val wwwHost = "www.coo.ee"
+  override val apiHost = application.environment.config.propertyOrNull("apiHost")?.getString() ?: "api.coo.ee"
+
+  override val wwwHost = application.environment.config.propertyOrNull("wwwHost")?.getString() ?: "www.coo.ee"
 
   private val eventLoop = NioEventLoopGroup()
 
