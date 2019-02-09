@@ -1,12 +1,10 @@
-@file:Suppress("UNUSED_PARAMETER")
+@file:Suppress("UNUSED_PARAMETER", "EXPERIMENTAL_API_USAGE")
 
 package com.baulsupp.cooee
 
+import com.baulsupp.cooee.authentication.ProdAuthenticationFlow
 import com.baulsupp.cooee.cache.MoshiTypedCache
-import com.baulsupp.cooee.mongo.MongoCache
-import com.baulsupp.cooee.mongo.MongoCredentialsStore
-import com.baulsupp.cooee.mongo.MongoFactory
-import com.baulsupp.cooee.mongo.MongoProviderConfigStore
+import com.baulsupp.cooee.mongo.*
 import com.baulsupp.cooee.okhttp.close
 import com.baulsupp.cooee.providers.ProviderRegistry
 import com.baulsupp.cooee.users.JwtUserAuthenticator
@@ -27,9 +25,9 @@ class ProdAppServices(application: Application) : AppServices {
     eventLoop.shutdownGracefully()
   }
 
-  // TODO fix for localhost
-  override val apiHost = "api.coo.ee"
-  override val wwwHost = "www.coo.ee"
+  override val apiHost = application.environment.config.propertyOrNull("apiHost")?.getString() ?: "api.coo.ee"
+
+  override val wwwHost = application.environment.config.propertyOrNull("wwwHost")?.getString() ?: "www.coo.ee"
 
   private val eventLoop = NioEventLoopGroup()
 
@@ -48,7 +46,10 @@ class ProdAppServices(application: Application) : AppServices {
 
   override val providerRegistry = ProviderRegistry(this)
 
-  // TODO remote cache
+  override val authenticationFlow = ProdAuthenticationFlow(this)
+
+  override val authenticationFlowCache = MongoAuthenticationFlowCache(mongoDb)
+
   override val cache = MoshiTypedCache(MongoCache(mongoDb))
 
   override val client: OkHttpClient = OkHttpClient.Builder().apply {

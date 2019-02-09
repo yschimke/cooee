@@ -1,5 +1,7 @@
 package com.baulsupp.cooee
 
+import com.baulsupp.cooee.authentication.AuthenticationFlow
+import com.baulsupp.cooee.authentication.AuthenticationFlowCache
 import com.baulsupp.cooee.cache.MoshiTypedCache
 import com.baulsupp.cooee.providers.CombinedProvider
 import com.baulsupp.cooee.providers.ProviderConfigStore
@@ -20,17 +22,21 @@ interface AppServices : AutoCloseable {
   val wwwHost: String
   val apiHost: String
   val cache: MoshiTypedCache
+  val authenticationFlow: AuthenticationFlow
+  val authenticationFlowCache: AuthenticationFlowCache
 
   val services: List<AuthInterceptor<*>>
 
   override fun close()
 
-  fun wwwUrl(path: String): String {
-    return if (wwwHost.startsWith("localhost:")) {
-      "http://$wwwHost$path"
-    } else {
-      "https://$wwwHost$path"
-    }
+  fun wwwUrl(path: String): String = when {
+    wwwHost.startsWith("localhost:") -> "http://$wwwHost$path"
+    else -> "https://$wwwHost$path"
+  }
+
+  fun apiUrl(path: String): String = when {
+    apiHost.startsWith("localhost:") -> "http://$apiHost$path"
+    else -> "https://$apiHost$path"
   }
 
   suspend fun userForCall(call: ApplicationCall): UserEntry? = userAuthenticator.userForRequest(call)

@@ -6,6 +6,7 @@ import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
 import com.baulsupp.cooee.suggester.Suggestion
 import com.baulsupp.cooee.suggester.SuggestionType
 import com.baulsupp.cooee.test.TestAppServices
+import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.okurl.kotlin.moshi
 import io.ktor.application.Application
 import io.ktor.http.ContentType
@@ -155,7 +156,7 @@ class ApplicationTest {
 
   @Test
   fun testUser() {
-    val token = services.userAuthenticator.tokenFor("yuri")
+    val token = JwtUserAuthenticator.tokenFor("yuri")
 
     testRequest("/api/v0/user", user = "yuri") {
       assertEquals("{\"token\":\"$token\",\"name\":\"yuri\",\"email\":\"yuri@coo.ee\"}", response.content)
@@ -227,7 +228,7 @@ class ApplicationTest {
   ) {
     handleRequest(method, path) {
       if (user != null) {
-        val token = services.userAuthenticator.tokenFor(user)
+        val token = JwtUserAuthenticator.tokenFor(user)
         addHeader("Authorization", "Bearer $token")
       }
     }.apply {
@@ -294,7 +295,7 @@ class ApplicationTest {
       handleRequest(HttpMethod.Put, "/api/v0/provider/bookmarks") {
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
         setBody("{\"config\":{\"bookmarks\":{\"a\": \"http://a.com\"}}}")
-        val token = services.userAuthenticator.tokenFor("yuri")
+        val token = JwtUserAuthenticator.tokenFor("yuri")
         addHeader("Authorization", "Bearer $token")
       }.apply {
         assertEquals(HttpStatusCode.OK, response.status())

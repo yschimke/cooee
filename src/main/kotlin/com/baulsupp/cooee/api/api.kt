@@ -83,6 +83,14 @@ data class Authorize(
   val tokenSet: String? = null
 )
 
+@KtorExperimentalLocationsAPI
+@Location("/web/authenticate/{service}")
+data class AuthenticateRequest(val service: String, val token: String? = null)
+
+@KtorExperimentalLocationsAPI
+@Location("/web/callback")
+data class AuthenticateCallbackRequest(val code: String? = null, val state: String? = null)
+
 data class CompletionItem(val word: String, val line: String, val description: String, val provider: String, val suggestion: Suggestion)
 
 data class Completions(val completions: List<CompletionItem>) {

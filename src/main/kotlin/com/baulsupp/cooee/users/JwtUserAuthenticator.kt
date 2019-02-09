@@ -12,13 +12,15 @@ class JwtUserAuthenticator : UserAuthenticator {
   override suspend fun userForRequest(call: ApplicationCall): UserEntry? {
     return call.request.header("Authorization")?.let {
       val token = bearerRegex.matchEntire(it)?.groupValues?.get(1)
-      return parseToken(token)
+      return token?.let { parseToken(token) }
     }
   }
 
-  private fun parseToken(token: String?): UserEntry? {
-    if (token != null) {
-      val jwt = Jwts.parser().setSigningKey("baulsupp4evabaulsupp4evabaulsupp4eva".toByteArray()).parseClaimsJws(token)
+  companion object {
+    val code = "baulsupp4evabaulsupp4evabaulsupp4eva"
+
+    fun parseToken(token: String): UserEntry? {
+      val jwt = Jwts.parser().setSigningKey(code.toByteArray()).parseClaimsJws(token)
 
       val name = jwt.body["name"] as? String
       val email = jwt.body["email"] as? String
@@ -26,13 +28,13 @@ class JwtUserAuthenticator : UserAuthenticator {
       if (name != null && email != null) {
         return UserEntry(token = token, name = name, email = email)
       }
+
+      return null
     }
 
-    return null
-  }
-
-  fun tokenFor(user: String): String {
-    return DefaultJwtBuilder().claim("name", user).claim("email", "$user@coo.ee")
-      .signWith(Keys.hmacShaKeyFor("baulsupp4evabaulsupp4evabaulsupp4eva".toByteArray())).compact()
+    fun tokenFor(user: String): String {
+      return DefaultJwtBuilder().claim("name", user).claim("email", "$user@coo.ee")
+        .signWith(Keys.hmacShaKeyFor(code.toByteArray())).compact()
+    }
   }
 }

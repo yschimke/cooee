@@ -46,6 +46,12 @@ fun Routing.root(appServices: AppServices) {
     val user = appServices.userAuthenticator.userForRequest(call) ?: throw AuthenticationException()
     providerConfigRequest(it, config, appServices, user)
   }
+  get<AuthenticateRequest> {
+    appServices.authenticationFlow.startFlow(it, call)
+  }
+  get<AuthenticateCallbackRequest> {
+    appServices.authenticationFlow.completeFlow(it, call)
+  }
 
   install(StatusPages) {
     exception<JwtException> { cause ->
