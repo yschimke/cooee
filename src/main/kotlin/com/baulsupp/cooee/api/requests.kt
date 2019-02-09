@@ -5,6 +5,7 @@ import com.baulsupp.cooee.mongo.StringService
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.providers.CombinedProvider
 import com.baulsupp.cooee.users.UserEntry
+import com.baulsupp.okurl.authenticator.AuthInterceptor
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
@@ -159,4 +160,65 @@ private fun providerStatus(
   val services = userStatus?.associatedServices() ?: providerClass.createInstance().associatedServices()
 
   return ProviderStatus(name, userStatus != null, userStatus?.config, services.sorted())
+}
+
+data class ServicesList(val services: List<ServiceStatus>)
+data class ServiceStatus(
+  val name: String,
+  val installed: Boolean
+)
+
+@KtorExperimentalLocationsAPI
+suspend fun PipelineContext<Unit, ApplicationCall>.servicesList(
+  appServices: AppServices,
+  user: UserEntry
+) {
+  val serviceNames =
+    appServices.providerRegistry.registered.values.flatMap { it.createInstance().associatedServices() }.toSet()
+
+  val list = appServices.services.filter { serviceNames.contains(it.name()) }.map {
+    serviceStatus(appServices, it, user)
+  }
+
+  call.respond(ServicesList(list))
+}
+
+@KtorExperimentalLocationsAPI
+suspend fun PipelineContext<Unit, ApplicationCall>.serviceRequest(
+  serviceRequest: ServiceRequest,
+  appServices: AppServices,
+  user: UserEntry
+) {
+  val service = appServices.services.find { it.name() == serviceRequest.name }
+
+  if (service == null) {
+    call.respond(HttpStatusCode.NotFound)
+  } else {
+    call.respond(serviceStatus(appServices, service, user))
+  }
+}
+
+private suspend fun serviceStatus(
+  appServices: AppServices,
+  service: AuthInterceptor<*>,
+  user: UserEntry
+): ServiceStatus {
+  val token = appServices.credentialsStore.get(service.serviceDefinition, user.email)
+
+  return ServiceStatus(service.name(), token != null)
+}
+
+@KtorExperimentalLocationsAPI
+suspend fun PipelineContext<Unit, ApplicationCall>.serviceDeleteRequest(
+  serviceRequest: ServiceRequest,
+  appServices: AppServices,
+  user: UserEntry
+) {
+  val service = appServices.services.find { it.name() == serviceRequest.name }
+
+  if (service != null) {
+    appServices.credentialsStore.remove(service.serviceDefinition, user.email)
+  }
+
+  call.respond(HttpStatusCode.OK)
 }

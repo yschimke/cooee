@@ -8,6 +8,7 @@ import com.baulsupp.cooee.suggester.SuggestionType
 import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.okurl.kotlin.moshi
+import com.baulsupp.okurl.services.strava.StravaAuthInterceptor
 import io.ktor.application.Application
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
@@ -18,11 +19,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.locations.KtorExperimentalLocationsAPI
-import io.ktor.server.testing.TestApplicationCall
-import io.ktor.server.testing.TestApplicationEngine
-import io.ktor.server.testing.handleRequest
-import io.ktor.server.testing.setBody
-import io.ktor.server.testing.withTestApplication
+import io.ktor.server.testing.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.debug.DebugProbes
 import kotlinx.coroutines.runBlocking
@@ -315,6 +312,66 @@ class ApplicationTest {
     testRequest("/api/v0/provider/test", user = "yuri") {
       assertEquals(
         "{\"name\":\"test\",\"installed\":false,\"services\":[]}",
+        response.content
+      )
+    }
+  }
+
+  @Test
+  fun testServices() {
+    testRequest("/api/v0/services", user = "yuri") {
+      assertEquals(
+        "{\"services\":[" +
+          "{\"name\":\"atlassian\",\"installed\":false}," +
+          "{\"name\":\"github\",\"installed\":false}," +
+          "{\"name\":\"google\",\"installed\":false}," +
+          "{\"name\":\"opsgenie\",\"installed\":false}," +
+          "{\"name\":\"trello\",\"installed\":false}," +
+          "{\"name\":\"twitter\",\"installed\":false}" +
+          "]}",
+        response.content
+      )
+    }
+  }
+
+  @Test
+  fun testServiceRequest() {
+    testRequest("/api/v0/service/strava", user = "yuri") {
+      assertEquals(
+        "{\"name\":\"strava\",\"installed\":false}",
+        response.content
+      )
+    }
+  }
+
+  @Test
+  fun testServiceDeleteRequest() {
+    runBlocking {
+      services.credentialsStore.set(
+        "strava",
+        "xxx"
+      )
+
+      val sd = StravaAuthInterceptor().serviceDefinition
+
+      assertEquals(1, services.credentialsStore.findAllNamed(sd).size)
+
+      testRequest("/api/v0/service/strava", user = "yuri", method = Delete)
+
+      assertEquals(0, services.credentialsStore.findAllNamed(sd).size)
+    }
+  }
+
+  @Test
+  fun testServiceRequestNotFound() {
+    testRequest("/api/v0/service/cooee2", user = "yuri", expectedCode = NotFound)
+  }
+
+  @Test
+  fun testServiceRequestNotInstalled() {
+    testRequest("/api/v0/service/strava", user = "yuri") {
+      assertEquals(
+        "{\"name\":\"strava\",\"installed\":false}",
         response.content
       )
     }

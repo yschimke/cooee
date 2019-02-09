@@ -46,6 +46,14 @@ class ProvidersRequest
 @Location("/api/v0/provider/{name}")
 data class ProviderRequest(val name: String)
 
+@KtorExperimentalLocationsAPI
+@Location("/api/v0/services")
+class ServicesRequest
+
+@KtorExperimentalLocationsAPI
+@Location("/api/v0/service/{name}")
+data class ServiceRequest(val name: String)
+
 data class ProviderConfig(val config: Map<String, Any>?)
 
 class SearchSuggestionsResultsAdapter : JsonAdapter<SearchSuggestionsResults>() {
@@ -96,12 +104,7 @@ data class CompletionItem(val word: String, val line: String, val description: S
 data class Completions(val completions: List<CompletionItem>) {
   companion object {
     fun complete(command: CompletionRequest, commands: List<Suggestion>): Completions {
-      val query = command.q ?: ""
-
       val distinctCommands = commands.distinctBy { it.line }
-
-      // TODO improve or test logic
-      val prefix = query.substring(0, query.lastIndexOf(" ") + 1)
 
       return Completions(distinctCommands.map { s ->
         val word = s.line.split("\\s+".toRegex()).last()
