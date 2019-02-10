@@ -48,7 +48,7 @@ class ProdAuthenticationFlow(val appServices: AppServices) : AuthenticationFlow 
 
         appServices.credentialsStore.set(serviceFlow.serviceDefinition, user.email, credentials)
 
-        call.respondRedirect(appServices.wwwUrl("/"))
+        call.respondRedirect(appServices.wwwUrl("/services"))
         return
       }
     }

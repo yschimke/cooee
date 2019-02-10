@@ -10,6 +10,7 @@ import com.baulsupp.cooee.providers.jira.JiraProvider
 import com.baulsupp.cooee.providers.mongodb.MongoDbProvider
 import com.baulsupp.cooee.providers.opsgenie.GcpProvider
 import com.baulsupp.cooee.providers.opsgenie.OpsGenieProvider
+import com.baulsupp.cooee.providers.strava.StravaProvider
 import com.baulsupp.cooee.providers.trello.TrelloProvider
 import com.baulsupp.cooee.providers.twitter.TwitterProvider
 import com.baulsupp.cooee.users.UserEntry
@@ -45,7 +46,7 @@ class ProviderRegistry(val appServices: AppServices, val registered: Map<String,
       "bookmarks" to BookmarksProvider::class,
       "gmail" to GmailProvider::class,
       // disabled for now
-//      "strava" to StravaProvider::class,
+      "strava" to StravaProvider::class,
       "trello" to TrelloProvider::class,
       "jira" to JiraProvider::class,
       "opsgenie" to OpsGenieProvider::class,
