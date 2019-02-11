@@ -10,7 +10,9 @@ import com.baulsupp.cooee.users.UserAuthenticator
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.authenticator.AuthInterceptor
 import com.baulsupp.okurl.credentials.CredentialsStore
+import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
+import io.ktor.config.ApplicationConfig
 import okhttp3.OkHttpClient
 
 interface AppServices : AutoCloseable {
@@ -45,4 +47,6 @@ interface AppServices : AutoCloseable {
     val user = userForCall(call)
     return providerRegistry.forUser(user).apply { init(this@AppServices, user) }
   }
+
+  val config: ApplicationConfig
 }

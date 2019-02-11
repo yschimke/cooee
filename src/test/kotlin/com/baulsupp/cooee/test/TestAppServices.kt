@@ -8,6 +8,8 @@ import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
 import com.baulsupp.okurl.authenticator.RenewingInterceptor
 import com.baulsupp.okurl.credentials.InMemoryCredentialsStore
+import io.ktor.config.ApplicationConfig
+import io.ktor.config.MapApplicationConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
 import org.slf4j.LoggerFactory
@@ -38,6 +40,8 @@ class TestAppServices : AppServices {
   override val authenticationFlow = TestAuthenticationFlow()
 
   override val authenticationFlowCache = TestAuthenticationFlowCache()
+
+  override val config = MapApplicationConfig()
 
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
     val services = AuthenticatingInterceptor.defaultServices()

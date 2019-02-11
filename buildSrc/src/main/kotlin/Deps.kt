@@ -7,6 +7,6 @@ object Versions {
   val netty = "4.1.33.Final"
   val okhttp = "3.13.1"
   val okio = "2.2.2"
-  val okurl = "1.80.0"
+  val okurl = "1.81.0"
   val reactor = "3.2.5.RELEASE"
 }
