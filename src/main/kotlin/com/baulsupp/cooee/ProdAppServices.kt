@@ -18,7 +18,7 @@ import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class ProdAppServices(application: Application) : AppServices {
+class ProdAppServices(val application: Application) : AppServices {
   override fun close() {
     client.close()
     mongo.close()
@@ -51,6 +51,8 @@ class ProdAppServices(application: Application) : AppServices {
   override val authenticationFlowCache = MongoAuthenticationFlowCache(mongoDb)
 
   override val cache = MoshiTypedCache(MongoCache(mongoDb))
+
+  override val config = application.environment.config
 
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
     eventListenerFactory(LoggingEventListener.Factory { s -> logger.info(s) })

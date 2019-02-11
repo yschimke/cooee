@@ -245,6 +245,7 @@ class ApplicationTest {
           "{\"name\":\"twitter\",\"installed\":false,\"services\":[\"twitter\"]}," +
           "{\"name\":\"bookmarks\",\"installed\":false,\"services\":[]}," +
           "{\"name\":\"gmail\",\"installed\":false,\"services\":[\"google\"]}," +
+          "{\"name\":\"strava\",\"installed\":false,\"services\":[\"strava\"]}," +
           "{\"name\":\"trello\",\"installed\":false,\"services\":[\"trello\"]}," +
           "{\"name\":\"jira\",\"installed\":false,\"services\":[\"atlassian\"]}," +
           "{\"name\":\"opsgenie\",\"installed\":false,\"services\":[\"opsgenie\"]}," +
@@ -326,6 +327,7 @@ class ApplicationTest {
           "{\"name\":\"github\",\"installed\":false}," +
           "{\"name\":\"google\",\"installed\":false}," +
           "{\"name\":\"opsgenie\",\"installed\":false}," +
+          "{\"name\":\"strava\",\"installed\":false}," +
           "{\"name\":\"trello\",\"installed\":false}," +
           "{\"name\":\"twitter\",\"installed\":false}" +
           "]}",
