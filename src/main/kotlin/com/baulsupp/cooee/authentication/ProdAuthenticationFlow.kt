@@ -10,6 +10,7 @@ import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.okurl.authenticator.authflow.Callback
 import com.baulsupp.okurl.authenticator.authflow.Prompt
 import com.baulsupp.okurl.authenticator.authflow.Scopes
+import com.baulsupp.okurl.authenticator.authflow.State
 import com.baulsupp.okurl.authenticator.oauth2.Oauth2Flow
 import io.ktor.application.ApplicationCall
 import io.ktor.http.HttpStatusCode
@@ -26,14 +27,15 @@ class ProdAuthenticationFlow(val appServices: AppServices) : AuthenticationFlow 
     if (serviceFlow != null) {
       val state = UUID.randomUUID().toString()
 
-      serviceFlow.init(appServices.client, state)
+      serviceFlow.init(appServices.client)
 
       val token = request.token ?: throw BadRequestException()
       appServices.authenticationFlowCache.store(AuthenticationFlowInstance(state, token, request.service))
 
-      val params = optionParams(serviceFlow)
+      val params = optionParams(serviceFlow, state)
+      serviceFlow.defineOptions(params)
 
-      val url = serviceFlow.start(params)
+      val url = serviceFlow.start()
 
       call.respondRedirect(url)
     } else {
@@ -41,7 +43,7 @@ class ProdAuthenticationFlow(val appServices: AppServices) : AuthenticationFlow 
     }
   }
 
-  private fun optionParams(serviceFlow: Oauth2Flow): Map<String, Any> {
+  private fun optionParams(serviceFlow: Oauth2Flow, state: String): Map<String, Any> {
     val options = serviceFlow.options()
 
     return options.map {
@@ -49,6 +51,7 @@ class ProdAuthenticationFlow(val appServices: AppServices) : AuthenticationFlow 
         is Prompt -> appServices.config.propertyOrNull(it.param)?.getString() ?: ""
         is Scopes -> appServices.config.propertyOrNull(it.param)?.getList().orEmpty()
         is Callback -> redirectUri
+        is State -> state
       }
 
       it.param to value
@@ -68,8 +71,10 @@ class ProdAuthenticationFlow(val appServices: AppServices) : AuthenticationFlow 
       val user = JwtUserAuthenticator.parseToken(flowInstance.token)
 
       if (serviceFlow != null && user != null && request.code != null) {
-        val params = optionParams(serviceFlow)
-        serviceFlow.start(params)
+        serviceFlow.init(appServices.client)
+
+        val params = optionParams(serviceFlow, state)
+        serviceFlow.defineOptions(params)
 
         val credentials = serviceFlow.complete(request.code)
 

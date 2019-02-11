@@ -27,8 +27,8 @@ fun main() {
       "strava.clientSecret" to "0cf3ecbf9d82ac4e190c0ffbf634e720c2853c63",
       "github.clientId" to "55437c08a32bb9838c51",
       "github.clientSecret" to "73c01e814183a59a2d7c01791a75ca4db25abc0d",
-      "atlassian.clientId" to "lWE2rprvJ7rcRrV28e7CUg2ErITtyw0p",
-      "atlassian.clientSecret" to "CqcwVFKugiK1AhP-HcRG26BwgdhML7-_Pa2UvVM5qjS8tD_xh50MCRVhFAPI24_Q"
+      "atlassian.clientId" to "3XE2L6KCIUmcYZXxzgu3XXPms0rBMvOb",
+      "atlassian.clientSecret" to "3CQ7XqG-FKC_G14pYE_Rf2-dw80aw9k_EyIr9NxpgYJTnMBq2qXbWAd_dBqAfsd6"
     ).apply {
       put(
         "strava.scopes", listOf(
