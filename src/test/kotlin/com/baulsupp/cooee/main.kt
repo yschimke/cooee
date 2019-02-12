@@ -25,6 +25,8 @@ fun main() {
       "wwwwHost" to "localhost:3000",
       "strava.clientId" to "31260",
       "strava.clientSecret" to "0cf3ecbf9d82ac4e190c0ffbf634e720c2853c63",
+      "google.clientId" to "415869238805-85g0t9q64gprvdabe34l9el9me7muqge.apps.googleusercontent.com",
+      "google.clientSecret" to "4drHLSYQgj1FBxxbL5yaLuPC",
       "github.clientId" to "55437c08a32bb9838c51",
       "github.clientSecret" to "73c01e814183a59a2d7c01791a75ca4db25abc0d",
       "atlassian.clientId" to "3XE2L6KCIUmcYZXxzgu3XXPms0rBMvOb",
@@ -49,29 +51,12 @@ fun main() {
           "read:jira-user", "read:jira-work", "write:jira-work", "offline_access"
         )
       )
+      put(
+        "google.scopes", listOf(
+          "plus.login", "plus.profile.emails.read"
+        )
+      )
     }
-
-
-//    atlassian {
-//      clientId = lWE2rprvJ7rcRrV28e7CUg2ErITtyw0p
-//      clientSecret = CqcwVFKugiK1AhP-HcRG26BwgdhML7-_Pa2UvVM5qjS8tD_xh50MCRVhFAPI24_Q
-//      scopes = [
-//        read:jira-user,
-//      read:jira-work,
-//      write:jira-work,
-//      offline_access
-//      ]
-//    }
-//    github {
-//      clientId = 55437c08a32bb9838c51
-//        clientSecret = 73c01e814183a59a2d7c01791a75ca4db25abc0d
-//        scopes = [
-//        user,
-//        repo,
-//        gist,
-//        admin:org
-//      ]
-//    }
 
 
     config.config("host")
