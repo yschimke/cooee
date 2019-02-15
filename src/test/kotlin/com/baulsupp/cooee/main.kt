@@ -30,7 +30,9 @@ fun main() {
       "github.clientId" to "55437c08a32bb9838c51",
       "github.clientSecret" to "73c01e814183a59a2d7c01791a75ca4db25abc0d",
       "atlassian.clientId" to "3XE2L6KCIUmcYZXxzgu3XXPms0rBMvOb",
-      "atlassian.clientSecret" to "3CQ7XqG-FKC_G14pYE_Rf2-dw80aw9k_EyIr9NxpgYJTnMBq2qXbWAd_dBqAfsd6"
+      "atlassian.clientSecret" to "3CQ7XqG-FKC_G14pYE_Rf2-dw80aw9k_EyIr9NxpgYJTnMBq2qXbWAd_dBqAfsd6",
+      "twitter.consumerKey" to "O2h47Hy8FNsz956UNmXJpXJNW",
+      "twitter.consumerSecret" to "cxeaVgSPLrBvZmUQDKG9LSQPe5H3HLkUo5MsL3YvS5JRJFHDM7"
     ).apply {
       put(
         "strava.scopes", listOf(

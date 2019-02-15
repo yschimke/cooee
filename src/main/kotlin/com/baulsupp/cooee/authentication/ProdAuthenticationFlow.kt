@@ -6,12 +6,15 @@ import com.baulsupp.cooee.AppServices
 import com.baulsupp.cooee.api.AuthenticateCallbackRequest
 import com.baulsupp.cooee.api.AuthenticateRequest
 import com.baulsupp.cooee.api.BadRequestException
+import com.baulsupp.cooee.providers.twitter.TwitterAuthFlow
 import com.baulsupp.cooee.users.JwtUserAuthenticator
+import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.authenticator.authflow.Callback
 import com.baulsupp.okurl.authenticator.authflow.Prompt
 import com.baulsupp.okurl.authenticator.authflow.Scopes
 import com.baulsupp.okurl.authenticator.authflow.State
 import com.baulsupp.okurl.authenticator.oauth2.Oauth2Flow
+import com.baulsupp.okurl.credentials.ServiceDefinition
 import io.ktor.application.ApplicationCall
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
@@ -43,7 +46,7 @@ class ProdAuthenticationFlow(val appServices: AppServices) : AuthenticationFlow 
     }
   }
 
-  private fun optionParams(serviceFlow: Oauth2Flow, state: String): Map<String, Any> {
+  private fun optionParams(serviceFlow: Oauth2Flow<*>, state: String): Map<String, Any> {
     val options = serviceFlow.options()
 
     return options.map {
@@ -58,7 +61,11 @@ class ProdAuthenticationFlow(val appServices: AppServices) : AuthenticationFlow 
     }.toMap()
   }
 
-  private fun serviceFlow(service: String): Oauth2Flow? {
+  private fun serviceFlow(service: String): Oauth2Flow<*>? {
+    if (service == "twitter") {
+      return TwitterAuthFlow(appServices.authenticationFlowCache)
+    }
+
     return appServices.services.find { it.name() == service }?.authFlow() as? Oauth2Flow
   }
 
@@ -70,15 +77,19 @@ class ProdAuthenticationFlow(val appServices: AppServices) : AuthenticationFlow 
       val serviceFlow = serviceFlow(flowInstance.service)
       val user = JwtUserAuthenticator.parseToken(flowInstance.token)
 
-      if (serviceFlow != null && user != null && request.code != null) {
+      val code = if (serviceFlow is TwitterAuthFlow) call.request.queryParameters["oauth_verifier"] else request.code
+
+      if (serviceFlow != null && user != null && code != null) {
         serviceFlow.init(appServices.client)
 
         val params = optionParams(serviceFlow, state)
         serviceFlow.defineOptions(params)
 
-        val credentials = serviceFlow.complete(request.code)
+        val credentials = serviceFlow.complete(code)
 
-        appServices.credentialsStore.set(serviceFlow.serviceDefinition, user.email, credentials)
+        // TODO fix
+        val serviceDefinition: ServiceDefinition<Any> = serviceFlow.serviceDefinition as ServiceDefinition<Any>
+        setToken(serviceDefinition, user, credentials!!)
 
         call.respondRedirect(appServices.wwwUrl("/services"))
         return
@@ -86,5 +97,13 @@ class ProdAuthenticationFlow(val appServices: AppServices) : AuthenticationFlow 
     }
 
     call.respond(HttpStatusCode.BadRequest)
+  }
+
+  private suspend fun <T> setToken(
+    serviceDefinition: ServiceDefinition<T>,
+    user: UserEntry,
+    credentials: T
+  ) {
+    appServices.credentialsStore.set(serviceDefinition, user.email, credentials)
   }
 }
