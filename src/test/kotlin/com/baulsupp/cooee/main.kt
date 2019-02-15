@@ -55,7 +55,7 @@ fun main() {
       )
       put(
         "google.scopes", listOf(
-          "plus.login", "plus.profile.emails.read"
+          "plus.login", "plus.profile.emails.read", "https://mail.google.com/"
         )
       )
     }
