@@ -32,7 +32,9 @@ class ProviderRegistry(val appServices: AppServices, val registered: Map<String,
 
     providers.add(CooeeProvider())
 
-    return CombinedProvider(providers)
+    val enabled = providers.filter { appServices.featureChecks.isProviderEnabled(it.name) }
+
+    return CombinedProvider(enabled)
   }
 
   private fun byName(name: String): BaseProvider? = registered[name]?.createInstance()

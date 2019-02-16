@@ -113,9 +113,13 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${Versions.kotlinCoroutines}")
   implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.68-kotlin-1.3.20")
   implementation("org.mongodb:mongodb-driver-reactivestreams:1.11.0")
+  implementation("org.mongodb:mongodb-driver-sync:3.10.1")
   implementation("org.webjars:jquery:3.2.1")
   implementation("org.litote.kmongo:kmongo-coroutine:3.9.2")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:${Versions.kotlinCoroutines}")
+  implementation("org.ff4j:ff4j-core:1.7.1")
+  implementation("org.ff4j:ff4j-store-mongodb-v3:1.7.1")
+  implementation("org.ff4j:ff4j-web:1.7.1")
   testCompile("io.ktor:ktor-server-tests:${Versions.ktor}")
 }
 

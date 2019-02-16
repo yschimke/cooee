@@ -2,6 +2,8 @@ package com.baulsupp.cooee.mongo
 
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
+import com.mongodb.client.MongoClient
+import com.mongodb.client.MongoClients
 import com.mongodb.connection.netty.NettyStreamFactoryFactory
 import io.netty.channel.nio.NioEventLoopGroup
 import org.litote.kmongo.coroutine.CoroutineClient
@@ -34,5 +36,32 @@ object MongoFactory {
       .build()
 
     return KMongo.createClient(settings).coroutine
+  }
+
+  private fun localhostMongoSync(): MongoClient {
+    val settings = MongoClientSettings.builder()
+      .streamFactoryFactory(NettyStreamFactoryFactory.builder().build())
+      .build()
+
+    return MongoClients.create(settings)
+  }
+
+  private fun cloudMongoSync(eventLoopGroup: NioEventLoopGroup): MongoClient {
+    val settings = MongoClientSettings.builder()
+      .streamFactoryFactory(NettyStreamFactoryFactory.builder().eventLoopGroup(eventLoopGroup).build())
+      .applyConnectionString(ConnectionString("mongodb://cooee:br4PA4HyGabAkN0c@cooeedb-shard-00-00-bnhzn.gcp.mongodb.net:27017,cooeedb-shard-00-01-bnhzn.gcp.mongodb.net:27017,cooeedb-shard-00-02-bnhzn.gcp.mongodb.net:27017/cooee?ssl=true&replicaSet=CooeeDB-shard-0&authSource=admin&retryWrites=true"))
+      .applyToConnectionPoolSettings {
+        it.maxSize(5)
+        it.maxWaitQueueSize(100)
+      }
+      .build()
+
+    return MongoClients.create(settings)
+  }
+
+  fun mongoSync(local: Boolean, eventLoopGroup: NioEventLoopGroup) = if (local) {
+    localhostMongoSync()
+  } else {
+    cloudMongoSync(eventLoopGroup)
   }
 }

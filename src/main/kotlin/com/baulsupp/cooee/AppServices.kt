@@ -3,6 +3,7 @@ package com.baulsupp.cooee
 import com.baulsupp.cooee.authentication.AuthenticationFlow
 import com.baulsupp.cooee.authentication.AuthenticationFlowCache
 import com.baulsupp.cooee.cache.MoshiTypedCache
+import com.baulsupp.cooee.features.FeatureCheck
 import com.baulsupp.cooee.providers.CombinedProvider
 import com.baulsupp.cooee.providers.ProviderConfigStore
 import com.baulsupp.cooee.providers.ProviderRegistry
@@ -14,6 +15,7 @@ import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.config.ApplicationConfig
 import okhttp3.OkHttpClient
+import org.ff4j.FF4j
 
 interface AppServices : AutoCloseable {
   val client: OkHttpClient
@@ -26,6 +28,7 @@ interface AppServices : AutoCloseable {
   val cache: MoshiTypedCache
   val authenticationFlow: AuthenticationFlow
   val authenticationFlowCache: AuthenticationFlowCache
+  val featureChecks: FeatureCheck
 
   val services: List<AuthInterceptor<*>>
 
