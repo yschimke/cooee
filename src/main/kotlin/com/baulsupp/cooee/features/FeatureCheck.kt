@@ -1,7 +1,7 @@
 package com.baulsupp.cooee.features
 
 interface FeatureCheck {
-  object ON: FeatureCheck {
+  object ON : FeatureCheck {
     override fun enabled(name: String): Boolean = true
   }
 

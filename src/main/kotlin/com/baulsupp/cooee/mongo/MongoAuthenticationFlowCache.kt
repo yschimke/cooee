@@ -4,7 +4,6 @@ import com.baulsupp.cooee.authentication.AuthenticationData
 import com.baulsupp.cooee.authentication.AuthenticationFlowCache
 import com.baulsupp.cooee.authentication.AuthenticationFlowInstance
 import com.mongodb.client.model.Filters
-import com.mongodb.client.model.Filters.and
 import com.mongodb.client.model.Filters.eq
 import com.mongodb.client.model.ReplaceOptions
 import org.litote.kmongo.coroutine.CoroutineCollection

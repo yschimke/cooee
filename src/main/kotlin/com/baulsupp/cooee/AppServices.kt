@@ -1,3 +1,5 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package com.baulsupp.cooee
 
 import com.baulsupp.cooee.authentication.AuthenticationFlow
@@ -11,11 +13,9 @@ import com.baulsupp.cooee.users.UserAuthenticator
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.authenticator.AuthInterceptor
 import com.baulsupp.okurl.credentials.CredentialsStore
-import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.config.ApplicationConfig
 import okhttp3.OkHttpClient
-import org.ff4j.FF4j
 
 interface AppServices : AutoCloseable {
   val client: OkHttpClient

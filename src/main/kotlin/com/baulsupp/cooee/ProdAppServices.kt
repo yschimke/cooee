@@ -16,9 +16,9 @@ import io.ktor.application.Application
 import io.netty.channel.nio.NioEventLoopGroup
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
-//import org.ff4j.mongo.store.EventRepositoryMongo
-import org.ff4j.mongo.store.FeatureStoreMongo
-//import org.ff4j.mongo.store.PropertyStoreMongo
+import org.ff4j.cache.InMemoryCacheManager
+// import org.ff4j.mongo.store.EventRepositoryMongo
+// import org.ff4j.mongo.store.PropertyStoreMongo
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -61,11 +61,14 @@ class ProdAppServices(val application: Application) : AppServices {
 
   val featureSwitches = CooeeFF4jProvider.ff4j.apply {
     isAutocreate = true
-    val client = MongoFactory.mongoSync(false, eventLoop)
+    val client = MongoFactory.mongo(false, eventLoop)
     val db = client.getDatabase("cooee")
-    featureStore = FeatureStoreMongo(db, "features")
+    featureStore = MongoFeatureStore(db)
 //    eventRepository = EventRepositoryMongo(db, "featureEvents")
-//    propertiesStore = PropertyStoreMongo(db, "featureProperties")
+    propertiesStore = MongoFeaturePropertyStore(db)
+
+    // TODO replace with event based updates to cache in Mongo
+    cache(InMemoryCacheManager())
   }
 
   override val featureChecks = FF4jFeatureCheck(featureSwitches)

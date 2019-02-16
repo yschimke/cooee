@@ -44,7 +44,6 @@ class TwitterProvider : BaseProvider() {
     })
   }
 
-
   override suspend fun suggest(command: String): List<Suggestion> {
     return TwitterSuggester(this).suggest(command)
   }
