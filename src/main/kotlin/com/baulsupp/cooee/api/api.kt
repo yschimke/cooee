@@ -121,6 +121,11 @@ data class Completions(val completions: List<CompletionItem>) {
   }
 }
 
+@KtorExperimentalLocationsAPI
+@Location("/api/v0/features")
+object FeaturesRequest
+
+
 sealed class GoResult {
   override fun toString(): String {
     return this::class.java.simpleName

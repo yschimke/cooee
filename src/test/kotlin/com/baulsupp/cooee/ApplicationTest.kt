@@ -24,6 +24,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.debug.DebugProbes
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.containsString
+import org.hamcrest.CoreMatchers.startsWith
 import org.junit.Assert.assertThat
 import org.junit.BeforeClass
 import kotlin.test.Test
@@ -376,6 +377,13 @@ class ApplicationTest {
         "{\"name\":\"strava\",\"installed\":false}",
         response.content
       )
+    }
+  }
+
+  @Test
+  fun testFeatureFlags() {
+    testRequest("/api/v0/features", user = "yuri") {
+      assertThat(response.content, startsWith("{\"features\":["))
     }
   }
 

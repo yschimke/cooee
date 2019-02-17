@@ -221,3 +221,20 @@ suspend fun PipelineContext<Unit, ApplicationCall>.serviceDeleteRequest(
 
   call.respond(HttpStatusCode.OK)
 }
+
+
+data class FeaturesList(val features: List<FeatureStatus>)
+data class FeatureStatus(
+  val name: String,
+  val enabled: Boolean
+)
+
+@KtorExperimentalLocationsAPI
+suspend fun PipelineContext<Unit, ApplicationCall>.featuresRequest(
+  appServices: AppServices,
+  user: UserEntry
+) {
+  val featureMap = appServices.featureChecks.all(user)
+
+  call.respond(FeaturesList(featureMap.map { FeatureStatus(it.key, it.value) }))
+}

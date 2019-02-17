@@ -66,6 +66,10 @@ fun Routing.root(appServices: AppServices) {
     val user = appServices.userAuthenticator.userForRequest(call) ?: throw AuthenticationException()
     serviceDeleteRequest(it, appServices, user)
   }
+  get<FeaturesRequest> {
+    val user = appServices.userAuthenticator.userForRequest(call) ?: throw AuthenticationException()
+    featuresRequest(appServices, user)
+  }
 
   install(StatusPages) {
     exception<JwtException> { cause ->
