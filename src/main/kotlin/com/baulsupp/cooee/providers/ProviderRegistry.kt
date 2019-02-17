@@ -36,10 +36,11 @@ class ProviderRegistry(val appServices: AppServices, val registered: Map<String,
   }
 
   private fun byName(name: String, user: UserEntry): BaseProvider? =
-    if (appServices.featureChecks.isProviderEnabled(name)) registered[name]?.createInstance() else null
+    if (appServices.featureChecks(user).isProviderEnabled(name)) registered[name]?.createInstance() else null
 
   fun registeredForUser(user: UserEntry): Map<String, BaseProvider> {
-    return registered.filterKeys { appServices.featureChecks.isProviderEnabled(it) }.mapValues { it.value.createInstance() }
+    return registered.filterKeys { appServices.featureChecks(user).isProviderEnabled(it) }
+      .mapValues { it.value.createInstance() }
   }
 
   companion object {

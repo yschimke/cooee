@@ -28,7 +28,7 @@ interface AppServices : AutoCloseable {
   val cache: MoshiTypedCache
   val authenticationFlow: AuthenticationFlow
   val authenticationFlowCache: AuthenticationFlowCache
-  val featureChecks: FeatureCheck
+  fun featureChecks(userEntry: UserEntry): FeatureCheck
 
   val services: List<AuthInterceptor<*>>
 

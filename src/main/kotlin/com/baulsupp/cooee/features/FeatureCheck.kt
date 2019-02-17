@@ -1,11 +1,9 @@
 package com.baulsupp.cooee.features
 
-import com.baulsupp.cooee.users.UserEntry
-
 interface FeatureCheck {
   object ON : FeatureCheck {
     override fun enabled(name: String): Boolean = true
-    override fun all(user: UserEntry): Map<String, Boolean> = mapOf()
+    override fun all(): Map<String, Boolean> = mapOf()
   }
 
   fun enabled(name: String): Boolean
@@ -13,5 +11,5 @@ interface FeatureCheck {
     return enabled("provider.$name")
   }
 
-  fun all(user: UserEntry): Map<String, Boolean>
+  fun all(): Map<String, Boolean>
 }

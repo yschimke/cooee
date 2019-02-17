@@ -4,21 +4,53 @@ import com.mongodb.client.model.Filters.eq
 import kotlinx.coroutines.runBlocking
 import org.ff4j.core.Feature
 import org.ff4j.exception.FeatureNotFoundException
+import org.ff4j.property.Property
+import org.ff4j.property.PropertyInt
 import org.ff4j.store.AbstractFeatureStore
+import org.ff4j.strategy.WhiteListStrategy
+import org.ff4j.utils.MappingUtil
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.CoroutineDatabase
+import org.litote.kreflect.setPropertyValue
 
 data class FeatureM(
   val _id: String,
   val enable: Boolean,
   val description: String?,
   val group: String?,
-  val permissions: Set<String>
+  val permissions: Set<String>,
+  val strategy: String?,
+  val expression: Map<String, String>?,
+  val properties: List<PropertyM>?
 ) {
-  fun toFeature() = Feature(_id, enable, description, group, permissions.toMutableSet())
+  fun toFeature(): Feature {
+    return Feature(_id, enable, description, group, permissions.toMutableSet()).apply {
+      properties?.forEach {
+        addProperty(it.toProperty())
+      }
+      if (strategy != null) {
+        flippingStrategy = MappingUtil.instanceFlippingStrategy(_id, strategy, expression)
+      }
+    }
+  }
 }
 
-fun Feature.toFeatureM() = FeatureM(uid, isEnable, description, group, permissions)
+fun Feature.toFeatureM(): FeatureM {
+  var strategy: String? = null
+  var expression: Map<String, String>? = null
+  var properties: List<PropertyM>? = null
+
+  if (flippingStrategy != null) {
+    strategy = flippingStrategy.javaClass.name
+    expression = flippingStrategy.initParams
+  }
+
+  if (customProperties != null) {
+    properties = customProperties.map { it.value.toPropertyM() }
+  }
+
+  return FeatureM(uid, isEnable, description, group, permissions, strategy, expression, properties)
+}
 
 class MongoFeatureStore(private val mongoDb: CoroutineDatabase) : AbstractFeatureStore() {
   private val featureDb: CoroutineCollection<FeatureM> by lazy {
@@ -50,8 +82,6 @@ class MongoFeatureStore(private val mongoDb: CoroutineDatabase) : AbstractFeatur
   }
 
   override fun read(featureUid: String): Feature? {
-    println("read " + featureUid)
-
     return runBlocking {
       featureDb.findOne(eq("_id", featureUid))
     }?.toFeature() ?: throw FeatureNotFoundException(featureUid)
@@ -59,11 +89,22 @@ class MongoFeatureStore(private val mongoDb: CoroutineDatabase) : AbstractFeatur
 
   override fun delete(fpId: String) {
     runBlocking {
-      featureDb.deleteMany(eq("uid", fpId))
+      featureDb.deleteMany(eq("_id", fpId))
     }
   }
 
   override fun readAll(): MutableMap<String, Feature> = runBlocking {
     featureDb.find().toList()
   }.map { it._id to it.toFeature() }.toMap().toMutableMap()
+}
+
+fun main() {
+  val f = Feature("id", true, "desc", "group", mutableListOf("role", "role2")).also {
+    it.addProperty(PropertyInt("pint", 5))
+    it.flippingStrategy = WhiteListStrategy("client")
+  }
+  val featureM = f.toFeatureM()
+  println(featureM)
+  val f2 = featureM.toFeature()
+  println(f2.toJson())
 }

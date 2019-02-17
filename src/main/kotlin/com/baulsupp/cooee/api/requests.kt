@@ -234,7 +234,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.featuresRequest(
   appServices: AppServices,
   user: UserEntry
 ) {
-  val featureMap = appServices.featureChecks.all(user)
+  val featureMap = appServices.featureChecks(user).all()
 
   call.respond(FeaturesList(featureMap.map { FeatureStatus(it.key, it.value) }))
 }

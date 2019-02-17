@@ -7,6 +7,7 @@ import com.baulsupp.cooee.cache.MoshiTypedCache
 import com.baulsupp.cooee.features.FeatureCheck
 import com.baulsupp.cooee.providers.ProviderRegistry
 import com.baulsupp.cooee.users.JwtUserAuthenticator
+import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
 import com.baulsupp.okurl.authenticator.RenewingInterceptor
 import com.baulsupp.okurl.credentials.InMemoryCredentialsStore
@@ -45,7 +46,7 @@ class TestAppServices : AppServices {
 
   override val config = MapApplicationConfig()
 
-  override val featureChecks = FeatureCheck.ON
+  override fun featureChecks(user: UserEntry) = FeatureCheck.ON
 
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
     val services = AuthenticatingInterceptor.defaultServices()
