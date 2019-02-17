@@ -36,7 +36,7 @@ class TwitterAuthFlow(val authenticationFlowCache: AuthenticationFlowCache) :
       )
     )
 
-    return "https://api.twitter.com/oauth/authenticate?oauth_token=${requestCredentials!!.token}"
+    return "https://api.twitter.com/oauth/authenticate?oauth_token=${requestCredentials.token}"
   }
 
   override suspend fun complete(code: String): TwitterCredentials {
@@ -59,7 +59,7 @@ class TwitterAuthFlow(val authenticationFlowCache: AuthenticationFlowCache) :
     request = request.newBuilder()
       .header(
         "Authorization",
-        Signature().generateAuthorization(request, requestCredentials!!)
+        Signature().generateAuthorization(request, requestCredentials)
       )
       .build()
     val tokenMap = parseTokenMap(client.queryForString(request))

@@ -7,17 +7,22 @@ import io.ktor.application.ApplicationCall
 import io.ktor.request.header
 
 class JwtUserAuthenticator : UserAuthenticator {
-  private val bearerRegex = "Bearer (.*)".toRegex()
 
   override suspend fun userForRequest(call: ApplicationCall): UserEntry? {
     return call.request.header("Authorization")?.let {
-      val token = bearerRegex.matchEntire(it)?.groupValues?.get(1)
-      return token?.let { parseToken(token) }
+      return parseHeader(it)
     }
   }
 
   companion object {
     val code = "baulsupp4evabaulsupp4evabaulsupp4eva"
+
+    private val bearerRegex = "Bearer (.*)".toRegex()
+
+    fun parseHeader(it: String): UserEntry? {
+      val token = bearerRegex.matchEntire(it)?.groupValues?.get(1)
+      return token?.let { parseToken(token) }
+    }
 
     fun parseToken(token: String): UserEntry? {
       val jwt = Jwts.parser().setSigningKey(code.toByteArray()).parseClaimsJws(token)

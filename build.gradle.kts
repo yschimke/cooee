@@ -120,6 +120,7 @@ dependencies {
   implementation("org.ff4j:ff4j-core:1.7.1")
   implementation("org.ff4j:ff4j-store-mongodb-v3:1.7.1")
   implementation("org.ff4j:ff4j-web:1.7.1")
+  implementation("javax.servlet:javax.servlet-api:4.0.1")
   testCompile("io.ktor:ktor-server-tests:${Versions.ktor}")
 }
 
