@@ -17,7 +17,6 @@ import io.ktor.locations.Locations
 import io.ktor.routing.routing
 import java.util.*
 
-
 fun Application.cloud() {
   module(ProdAppServices(this), cloud = true)
 }

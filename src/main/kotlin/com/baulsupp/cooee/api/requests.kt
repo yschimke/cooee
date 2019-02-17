@@ -12,8 +12,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.locations.KtorExperimentalLocationsAPI
 import io.ktor.response.respond
 import io.ktor.util.pipeline.PipelineContext
-import kotlin.reflect.KClass
-import kotlin.reflect.full.createInstance
 
 @KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.bounceApi(
@@ -103,10 +101,11 @@ data class ProviderStatus(
 @KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.providersList(
   appServices: AppServices,
-  providers: CombinedProvider
+  providers: CombinedProvider,
+  user: UserEntry
 ) {
-  val list = appServices.providerRegistry.registered.map { (name, providerClass) ->
-    providerStatus(providers, name, providerClass)
+  val list = appServices.providerRegistry.registeredForUser(user).map { (_, provider) ->
+    providerStatus(providers, provider)
   }
 
   call.respond(ProviderList(list))
@@ -116,14 +115,15 @@ suspend fun PipelineContext<Unit, ApplicationCall>.providersList(
 suspend fun PipelineContext<Unit, ApplicationCall>.providerRequest(
   providerRequest: ProviderRequest,
   appServices: AppServices,
-  providers: CombinedProvider
+  providers: CombinedProvider,
+  user: UserEntry
 ) {
-  val klazz = appServices.providerRegistry.registered[providerRequest.name]
+  val provider = appServices.providerRegistry.registeredForUser(user)[providerRequest.name]
 
-  if (klazz == null) {
+  if (provider == null) {
     call.respond(HttpStatusCode.NotFound)
   } else {
-    call.respond(providerStatus(providers, providerRequest.name, klazz))
+    call.respond(providerStatus(providers, provider))
   }
 }
 
@@ -152,14 +152,13 @@ suspend fun PipelineContext<Unit, ApplicationCall>.providerConfigRequest(
 
 private fun providerStatus(
   providers: CombinedProvider,
-  name: String,
-  providerClass: KClass<out BaseProvider>
+  provider: BaseProvider
 ): ProviderStatus {
-  val userStatus = providers.providers.find { it.name == name }
+  val userStatus = providers.providers.find { it.name == provider.name }
 
-  val services = userStatus?.associatedServices() ?: providerClass.createInstance().associatedServices()
+  val services = userStatus?.associatedServices() ?: provider.associatedServices()
 
-  return ProviderStatus(name, userStatus != null, userStatus?.config, services.sorted())
+  return ProviderStatus(provider.name, userStatus != null, userStatus?.config, services.sorted())
 }
 
 data class ServicesList(val services: List<ServiceStatus>)
@@ -174,7 +173,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.servicesList(
   user: UserEntry
 ) {
   val serviceNames =
-    appServices.providerRegistry.registered.values.flatMap { it.createInstance().associatedServices() }.toSet()
+    appServices.providerRegistry.registeredForUser(user).values.flatMap { it.associatedServices() }.toSet()
 
   val list = appServices.services.filter { serviceNames.contains(it.name()) }.map {
     serviceStatus(appServices, it, user)

@@ -24,7 +24,7 @@ class BaseSuggester(val name: String, val commandCompleter: CommandCompleter, va
     val suggestions = argumentCompleter.suggestArguments(parts.first(), parts.drop(1))
     return suggestions.map {
       val line = command.substring(0, command.length - parts.last().length) + it
-      Suggestion(line, provider=name, description = "Command for '$line'", type=SuggestionType.UNKNOWN)
+      Suggestion(line, provider = name, description = "Command for '$line'", type = SuggestionType.UNKNOWN)
     }
   }
 }

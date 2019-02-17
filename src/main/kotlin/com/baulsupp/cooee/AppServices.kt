@@ -1,8 +1,11 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package com.baulsupp.cooee
 
 import com.baulsupp.cooee.authentication.AuthenticationFlow
 import com.baulsupp.cooee.authentication.AuthenticationFlowCache
 import com.baulsupp.cooee.cache.MoshiTypedCache
+import com.baulsupp.cooee.features.FeatureCheck
 import com.baulsupp.cooee.providers.CombinedProvider
 import com.baulsupp.cooee.providers.ProviderConfigStore
 import com.baulsupp.cooee.providers.ProviderRegistry
@@ -10,7 +13,6 @@ import com.baulsupp.cooee.users.UserAuthenticator
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.authenticator.AuthInterceptor
 import com.baulsupp.okurl.credentials.CredentialsStore
-import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.config.ApplicationConfig
 import okhttp3.OkHttpClient
@@ -26,6 +28,7 @@ interface AppServices : AutoCloseable {
   val cache: MoshiTypedCache
   val authenticationFlow: AuthenticationFlow
   val authenticationFlowCache: AuthenticationFlowCache
+  val featureChecks: FeatureCheck
 
   val services: List<AuthInterceptor<*>>
 

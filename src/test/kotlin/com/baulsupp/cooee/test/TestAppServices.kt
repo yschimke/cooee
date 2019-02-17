@@ -1,17 +1,19 @@
 package com.baulsupp.cooee.test
 
 import com.baulsupp.cooee.AppServices
+import com.baulsupp.cooee.features.CooeeFF4jProvider
 import com.baulsupp.cooee.cache.LocalCache
 import com.baulsupp.cooee.cache.MoshiTypedCache
+import com.baulsupp.cooee.features.FeatureCheck
 import com.baulsupp.cooee.providers.ProviderRegistry
 import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
 import com.baulsupp.okurl.authenticator.RenewingInterceptor
 import com.baulsupp.okurl.credentials.InMemoryCredentialsStore
-import io.ktor.config.ApplicationConfig
 import io.ktor.config.MapApplicationConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
+import org.ff4j.FF4j
 import org.slf4j.LoggerFactory
 
 class TestAppServices : AppServices {
@@ -42,6 +44,8 @@ class TestAppServices : AppServices {
   override val authenticationFlowCache = TestAuthenticationFlowCache()
 
   override val config = MapApplicationConfig()
+
+  override val featureChecks = FeatureCheck.ON
 
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
     val services = AuthenticatingInterceptor.defaultServices()

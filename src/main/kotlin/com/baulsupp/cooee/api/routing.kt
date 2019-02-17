@@ -32,10 +32,12 @@ fun Routing.root(appServices: AppServices) {
     searchSuggestion(it, appServices.providers(call))
   }
   get<ProvidersRequest> {
-    providersList(appServices, appServices.providers(call))
+    val user = appServices.userAuthenticator.userForRequest(call) ?: throw AuthenticationException()
+    providersList(appServices, appServices.providers(call), user)
   }
   get<ProviderRequest> {
-    providerRequest(it, appServices, appServices.providers(call))
+    val user = appServices.userAuthenticator.userForRequest(call) ?: throw AuthenticationException()
+    providerRequest(it, appServices, appServices.providers(call), user)
   }
   delete<ProviderRequest> {
     val user = appServices.userAuthenticator.userForRequest(call) ?: throw AuthenticationException()

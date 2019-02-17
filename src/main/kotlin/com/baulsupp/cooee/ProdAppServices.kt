@@ -4,6 +4,8 @@ package com.baulsupp.cooee
 
 import com.baulsupp.cooee.authentication.ProdAuthenticationFlow
 import com.baulsupp.cooee.cache.MoshiTypedCache
+import com.baulsupp.cooee.features.CooeeFF4jProvider
+import com.baulsupp.cooee.features.FF4jFeatureCheck
 import com.baulsupp.cooee.mongo.*
 import com.baulsupp.cooee.okhttp.close
 import com.baulsupp.cooee.providers.ProviderRegistry
@@ -14,6 +16,9 @@ import io.ktor.application.Application
 import io.netty.channel.nio.NioEventLoopGroup
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
+import org.ff4j.cache.InMemoryCacheManager
+// import org.ff4j.mongo.store.EventRepositoryMongo
+// import org.ff4j.mongo.store.PropertyStoreMongo
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -53,6 +58,20 @@ class ProdAppServices(val application: Application) : AppServices {
   override val cache = MoshiTypedCache(MongoCache(mongoDb))
 
   override val config = application.environment.config
+
+  val featureSwitches = CooeeFF4jProvider.ff4j.apply {
+    isAutocreate = true
+    val client = MongoFactory.mongo(false, eventLoop)
+    val db = client.getDatabase("cooee")
+    featureStore = MongoFeatureStore(db)
+//    eventRepository = EventRepositoryMongo(db, "featureEvents")
+    propertiesStore = MongoFeaturePropertyStore(db)
+
+    // TODO replace with event based updates to cache in Mongo
+    cache(InMemoryCacheManager())
+  }
+
+  override val featureChecks = FF4jFeatureCheck(featureSwitches)
 
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
     eventListenerFactory(LoggingEventListener.Factory { s -> logger.info(s) })

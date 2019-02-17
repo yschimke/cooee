@@ -56,7 +56,6 @@ class CombinedProvider(val providers: List<BaseProvider>) : ProviderFunctions {
     }.awaitAll()
   }
 
-
   companion object {
     val log: Logger = LoggerFactory.getLogger(this::class.java.declaringClass)
   }
