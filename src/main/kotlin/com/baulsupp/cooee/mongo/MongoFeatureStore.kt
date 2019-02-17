@@ -4,14 +4,10 @@ import com.mongodb.client.model.Filters.eq
 import kotlinx.coroutines.runBlocking
 import org.ff4j.core.Feature
 import org.ff4j.exception.FeatureNotFoundException
-import org.ff4j.property.Property
-import org.ff4j.property.PropertyInt
 import org.ff4j.store.AbstractFeatureStore
-import org.ff4j.strategy.WhiteListStrategy
 import org.ff4j.utils.MappingUtil
 import org.litote.kmongo.coroutine.CoroutineCollection
 import org.litote.kmongo.coroutine.CoroutineDatabase
-import org.litote.kreflect.setPropertyValue
 
 data class FeatureM(
   val _id: String,
@@ -96,15 +92,4 @@ class MongoFeatureStore(private val mongoDb: CoroutineDatabase) : AbstractFeatur
   override fun readAll(): MutableMap<String, Feature> = runBlocking {
     featureDb.find().toList()
   }.map { it._id to it.toFeature() }.toMap().toMutableMap()
-}
-
-fun main() {
-  val f = Feature("id", true, "desc", "group", mutableListOf("role", "role2")).also {
-    it.addProperty(PropertyInt("pint", 5))
-    it.flippingStrategy = WhiteListStrategy("client")
-  }
-  val featureM = f.toFeatureM()
-  println(featureM)
-  val f2 = featureM.toFeature()
-  println(f2.toJson())
 }
