@@ -17,3 +17,5 @@ data class Suggestion(
     return line.contains(command)
   }
 }
+
+data class SuggestionList(val suggestions: List<Suggestion>)

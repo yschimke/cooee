@@ -93,6 +93,8 @@ class ApplicationTest {
   }
 
   private fun testCompletion(prefix: String, check: (Completions) -> Unit = {}) {
+    services.checks.checks["newsuggestions"] = false
+
     withTestApplication({ test() }) {
       handleRequest(HttpMethod.Get, "/api/v0/completion?q=$prefix").apply {
         assertEquals(HttpStatusCode.OK, response.status())
@@ -168,6 +170,22 @@ class ApplicationTest {
     }
 
     testRequest("/api/v0/goinfo?q=bookmarks add nb https://newbookmark")
+  }
+
+  @Test
+  fun testSearchSuggestionsCommandsNew() {
+    runBlocking {
+      services.checks.checks["newsuggestions"] = true
+      services.providerConfigStore.store("yuri@coo.ee", "test", mapOf())
+    }
+
+    testRequest("/api/v0/search-suggestion?q=tes", expectedCode = OK, user = "yuri") {
+      assertEquals(
+        "{\"suggestions\":[" +
+          "{\"line\":\"test\",\"provider\":\"test\",\"description\":\"Command for 'test'\",\"type\":\"UNKNOWN\"}]}",
+        response.content
+      )
+    }
   }
 
   @Test

@@ -4,6 +4,7 @@ import com.baulsupp.cooee.AppServices
 import com.baulsupp.cooee.mongo.StringService
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.providers.CombinedProvider
+import com.baulsupp.cooee.suggester.SuggestionList
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.authenticator.AuthInterceptor
 import io.ktor.application.ApplicationCall
@@ -73,21 +74,28 @@ suspend fun PipelineContext<Unit, ApplicationCall>.authorize(
 
 @KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.searchSuggestion(
+  appServices: AppServices,
+  user: UserEntry?,
   it: SearchSuggestion,
   providers: CombinedProvider
 ) {
   val query = CompletionRequest(it.q ?: "")
 
-  val results = commandCompletion(providers, query)
+  if (appServices.featureChecks(user).enabled("newsuggestions")) {
+    val commands = providers.suggest(query.q ?: "")
+    call.respond(SuggestionList(commands))
+  } else {
+    val results = commandCompletion(providers, query)
 
-  val response =
-    SearchSuggestionsResults(
-      it.q ?: "",
-      results.completions.map { it.line },
-      results.completions.map { it.description },
-      results.completions.map { "https://coo.ee/go?q=${it.line.replace(" ", "+")}" })
+    val response =
+      SearchSuggestionsResults(
+        it.q ?: "",
+        results.completions.map { it.line },
+        results.completions.map { it.description },
+        results.completions.map { "https://coo.ee/go?q=${it.line.replace(" ", "+")}" })
 
-  call.respond(response)
+    call.respond(response)
+  }
 }
 
 data class ProviderList(val providers: List<ProviderStatus>)

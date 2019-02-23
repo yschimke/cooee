@@ -29,7 +29,8 @@ fun Routing.root(appServices: AppServices) {
     authorize(it, user, appServices)
   }
   get<SearchSuggestion> {
-    searchSuggestion(it, appServices.providers(call))
+    val user = appServices.userAuthenticator.userForRequest(call)
+    searchSuggestion(appServices, user, it, appServices.providers(call))
   }
   get<ProvidersRequest> {
     val user = appServices.userAuthenticator.userForRequest(call) ?: throw AuthenticationException()

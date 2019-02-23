@@ -70,7 +70,7 @@ class ProdAppServices(val application: Application) : AppServices {
     cache(InMemoryCacheManager())
   }
 
-  override fun featureChecks(userEntry: UserEntry): FeatureCheck {
+  override fun featureChecks(userEntry: UserEntry?): FeatureCheck {
     return FF4jFeatureCheck(featureSwitches, userEntry)
   }
 

@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory
 
 class TestAppServices : AppServices {
   val log = LoggerFactory.getLogger(this::class.java)
+  val checks = TestFeatureChecks()
 
   override fun close() {
     // TODO tearing down here causes the request to
@@ -46,7 +47,7 @@ class TestAppServices : AppServices {
 
   override val config = MapApplicationConfig()
 
-  override fun featureChecks(user: UserEntry) = FeatureCheck.ON
+  override fun featureChecks(user: UserEntry?) = checks
 
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
     val services = AuthenticatingInterceptor.defaultServices()
