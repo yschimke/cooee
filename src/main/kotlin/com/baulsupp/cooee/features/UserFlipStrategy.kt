@@ -11,6 +11,6 @@ class UserFlipStrategy: AbstractFlipStrategy() {
     executionContext: FlippingExecutionContext?
   ): Boolean {
     val email = this.initParams["user"]
-    return executionContext?.getString("email") == email
+    return executionContext?.getValue("email", false) == email
   }
 }

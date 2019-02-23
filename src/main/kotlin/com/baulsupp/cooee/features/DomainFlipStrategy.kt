@@ -11,6 +11,6 @@ class DomainFlipStrategy: AbstractFlipStrategy() {
     executionContext: FlippingExecutionContext?
   ): Boolean {
     val domain = this.initParams["domain"]
-    return executionContext?.getString("domain") == domain
+    return executionContext?.getValue("domain", false) == domain
   }
 }
