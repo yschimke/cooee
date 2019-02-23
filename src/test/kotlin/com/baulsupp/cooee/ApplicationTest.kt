@@ -108,6 +108,7 @@ class ApplicationTest {
   @Test
   fun testArgumentCompletion() {
     runBlocking {
+      services.checks.checks["newsuggestions"] = false
       services.providerConfigStore.store("yuri@coo.ee", "test", mapOf())
     }
 
@@ -115,6 +116,22 @@ class ApplicationTest {
       assertEquals(HttpStatusCode.OK, response.status())
       assertEquals(
         "{\"completions\":[{\"word\":\"test\",\"line\":\"test\",\"description\":\"Command for 'test'\",\"provider\":\"test\",\"suggestion\":{\"line\":\"test\",\"provider\":\"test\",\"description\":\"Command for 'test'\",\"type\":\"UNKNOWN\"}}]}",
+        response.content
+      )
+    }
+  }
+
+  @Test
+  fun testArgumentCompletionNew() {
+    runBlocking {
+      services.checks.checks["newsuggestions"] = true
+      services.providerConfigStore.store("yuri@coo.ee", "test", mapOf())
+    }
+
+    testRequest("/api/v0/completion?q=test ", user = "yuri") {
+      assertEquals(HttpStatusCode.OK, response.status())
+      assertEquals(
+        "{\"suggestions\":[{\"line\":\"test\",\"provider\":\"test\",\"description\":\"Command for 'test'\",\"type\":\"UNKNOWN\"}]}",
         response.content
       )
     }
@@ -170,22 +187,6 @@ class ApplicationTest {
     }
 
     testRequest("/api/v0/goinfo?q=bookmarks add nb https://newbookmark")
-  }
-
-  @Test
-  fun testSearchSuggestionsCommandsNew() {
-    runBlocking {
-      services.checks.checks["newsuggestions"] = true
-      services.providerConfigStore.store("yuri@coo.ee", "test", mapOf())
-    }
-
-    testRequest("/api/v0/search-suggestion?q=tes", expectedCode = OK, user = "yuri") {
-      assertEquals(
-        "{\"suggestions\":[" +
-          "{\"line\":\"test\",\"provider\":\"test\",\"description\":\"Command for 'test'\",\"type\":\"UNKNOWN\"}]}",
-        response.content
-      )
-    }
   }
 
   @Test

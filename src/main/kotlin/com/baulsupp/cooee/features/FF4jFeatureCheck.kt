@@ -1,8 +1,11 @@
 package com.baulsupp.cooee.features
 
+import com.baulsupp.cooee.ProdAppServices
 import com.baulsupp.cooee.users.UserEntry
 import org.ff4j.FF4j
 import org.ff4j.core.FlippingExecutionContext
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class FF4jFeatureCheck(val ff4j: FF4j, user: UserEntry?) : FeatureCheck {
   val executionContext = FlippingExecutionContext().apply {
@@ -13,8 +16,17 @@ class FF4jFeatureCheck(val ff4j: FF4j, user: UserEntry?) : FeatureCheck {
   }
 
   override fun enabled(name: String, default: Boolean): Boolean {
-    return ff4j.check(name, executionContext)
+    return try {
+      ff4j.check(name, executionContext)
+    } catch (e: Exception) {
+      logger.error("feature check failed", e)
+      default
+    }
   }
 
   override fun all(): Map<String, Boolean> = ff4j.features.mapValues { enabled(it.key) }
+
+  companion object {
+    val logger: Logger = LoggerFactory.getLogger(FF4jFeatureCheck::class.java)
+  }
 }
