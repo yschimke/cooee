@@ -10,7 +10,7 @@ class UserFlipStrategy: AbstractFlipStrategy() {
     store: FeatureStore?,
     executionContext: FlippingExecutionContext?
   ): Boolean {
-    val email = this.initParams["user"]
+    val email = this.initParams["email"]
     return executionContext?.getValue("email", false) == email
   }
 }
