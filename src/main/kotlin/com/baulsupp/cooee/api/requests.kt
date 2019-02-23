@@ -41,12 +41,19 @@ suspend fun PipelineContext<Unit, ApplicationCall>.userApi(
 
 @KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.completionApi(
+  user: UserEntry?,
+  appServices: AppServices,
   commandQuery: CompletionRequest,
   providers: CombinedProvider
 ) {
-  val completions = commandCompletion(providers, commandQuery)
+  if (appServices.featureChecks(user).enabled("newsuggestions")) {
+    val commands = providers.suggest(commandQuery.q ?: "")
+    call.respond(SuggestionList(commands))
+  } else {
+    val results = commandCompletion(providers, commandQuery)
 
-  call.respond(completions)
+    call.respond(results)
+  }
 }
 
 @KtorExperimentalLocationsAPI
@@ -74,28 +81,19 @@ suspend fun PipelineContext<Unit, ApplicationCall>.authorize(
 
 @KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.searchSuggestion(
-  appServices: AppServices,
-  user: UserEntry?,
   it: SearchSuggestion,
   providers: CombinedProvider
 ) {
-  val query = CompletionRequest(it.q ?: "")
+  val results = commandCompletion(providers, CompletionRequest(it.q ?: ""))
 
-  if (appServices.featureChecks(user).enabled("newsuggestions")) {
-    val commands = providers.suggest(query.q ?: "")
-    call.respond(SuggestionList(commands))
-  } else {
-    val results = commandCompletion(providers, query)
+  val response =
+    SearchSuggestionsResults(
+      it.q ?: "",
+      results.completions.map { it.line },
+      results.completions.map { it.description },
+      results.completions.map { "https://coo.ee/go?q=${it.line.replace(" ", "+")}" })
 
-    val response =
-      SearchSuggestionsResults(
-        it.q ?: "",
-        results.completions.map { it.line },
-        results.completions.map { it.description },
-        results.completions.map { "https://coo.ee/go?q=${it.line.replace(" ", "+")}" })
-
-    call.respond(response)
-  }
+  call.respond(response)
 }
 
 data class ProviderList(val providers: List<ProviderStatus>)

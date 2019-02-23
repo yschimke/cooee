@@ -23,14 +23,16 @@ import io.ktor.routing.Routing
 fun Routing.root(appServices: AppServices) {
   get<GoInfo> { bounceApi(it, appServices.providers(call)) }
   get<UserInfo> { userApi(appServices.userAuthenticator.userForRequest(call)) }
-  get<CompletionRequest> { completionApi(it, appServices.providers(call)) }
+  get<CompletionRequest> {
+    val user = appServices.userAuthenticator.userForRequest(call)
+    completionApi(user, appServices, it, appServices.providers(call))
+  }
   post<Authorize> {
     val user = appServices.userAuthenticator.userForRequest(call) ?: throw AuthenticationException()
     authorize(it, user, appServices)
   }
   get<SearchSuggestion> {
-    val user = appServices.userAuthenticator.userForRequest(call)
-    searchSuggestion(appServices, user, it, appServices.providers(call))
+    searchSuggestion(it, appServices.providers(call))
   }
   get<ProvidersRequest> {
     val user = appServices.userAuthenticator.userForRequest(call) ?: throw AuthenticationException()
