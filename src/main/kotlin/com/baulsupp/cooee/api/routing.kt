@@ -70,8 +70,12 @@ fun Routing.root(appServices: AppServices) {
     serviceDeleteRequest(it, appServices, user)
   }
   get<FeaturesRequest> {
-    val user = appServices.userAuthenticator.userForRequest(call) ?: throw AuthenticationException()
+    val user = appServices.userAuthenticator.userForRequest(call)
     featuresRequest(appServices, user)
+  }
+  get<FeatureRequest> {
+    val user = appServices.userAuthenticator.userForRequest(call)
+    featureRequest(appServices, user, it)
   }
 
   install(StatusPages) {

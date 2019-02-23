@@ -238,9 +238,20 @@ data class FeatureStatus(
 @KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.featuresRequest(
   appServices: AppServices,
-  user: UserEntry
+  user: UserEntry?
 ) {
   val featureMap = appServices.featureChecks(user).all()
 
   call.respond(FeaturesList(featureMap.map { FeatureStatus(it.key, it.value) }))
+}
+
+@KtorExperimentalLocationsAPI
+suspend fun PipelineContext<Unit, ApplicationCall>.featureRequest(
+  appServices: AppServices,
+  user: UserEntry?,
+  request: FeatureRequest
+) {
+  val featureCheck = appServices.featureChecks(user).enabled(request.feature, false)
+
+  call.respond(FeatureStatus(request.feature, featureCheck))
 }

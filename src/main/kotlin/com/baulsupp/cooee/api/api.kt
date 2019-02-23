@@ -125,6 +125,10 @@ data class Completions(val completions: List<CompletionItem>) {
 @Location("/api/v0/features")
 object FeaturesRequest
 
+@KtorExperimentalLocationsAPI
+@Location("/api/v0/feature/{feature}")
+data class FeatureRequest(val feature: String)
+
 
 sealed class GoResult {
   override fun toString(): String {
