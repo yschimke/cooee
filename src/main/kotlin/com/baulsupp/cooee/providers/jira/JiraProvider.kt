@@ -15,11 +15,8 @@ import com.baulsupp.okurl.kotlin.query
 import com.baulsupp.okurl.kotlin.queryList
 import com.baulsupp.okurl.kotlin.request
 import com.baulsupp.okurl.services.atlassian.model.AccessibleResource
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import okhttp3.RequestBody
-import java.util.concurrent.ConcurrentHashMap
 
 data class ProjectReference(val project: Project, val server: AccessibleResource) {
   val projectKey = project.key
@@ -44,8 +41,6 @@ class JiraProvider : BaseProvider() {
 
   lateinit var instances: List<AccessibleResource>
   lateinit var projects: List<ProjectReference>
-  // TODO cache lazily per project
-  var issues: MutableMap<String, List<Issue>> = ConcurrentHashMap()
 
   val issueFields = listOf("summary", "url")
 
@@ -53,7 +48,7 @@ class JiraProvider : BaseProvider() {
     super.init(appServices, user)
     instances = instances()
     projects = listProjects()
-    loadKnownIssues()
+    loadKnownIssues(user)
   }
 
   override suspend fun go(command: String, vararg args: String): GoResult {
@@ -128,9 +123,11 @@ class JiraProvider : BaseProvider() {
     KnownProjects(instances.flatMap { instance -> projects(instance.id).values.map { ProjectReference(it, instance) } })
   }.list
 
-  private suspend fun loadKnownIssues() {
-    coroutineScope {
-      projects.map { async { queryProjectIssues(it) } }.awaitAll()
+  private suspend fun loadKnownIssues(user: UserEntry?) {
+    if (appServices.featureChecks(user).enabled("backgroundfetch")) {
+      GlobalScope.launch {
+        projects.map { launch { queryProjectIssues(it) } }
+      }
     }
   }
 
