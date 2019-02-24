@@ -9,7 +9,7 @@ class MoshiTypedCache(val cache: ServiceCache) {
     key: String,
     readThrough: () -> T
   ): T {
-    val valueString = cache.get(email, providerName, key)
+    val valueString = cache.get(email ?: All, providerName ?: All, key)
     return when {
       valueString != null -> moshi.adapter(T::class.java).fromJson(valueString)!!
       else -> {
@@ -17,7 +17,7 @@ class MoshiTypedCache(val cache: ServiceCache) {
 
         // TODO consider a sentinel value for negative caching
         if (value != null) {
-          set(email, providerName, key, value)
+          set(email ?: All, providerName ?: All, key, value)
         }
 
         value
@@ -27,6 +27,10 @@ class MoshiTypedCache(val cache: ServiceCache) {
 
   suspend inline fun <reified T> set(email: String?, providerName: String?, key: String, value: T) {
     val valueString = moshi.adapter(T::class.java).toJson(value)
-    cache.set(email, providerName, key, valueString)
+    cache.set(email ?: All, providerName ?: All, key, valueString)
+  }
+
+  companion object {
+      val All = "All"
   }
 }

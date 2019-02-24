@@ -109,14 +109,16 @@ class JiraProvider : BaseProvider() {
   suspend fun projectIssues(
     project: ProjectReference
   ): Issues {
-    return appServices.client.query(
-      request(
-        "https://api.atlassian.com/ex/jira/${project.serverId}/rest/api/3/search",
-        userToken
-      ) {
-        postJsonBody(IssueQuery("project = ${project.projectKey} order by created DESC", fields = issueFields))
-      }
-    )
+    return appServices.cache.get(user?.email, name, "${project.projectKey}.issues") {
+      appServices.client.query(
+        request(
+          "https://api.atlassian.com/ex/jira/${project.serverId}/rest/api/3/search",
+          userToken
+        ) {
+          postJsonBody(IssueQuery("project = ${project.projectKey} order by created DESC", fields = issueFields))
+        }
+      )
+    }
   }
 
   private suspend fun listProjects(): List<ProjectReference> = appServices.cache.get(user?.email, name, "projects") {
