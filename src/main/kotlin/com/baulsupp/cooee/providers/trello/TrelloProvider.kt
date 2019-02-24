@@ -61,6 +61,6 @@ class TrelloProvider : BaseProvider() {
   }
 
   override suspend fun suggest(command: String): List<Suggestion> {
-    return TrelloSuggester(this).suggest(command)
+    return TrelloSuggester(this, check("caseinsensitive")).suggest(command)
   }
 }

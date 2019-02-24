@@ -9,12 +9,12 @@ data class Suggestion(
   val url: String? = null,
   val message: String? = null
 ) {
-  fun startsWith(command: String): Boolean {
-    return line.startsWith(command)
+  fun startsWith(command: String, ignoreCase: Boolean): Boolean {
+    return line.startsWith(command, ignoreCase = ignoreCase)
   }
 
-  fun contains(command: String): Boolean {
-    return line.contains(command)
+  fun contains(command: String, ignoreCase: Boolean): Boolean {
+    return line.contains(command, ignoreCase = ignoreCase)
   }
 }
 

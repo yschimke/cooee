@@ -14,14 +14,20 @@ import org.slf4j.LoggerFactory
 
 // TODO add exception handling for individual items and log errors
 // log multiple conflicts etc
-class CombinedProvider(val providers: List<BaseProvider>) : ProviderFunctions {
+class CombinedProvider(val providers: List<BaseProvider>) : BaseProvider() {
+  override val name = "combined"
+
   override suspend fun suggest(command: String): List<Suggestion> {
-    return CombinedSuggester(providers).suggest(command)
+    return CombinedSuggester(providers, check("caseinsensitive")).suggest(command)
   }
 
-  suspend fun init(appServices: AppServices, user: UserEntry?) = coroutineScope {
-    forEachProvider {
-      it.init(appServices, user)
+  override suspend fun init(appServices: AppServices, user: UserEntry?) {
+    coroutineScope {
+      super.init(appServices, user)
+
+      forEachProvider {
+        it.init(appServices, user)
+      }
     }
   }
 

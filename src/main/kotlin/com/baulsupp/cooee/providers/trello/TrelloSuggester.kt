@@ -12,11 +12,11 @@ val TrelloHomepage = Suggestion(
   type = SuggestionType.LINK
 )
 
-class TrelloSuggester(val provider: TrelloProvider) : Suggester {
+class TrelloSuggester(val provider: TrelloProvider, val ignoreCase: Boolean) : Suggester {
   override suspend fun suggest(command: String): List<Suggestion> {
     val boards = provider.boards.map { boardCompletion(it) }
 
-    return (boards + TrelloHomepage).filter { it.startsWith(command) }
+    return (boards + TrelloHomepage).filter { it.startsWith(command, ignoreCase) }
   }
 
   private fun boardCompletion(it: BoardResponse) =

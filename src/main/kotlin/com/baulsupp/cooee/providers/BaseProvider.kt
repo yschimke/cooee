@@ -27,7 +27,7 @@ abstract class BaseProvider : Provider, Suggester {
   val client
     get() = appServices.client
 
-  override suspend fun init(appServices: AppServices, user: UserEntry?) {
+  override suspend fun init(appServices: AppServices, user: UserEntry?): Unit {
     this.appServices = appServices
     this.user = user
   }
@@ -56,4 +56,6 @@ abstract class BaseProvider : Provider, Suggester {
   }
 
   open fun associatedServices() = setOf<String>()
+
+  fun check(key: String): Boolean = appServices.featureChecks(user).enabled(key, true)
 }

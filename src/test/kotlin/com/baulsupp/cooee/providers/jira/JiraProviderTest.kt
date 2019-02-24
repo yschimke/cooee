@@ -19,6 +19,7 @@ class JiraProviderTest {
   private val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
   val p = JiraProvider().apply {
     runBlocking {
+      JiraProviderTest.appServices.checks.checks["caseinsensitive"] = true
       init(JiraProviderTest.appServices, userEntry)
     }
   }
@@ -53,6 +54,14 @@ class JiraProviderTest {
   }
 
   @Test
+  fun completeCommandProjectsCaseInsensitive() = runBlocking {
+    assertThat(
+      p.suggest("cOoE").map { it.line },
+      equalTo(listOf("COOEE-3", "COOEE-2", "COOEE-1", "COOEE"))
+    )
+  }
+
+  @Test
   fun completeCommandIssues() = runBlocking {
     val suggestCommands = p.suggest("COOEE-")
     assertThat(
@@ -64,6 +73,15 @@ class JiraProviderTest {
   @Test
   fun completeArgumentsOnIssues() = runBlocking {
     val suggestArguments = p.suggest("COOEE-1 ").map(Suggestion::line)
+    assertThat(
+      suggestArguments,
+      hasItem(equalTo("COOEE-1 comment"))
+    )
+  }
+
+  @Test
+  fun completeArgumentsOnIssuesCaseInsensitive() = runBlocking {
+    val suggestArguments = p.suggest("cooee-1 ").map(Suggestion::line)
     assertThat(
       suggestArguments,
       hasItem(equalTo("COOEE-1 comment"))

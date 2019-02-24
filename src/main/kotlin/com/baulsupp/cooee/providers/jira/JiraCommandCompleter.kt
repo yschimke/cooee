@@ -3,10 +3,15 @@ package com.baulsupp.cooee.providers.jira
 import com.baulsupp.cooee.suggester.Suggester
 import com.baulsupp.cooee.suggester.Suggestion
 import com.baulsupp.cooee.suggester.SuggestionType
+import org.jetbrains.kotlin.util.capitalizeDecapitalize.toUpperCaseAsciiOnly
 
 class JiraCommandCompleter(val provider: JiraProvider) : Suggester {
+  val caseInsensitive = provider.check("caseinsensitive")
+
   override suspend fun suggest(command: String): List<Suggestion> {
-    val parts = command.split("\\s+".toPattern())
+    val commandFixed = command.fixCase()
+
+    val parts = commandFixed.split("\\s+".toPattern())
 
     if (parts.size > 2) {
       return listOf()
@@ -14,13 +19,13 @@ class JiraCommandCompleter(val provider: JiraProvider) : Suggester {
       if (parts[0].isIssueOrPartialIssue()) {
         return listOf(
           Suggestion(
-            command.completeLastWord("vote"),
+            commandFixed.completeLastWord("vote"),
             provider = provider.name,
             description = "Vote for ${parts[0]}",
             type = SuggestionType.COMMAND
           ),
           Suggestion(
-            command.completeLastWord("comment"),
+            commandFixed.completeLastWord("comment"),
             provider = provider.name,
             description = "Comment on ${parts[0]}",
             type = SuggestionType.COMMAND
@@ -30,17 +35,17 @@ class JiraCommandCompleter(val provider: JiraProvider) : Suggester {
     }
 
     return when {
-      command == "" -> listOf()
-      command.isProjectOrPartialProject() -> {
-        provider.projects.filter { it.projectKey.startsWith(command) }.flatMap {
+      commandFixed == "" -> listOf()
+      commandFixed.isProjectOrPartialProject() -> {
+        provider.projects.filter { it.projectKey.startsWith(commandFixed) }.flatMap {
           mostLikelyProjectIssues(it) + listOfNotNull(projectCompletion(it))
         }
       }
-      command.isProjectIssueStart() -> {
-        val projectCode = command.projectCode()!!
+      commandFixed.isProjectIssueStart() -> {
+        val projectCode = commandFixed.projectCode()!!
         provider.issues(projectCode)?.issues?.map { issueToCompletion(it) }.orEmpty()
       }
-      command.isIssueOrPartialIssue() -> mostLikelyIssueCompletions(command)
+      commandFixed.isIssueOrPartialIssue() -> mostLikelyIssueCompletions(commandFixed)
       else -> listOf()
     }
   }
@@ -73,9 +78,26 @@ class JiraCommandCompleter(val provider: JiraProvider) : Suggester {
 
     return listOf(issueCompletion)
   }
+
+  private fun String.fixCase(): String {
+    if (!caseInsensitive) {
+      return this
+    }
+
+    val parts = split("\\s+".toPattern(), limit = 2)
+
+    val inputCommandFixed = parts.first().toUpperCaseAsciiOnly()
+
+    if (inputCommandFixed == parts.first()) {
+      return this
+    }
+
+    return inputCommandFixed + if (parts.size == 2) " " + parts.last() else ""
+  }
+
+  private fun String.completeLastWord(s: String): String {
+    val parts = split("\\s+".toPattern())
+    return substring(0, length - parts.last().length) + s
+  }
 }
 
-private fun String.completeLastWord(s: String): String {
-  val parts = split(" +".toPattern())
-  return substring(0, length - parts.last().length) + s
-}
