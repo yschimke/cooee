@@ -59,10 +59,10 @@ class ApplicationTest {
   @Test
   fun testCors() {
     withTestApplication({ test() }) {
-      handleRequest(HttpMethod.Get, "/api/v0/goinfo?q=g abc") {
+      handleRequest(Get, "/api/v0/goinfo?q=g abc") {
         addHeader("Origin", "https://google.com")
       }.apply {
-        assertEquals(HttpStatusCode.OK, response.status())
+        assertEquals(OK, response.status())
         assertEquals("{\"location\":\"https://www.google.com/search?q=abc\"}", response.content)
         assertEquals("*", response.headers["Access-Control-Allow-Origin"])
       }
@@ -96,8 +96,8 @@ class ApplicationTest {
     services.checks.checks["newsuggestions"] = false
 
     withTestApplication({ test() }) {
-      handleRequest(HttpMethod.Get, "/api/v0/completion?q=$prefix").apply {
-        assertEquals(HttpStatusCode.OK, response.status())
+      handleRequest(Get, "/api/v0/completion?q=$prefix").apply {
+        assertEquals(OK, response.status())
         val completions: Completions = moshi.adapter(Completions::class.java).fromJson(response.content!!)!!
 
         check(completions)
@@ -113,7 +113,7 @@ class ApplicationTest {
     }
 
     testRequest("/api/v0/completion?q=test ", user = "yuri") {
-      assertEquals(HttpStatusCode.OK, response.status())
+      assertEquals(OK, response.status())
       assertEquals(
         "{\"completions\":[{\"word\":\"test\",\"line\":\"test\",\"description\":\"Command for 'test'\",\"provider\":\"test\",\"suggestion\":{\"line\":\"test\",\"provider\":\"test\",\"description\":\"Command for 'test'\",\"type\":\"UNKNOWN\"}}]}",
         response.content
@@ -129,7 +129,7 @@ class ApplicationTest {
     }
 
     testRequest("/api/v0/completion?q=test ", user = "yuri") {
-      assertEquals(HttpStatusCode.OK, response.status())
+      assertEquals(OK, response.status())
       assertEquals(
         "{\"suggestions\":[{\"line\":\"test\",\"provider\":\"test\",\"description\":\"Command for 'test'\",\"type\":\"UNKNOWN\"}]}",
         response.content
@@ -316,7 +316,7 @@ class ApplicationTest {
         val token = JwtUserAuthenticator.tokenFor("yuri")
         addHeader("Authorization", "Bearer $token")
       }.apply {
-        assertEquals(HttpStatusCode.OK, response.status())
+        assertEquals(OK, response.status())
       }
     }
 
@@ -394,6 +394,21 @@ class ApplicationTest {
     testRequest("/api/v0/service/strava", user = "yuri") {
       assertEquals(
         "{\"name\":\"strava\",\"installed\":false}",
+        response.content
+      )
+    }
+  }
+
+  @Test
+  fun testTodos() {
+    runBlocking {
+      services.providerConfigStore.store("yuri@coo.ee", "test", mapOf())
+    }
+
+    testRequest("/api/v0/todo", user = "yuri") {
+      assertEquals(OK, response.status())
+      assertEquals(
+        "{\"completions\":[{\"line\":\"test aaa\",\"provider\":\"test\",\"description\":\"AAA Test\",\"type\":\"COMMAND\"}]}",
         response.content
       )
     }

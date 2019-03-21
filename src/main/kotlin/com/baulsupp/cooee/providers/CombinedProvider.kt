@@ -62,6 +62,12 @@ class CombinedProvider(val providers: List<BaseProvider>) : BaseProvider() {
     }.awaitAll()
   }
 
+  override suspend fun todo(): List<Suggestion> = coroutineScope {
+    forEachProvider {
+      it.todo()
+    }
+  }.flatMap { it.orEmpty() }
+
   companion object {
     val log: Logger = LoggerFactory.getLogger(this::class.java.declaringClass)
   }

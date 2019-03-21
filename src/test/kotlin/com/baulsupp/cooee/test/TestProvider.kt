@@ -7,6 +7,8 @@ import com.baulsupp.cooee.completion.CommandCompleter
 import com.baulsupp.cooee.completion.SimpleArgumentCompleter
 import com.baulsupp.cooee.completion.SimpleCommandCompleter
 import com.baulsupp.cooee.providers.BaseProvider
+import com.baulsupp.cooee.suggester.Suggestion
+import com.baulsupp.cooee.suggester.SuggestionType
 
 class TestProvider : BaseProvider() {
   override val name = "test"
@@ -21,5 +23,9 @@ class TestProvider : BaseProvider() {
 
   override fun argumentCompleter(): ArgumentCompleter {
     return SimpleArgumentCompleter(listOf("aaa", "bbb"))
+  }
+
+  override suspend fun todo(): List<Suggestion> {
+    return listOf(Suggestion("test aaa", name, "AAA Test", SuggestionType.COMMAND))
   }
 }

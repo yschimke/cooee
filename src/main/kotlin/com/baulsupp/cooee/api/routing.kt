@@ -77,6 +77,10 @@ fun Routing.root(appServices: AppServices) {
     val user = appServices.userAuthenticator.userForRequest(call)
     featureRequest(appServices, user, it)
   }
+  get<TodoRequest> {
+    val user = appServices.userAuthenticator.userForRequest(call)
+    todoApi(user, appServices, it, appServices.providers(call))
+  }
 
   install(StatusPages) {
     exception<JwtException> { cause ->

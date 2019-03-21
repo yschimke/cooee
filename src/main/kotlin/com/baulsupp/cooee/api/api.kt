@@ -43,6 +43,10 @@ data class SearchSuggestionsResults(
 class ProvidersRequest
 
 @KtorExperimentalLocationsAPI
+@Location("/api/v0/todo")
+class TodoRequest
+
+@KtorExperimentalLocationsAPI
 @Location("/api/v0/provider/{name}")
 data class ProviderRequest(val name: String)
 
@@ -120,6 +124,8 @@ data class Completions(val completions: List<CompletionItem>) {
     }
   }
 }
+
+data class Todos(val completions: List<Suggestion>)
 
 @KtorExperimentalLocationsAPI
 @Location("/api/v0/features")

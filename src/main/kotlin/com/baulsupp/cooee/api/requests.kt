@@ -66,6 +66,25 @@ private suspend fun commandCompletion(
 }
 
 @KtorExperimentalLocationsAPI
+suspend fun PipelineContext<Unit, ApplicationCall>.todoApi(
+  user: UserEntry?,
+  appServices: AppServices,
+  todoQuery: TodoRequest,
+  providers: CombinedProvider
+) {
+  val commands = providers.todo()
+  call.respond(Todos(commands))
+}
+
+@KtorExperimentalLocationsAPI
+private suspend fun todo(
+  providers: CombinedProvider
+): Todos {
+  val commands = providers.todo()
+  return Todos(commands)
+}
+
+@KtorExperimentalLocationsAPI
 suspend fun PipelineContext<Unit, ApplicationCall>.authorize(
   authorize: Authorize,
   user: UserEntry,
