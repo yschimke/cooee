@@ -58,4 +58,6 @@ abstract class BaseProvider : Provider, Suggester {
   open fun associatedServices() = setOf<String>()
 
   fun check(key: String): Boolean = appServices.featureChecks(user).enabled(key, true)
+
+  override suspend fun todo(): List<Suggestion> = listOf()
 }

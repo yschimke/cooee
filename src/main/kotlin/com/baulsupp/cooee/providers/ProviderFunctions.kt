@@ -9,4 +9,5 @@ interface ProviderFunctions {
   suspend fun matches(command: String): Boolean
 
   suspend fun suggest(command: String): List<Suggestion>
+  suspend fun todo(): List<Suggestion>
 }
