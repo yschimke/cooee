@@ -4,9 +4,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
   kotlin("jvm") version Versions.kotlin
   war
-  id("com.github.ben-manes.versions") version "0.20.0"
+  id("com.github.ben-manes.versions") version "0.21.0"
   id("com.google.cloud.tools.appengine") version "2.0.0-rc5"
-  id("org.jlleitschuh.gradle.ktlint") version "7.1.0"
+  id("org.jlleitschuh.gradle.ktlint") version "7.2.1"
 }
 
 group = "cooee"
@@ -62,7 +62,7 @@ dependencies {
   implementation("com.baulsupp:okurl:${Versions.okurl}")
   implementation("com.google.cloud:google-cloud-logging-logback:0.79.0-alpha")
   implementation("com.google.appengine:appengine-api-1.0-sdk:1.9.71")
-  implementation("io.lettuce:lettuce-core:5.1.3.RELEASE")
+  implementation("io.lettuce:lettuce-core:5.1.5.RELEASE")
   implementation("com.ryanharter.ktor:ktor-moshi:1.0.1")
   implementation("com.squareup.moshi:moshi-adapters:1.8.0")
   implementation("com.squareup.okhttp3:logging-interceptor:${Versions.okhttp}")
@@ -114,7 +114,7 @@ dependencies {
   implementation("org.mongodb:mongodb-driver-reactivestreams:1.11.0")
   implementation("org.mongodb:mongodb-driver-sync:3.10.1")
   implementation("org.webjars:jquery:3.2.1")
-  implementation("org.litote.kmongo:kmongo-coroutine:3.9.2")
+  implementation("org.litote.kmongo:kmongo-coroutine:3.10.0")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-debug:${Versions.kotlinCoroutines}")
   implementation("org.ff4j:ff4j-core:${Versions.ff4j}")
   implementation("org.ff4j:ff4j-store-mongodb-v3:${Versions.ff4j}")
