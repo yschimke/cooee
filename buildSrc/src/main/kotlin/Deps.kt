@@ -5,7 +5,7 @@ object Versions {
   val ktor = "1.1.3"
   val logback = "1.2.3"
   val netty = "4.1.34.Final"
-  val okhttp = "3.13.1"
+  val okhttp = "3.14.0"
   val okio = "2.2.2"
   val okurl = "1.88.0"
   val reactor = "3.2.6.RELEASE"
