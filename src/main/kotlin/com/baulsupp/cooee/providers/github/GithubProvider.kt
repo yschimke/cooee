@@ -9,8 +9,10 @@ import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.suggester.Suggestion
 import com.baulsupp.cooee.suggester.SuggestionType
 import com.baulsupp.cooee.users.UserEntry
+import com.baulsupp.okurl.kotlin.postJsonBody
 import com.baulsupp.okurl.kotlin.query
 import com.baulsupp.okurl.kotlin.queryList
+import com.baulsupp.okurl.kotlin.request
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 
@@ -18,6 +20,38 @@ data class Repos(val list: List<Repository>)
 
 class GithubProvider : BaseProvider() {
   override val name = "github"
+
+  val openPullRequests = """
+    query {
+      viewer {
+        login
+        pullRequests(first: 20, states:OPEN, orderBy: {field: UPDATED_AT, direction: DESC}) {
+          nodes {
+            number
+            permalink
+            state
+            title
+            createdAt
+            updatedAt
+            repository {
+              nameWithOwner
+            }
+            author {
+              login
+              ... on User {
+                name
+              }
+            }
+            reviews(first: 20, states: [APPROVED, CHANGES_REQUESTED]) {
+              nodes {
+                state
+              }
+            }
+          }
+        }
+      }
+    }
+  """.trimIndent()
 
   lateinit var projects: List<Repository>
   lateinit var githubUser: User
@@ -97,5 +131,21 @@ class GithubProvider : BaseProvider() {
 
   override suspend fun matches(command: String): Boolean {
     return projects.any { it.full_name == command } || command == "github"
+  }
+
+  private suspend fun recentActivePullRequests(): List<PullRequest> =
+    appServices.cache.get(user?.email, name, "pullRequests") {
+      query<PullRequestResponse>(request {
+        url("https://api.github.com/graphql")
+//        header("Accept", "application/vnd.github.antiope-preview")
+        postJsonBody(Query(openPullRequests))
+      }).data.viewer.pullRequests.nodes
+    }
+
+  override suspend fun todo(): List<Suggestion> {
+    return recentActivePullRequests().map {
+      Suggestion("${it.repository.nameWithOwner}#${it.number}", name, it.title, SuggestionType.LINK,
+        url = it.permalink)
+    }
   }
 }

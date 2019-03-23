@@ -158,3 +158,35 @@ data class Plan(
   val private_repos: Int?,
   val space: Int?
 )
+
+data class PullRequestResponse(val data: PullRequestData)
+
+data class PullRequests(val nodes: List<PullRequest>)
+
+data class PRRepository(val nameWithOwner: String)
+
+data class PullRequest(
+  val createdAt: String,
+  val reviews: Any,
+  val author: Author,
+  val state: String,
+  val permalink: String,
+  val title: String,
+  val updatedAt: String,
+  val number: Int,
+  val repository: PRRepository
+)
+
+data class Author(
+  val name: String,
+  val login: String
+)
+
+data class Viewer(
+  val pullRequests: PullRequests,
+  val login: String
+)
+
+data class PullRequestData(val viewer: Viewer)
+
+data class Query(val query: String)

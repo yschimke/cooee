@@ -6,6 +6,7 @@ import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.services.github.GithubAuthInterceptor
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers.*
+import org.hamcrest.TypeSafeMatcher
 import org.junit.Assert.assertThat
 import org.junit.Test
 import kotlin.test.assertEquals
@@ -35,6 +36,14 @@ class GithubProviderTest {
     assertThat(
       p.commandCompleter().suggestCommands("yschimke/cooe").map { it.line },
       hasItem(equalTo("yschimke/cooee"))
+    )
+  }
+
+  @Test
+  fun pullRequests() = runBlocking {
+    assertThat(
+      p.todo().map { it.line },
+      hasItem(containsString("yschimke/"))
     )
   }
 
