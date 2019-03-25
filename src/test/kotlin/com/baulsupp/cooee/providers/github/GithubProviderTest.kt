@@ -40,6 +40,14 @@ class GithubProviderTest {
   }
 
   @Test
+  fun completeUserRepos2() = runBlocking {
+    assertThat(
+      p.commandCompleter().suggestCommands("square/").map { it.line },
+      hasItem(equalTo("square/okhttp"))
+    )
+  }
+
+  @Test
   fun pullRequests() = runBlocking {
     assertThat(
       p.todo().map { it.line },

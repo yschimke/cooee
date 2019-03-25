@@ -2,6 +2,7 @@ package com.baulsupp.cooee.providers
 
 import com.baulsupp.cooee.AppServices
 import com.baulsupp.cooee.providers.bookmarks.BookmarksProvider
+import com.baulsupp.cooee.providers.circleci.CircleCiProvider
 import com.baulsupp.cooee.providers.cooee.CooeeProvider
 import com.baulsupp.cooee.providers.github.GithubProvider
 import com.baulsupp.cooee.providers.google.GmailProvider
@@ -57,7 +58,8 @@ class ProviderRegistry(val appServices: AppServices, val registered: Map<String,
       "jira" to JiraProvider::class,
       "opsgenie" to OpsGenieProvider::class,
       "gcp" to GcpProvider::class,
-      "mongodb" to MongoDbProvider::class
+      "mongodb" to MongoDbProvider::class,
+      "circleci" to CircleCiProvider::class
     )
   }
 }

@@ -11,7 +11,6 @@ import com.baulsupp.cooee.suggester.SuggestionType
 import com.baulsupp.cooee.users.UserEntry
 import com.baulsupp.okurl.kotlin.postJsonBody
 import com.baulsupp.okurl.kotlin.query
-import com.baulsupp.okurl.kotlin.queryList
 import com.baulsupp.okurl.kotlin.request
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -60,7 +59,9 @@ class GithubProvider : BaseProvider() {
     super.init(appServices, user)
 
     coroutineScope {
-      val reposAsync = async { listUserRepositories() }
+      val reposAsync = async {
+        (listUserRepositories() + listStarredRepositories()).distinctBy { it.url }
+      }
 
       // TODO reorder when concurrency bug in JVM is fixed
       projects = reposAsync.await()
@@ -74,11 +75,30 @@ class GithubProvider : BaseProvider() {
   private suspend fun listUserRepositories(): List<Repository> =
     appServices.cache.get(user?.email, name, "userRepositories") {
       Repos(
-        appServices.client.queryList<Repository>(
-          "https://api.github.com/user/repos?affiliation=owner,collaborator",
-          userToken
-        ).filter { it.archived == false })
+        queryUserRepos()
+      )
     }.list
+
+  private suspend fun listStarredRepositories(): List<Repository> =
+    appServices.cache.get(user?.email, name, "starredRepositories") {
+      Repos(
+        queryStarredRepos()
+      )
+    }.list
+
+  private suspend fun queryStarredRepos(): List<Repository> {
+    return appServices.client.queryGithubPages<Repository>(
+      "https://api.github.com/user/starred?per_page=25",
+      tokenSet = userToken
+    ).filter { it.archived == false }
+  }
+
+  private suspend fun queryUserRepos(): List<Repository> {
+    return appServices.client.queryGithubPages<Repository>(
+      "https://api.github.com/user/repos?per_page=25",
+      tokenSet = userToken
+    ).filter { it.archived == false }
+  }
 
   private suspend fun fetchUser(): User = appServices.cache.get(user?.email, name, "user") {
     appServices.client.query("https://api.github.com/user", userToken)
@@ -144,8 +164,10 @@ class GithubProvider : BaseProvider() {
 
   override suspend fun todo(): List<Suggestion> {
     return recentActivePullRequests().map {
-      Suggestion("${it.repository.nameWithOwner}#${it.number}", name, it.title, SuggestionType.LINK,
-        url = it.permalink)
+      Suggestion(
+        "${it.repository.nameWithOwner}#${it.number}", name, it.title, SuggestionType.LINK,
+        url = it.permalink
+      )
     }
   }
 }
