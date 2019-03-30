@@ -14,6 +14,8 @@ import com.baulsupp.okurl.kotlin.query
 import com.baulsupp.okurl.kotlin.request
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 data class Repos(val list: List<Repository>)
 
@@ -157,13 +159,16 @@ class GithubProvider : BaseProvider() {
     appServices.cache.get(user?.email, name, "pullRequests") {
       query<PullRequestResponse>(request {
         url("https://api.github.com/graphql")
-//        header("Accept", "application/vnd.github.antiope-preview")
         postJsonBody(Query(openPullRequests))
       }).data.viewer.pullRequests.nodes
     }
 
   override suspend fun todo(): List<Suggestion> {
-    return recentActivePullRequests().map {
+    val cutoff = Instant.now().minus(3, ChronoUnit.DAYS)
+
+    return recentActivePullRequests().filter {
+      it.updatedAt.isAfter(cutoff)
+    }.map {
       Suggestion(
         "${it.repository.nameWithOwner}#${it.number}", name, it.title, SuggestionType.LINK,
         url = it.permalink

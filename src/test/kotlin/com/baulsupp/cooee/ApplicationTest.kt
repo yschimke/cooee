@@ -271,6 +271,7 @@ class ApplicationTest {
           "{\"name\":\"opsgenie\",\"installed\":false,\"services\":[\"opsgenie\"]}," +
           "{\"name\":\"gcp\",\"installed\":false,\"services\":[]}," +
           "{\"name\":\"mongodb\",\"installed\":false,\"services\":[]}," +
+          "{\"name\":\"circleci\",\"installed\":false,\"services\":[\"circleci\"]}," +
           "{\"name\":\"test\",\"installed\":false,\"services\":[]}" +
           "]}",
         response.content
@@ -344,6 +345,7 @@ class ApplicationTest {
       assertEquals(
         "{\"services\":[" +
           "{\"name\":\"atlassian\",\"installed\":false}," +
+          "{\"name\":\"circleci\",\"installed\":false}," +
           "{\"name\":\"github\",\"installed\":false}," +
           "{\"name\":\"google\",\"installed\":false}," +
           "{\"name\":\"opsgenie\",\"installed\":false}," +

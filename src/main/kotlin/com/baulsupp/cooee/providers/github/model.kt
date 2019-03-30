@@ -1,5 +1,7 @@
 package com.baulsupp.cooee.providers.github
 
+import java.time.Instant
+
 data class Owner(
   val avatar_url: String,
   val events_url: String?,
@@ -166,13 +168,13 @@ data class PullRequests(val nodes: List<PullRequest>)
 data class PRRepository(val nameWithOwner: String)
 
 data class PullRequest(
-  val createdAt: String,
+  val createdAt: Instant,
   val reviews: Any,
   val author: Author,
   val state: String,
   val permalink: String,
   val title: String,
-  val updatedAt: String,
+  val updatedAt: Instant,
   val number: Int,
   val repository: PRRepository
 )

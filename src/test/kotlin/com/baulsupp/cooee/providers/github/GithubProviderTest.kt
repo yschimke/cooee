@@ -51,7 +51,7 @@ class GithubProviderTest {
   fun pullRequests() = runBlocking {
     assertThat(
       p.todo().map { it.line },
-      hasItem(containsString("yschimke/"))
+      hasItem(containsString("square/"))
     )
   }
 
