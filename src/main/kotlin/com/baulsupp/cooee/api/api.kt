@@ -125,7 +125,7 @@ data class Completions(val completions: List<CompletionItem>) {
   }
 }
 
-data class Todos(val completions: List<Suggestion>)
+data class Todos(val todos: List<Suggestion>)
 
 @KtorExperimentalLocationsAPI
 @Location("/api/v0/features")

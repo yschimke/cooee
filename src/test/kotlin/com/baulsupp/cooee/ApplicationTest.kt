@@ -410,7 +410,7 @@ class ApplicationTest {
     testRequest("/api/v0/todo", user = "yuri") {
       assertEquals(OK, response.status())
       assertEquals(
-        "{\"completions\":[{\"line\":\"test aaa\",\"provider\":\"test\",\"description\":\"AAA Test\",\"type\":\"COMMAND\"}]}",
+        "{\"todos\":[{\"line\":\"test aaa\",\"provider\":\"test\",\"description\":\"AAA Test\",\"type\":\"COMMAND\"}]}",
         response.content
       )
     }
