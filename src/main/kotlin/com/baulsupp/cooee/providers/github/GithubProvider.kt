@@ -156,12 +156,12 @@ class GithubProvider : BaseProvider() {
   }
 
   private suspend fun recentActivePullRequests(): List<PullRequest> =
-    appServices.cache.get(user?.email, name, "pullRequests") {
+    appServices.cache.get(user?.email, name, "pullRequestResponse") {
       query<PullRequestResponse>(request {
         url("https://api.github.com/graphql")
         postJsonBody(Query(openPullRequests))
-      }).data.viewer.pullRequests.nodes
-    }
+      })
+    }.data.viewer.pullRequests.nodes
 
   override suspend fun todo(): List<Suggestion> {
     val cutoff = Instant.now().minus(3, ChronoUnit.DAYS)
