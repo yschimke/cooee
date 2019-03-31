@@ -1,5 +1,6 @@
 package com.baulsupp.cooee.providers.github
 
+import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.test.TestAppServices
 import com.baulsupp.cooee.test.setLocalCredentials
 import com.baulsupp.cooee.users.UserEntry
@@ -53,6 +54,24 @@ class GithubProviderTest {
       p.todo().map { it.line },
       hasItem(containsString("square/"))
     )
+  }
+
+  @Test
+  fun gotoRepo() {
+    runBlocking {
+      val result = p.go("yschimke/cooee") as? RedirectResult
+
+      assertThat(result?.location, equalTo("https://github.com/yschimke/cooee"))
+    }
+  }
+
+  @Test
+  fun gotoIssue() {
+    runBlocking {
+      val result = p.go("yschimke/cooee#10") as? RedirectResult
+
+      assertThat(result?.location, equalTo("https://github.com/yschimke/cooee/issues/10"))
+    }
   }
 
   companion object {
