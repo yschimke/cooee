@@ -7,7 +7,8 @@ data class Suggestion(
   val type: SuggestionType,
   val list: List<Suggestion>? = null,
   val url: String? = null,
-  val message: String? = null
+  val message: String? = null,
+  val color: String? = null
 ) {
   fun startsWith(command: String, ignoreCase: Boolean): Boolean {
     return line.startsWith(command, ignoreCase = ignoreCase)
