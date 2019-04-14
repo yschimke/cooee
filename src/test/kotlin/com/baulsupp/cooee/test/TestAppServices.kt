@@ -12,6 +12,7 @@ import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
 import com.baulsupp.okurl.authenticator.RenewingInterceptor
 import com.baulsupp.okurl.credentials.InMemoryCredentialsStore
 import io.ktor.config.MapApplicationConfig
+import io.ktor.util.KtorExperimentalAPI
 import okhttp3.OkHttpClient
 import okhttp3.logging.LoggingEventListener
 import org.ff4j.FF4j
@@ -45,9 +46,10 @@ class TestAppServices : AppServices {
 
   override val authenticationFlowCache = TestAuthenticationFlowCache()
 
+  @UseExperimental(KtorExperimentalAPI::class)
   override val config = MapApplicationConfig()
 
-  override fun featureChecks(user: UserEntry?) = checks
+  override fun featureChecks(userEntry: UserEntry?) = checks
 
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
     val services = AuthenticatingInterceptor.defaultServices()
