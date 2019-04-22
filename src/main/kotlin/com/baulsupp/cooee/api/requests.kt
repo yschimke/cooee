@@ -23,7 +23,7 @@ suspend fun PipelineContext<Unit, ApplicationCall>.bounceApi(
     goInfo.command?.let { providers.go(it, *goInfo.args.toTypedArray()) } ?: Unmatched
 
   if (r == Unmatched) {
-    call.respond(Completed(message = "no match"))
+    call.respond(HttpStatusCode.NotFound, Completed(message = "no match"))
   } else {
     call.respond(r)
   }
