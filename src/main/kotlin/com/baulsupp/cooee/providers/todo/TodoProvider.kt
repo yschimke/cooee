@@ -2,6 +2,7 @@ package com.baulsupp.cooee.providers.todo
 
 import com.baulsupp.cooee.api.Completed
 import com.baulsupp.cooee.api.GoResult
+import com.baulsupp.cooee.api.RedirectResult
 import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.providers.BaseProvider
 import com.baulsupp.cooee.suggester.Suggestion
@@ -13,8 +14,19 @@ class TodoProvider : BaseProvider() {
   override suspend fun go(command: String, vararg args: String): GoResult =
     when {
       command == "todo" -> Completed("todo added")
-      else -> Unmatched
+      else -> findTodo(command)
     }
+
+  private suspend fun findTodo(command: String): GoResult {
+    return todo().find { it.line ==  command }?.let {
+      if (it.url != null) {
+        RedirectResult(it.url)
+      } else {
+        Completed(it.message ?: "None")
+      }
+      Unmatched
+    } ?: Unmatched
+  }
 
   override suspend fun todo(): List<Suggestion> {
     return listOf(
