@@ -186,7 +186,7 @@ class ApplicationTest {
       services.providerConfigStore.store("yuri@coo.ee", "bookmarks", mapOf())
     }
 
-    testRequest("/api/v0/goinfo?q=bookmarks add nb https://newbookmark")
+    testRequest("/api/v0/goinfo?q=bookmarks add nb https://newbookmark", user = "yuri")
   }
 
   @Test
@@ -272,6 +272,7 @@ class ApplicationTest {
           "{\"name\":\"gcp\",\"installed\":false,\"services\":[]}," +
           "{\"name\":\"mongodb\",\"installed\":false,\"services\":[]}," +
           "{\"name\":\"circleci\",\"installed\":false,\"services\":[\"circleci\"]}," +
+          "{\"name\":\"todo\",\"installed\":false,\"services\":[]}" +
           "{\"name\":\"test\",\"installed\":false,\"services\":[]}" +
           "]}",
         response.content

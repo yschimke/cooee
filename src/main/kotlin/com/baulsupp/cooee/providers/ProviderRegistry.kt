@@ -12,6 +12,7 @@ import com.baulsupp.cooee.providers.mongodb.MongoDbProvider
 import com.baulsupp.cooee.providers.opsgenie.GcpProvider
 import com.baulsupp.cooee.providers.opsgenie.OpsGenieProvider
 import com.baulsupp.cooee.providers.strava.StravaProvider
+import com.baulsupp.cooee.providers.todo.TodoProvider
 import com.baulsupp.cooee.providers.trello.TrelloProvider
 import com.baulsupp.cooee.providers.twitter.TwitterProvider
 import com.baulsupp.cooee.users.UserEntry
@@ -59,7 +60,8 @@ class ProviderRegistry(val appServices: AppServices, val registered: Map<String,
       "opsgenie" to OpsGenieProvider::class,
       "gcp" to GcpProvider::class,
       "mongodb" to MongoDbProvider::class,
-      "circleci" to CircleCiProvider::class
+      "circleci" to CircleCiProvider::class,
+      "todo" to TodoProvider::class
     )
   }
 }
