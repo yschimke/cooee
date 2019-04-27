@@ -272,7 +272,7 @@ class ApplicationTest {
           "{\"name\":\"gcp\",\"installed\":false,\"services\":[]}," +
           "{\"name\":\"mongodb\",\"installed\":false,\"services\":[]}," +
           "{\"name\":\"circleci\",\"installed\":false,\"services\":[\"circleci\"]}," +
-          "{\"name\":\"todo\",\"installed\":false,\"services\":[]}" +
+          "{\"name\":\"todo\",\"installed\":false,\"services\":[]}," +
           "{\"name\":\"test\",\"installed\":false,\"services\":[]}" +
           "]}",
         response.content
