@@ -5,7 +5,7 @@ plugins {
   kotlin("jvm") version "1.3.31"
   war
   id("com.github.ben-manes.versions") version "0.21.0"
-  id("com.google.cloud.tools.appengine") version "2.0.0-rc5"
+  id("com.google.cloud.tools.appengine") version "2.0.0-rc6"
   id("com.palantir.consistent-versions") version "1.5.0"
   id("com.diffplug.gradle.spotless") version "3.23.0"
 }
