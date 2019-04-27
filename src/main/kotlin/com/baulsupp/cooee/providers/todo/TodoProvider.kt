@@ -19,6 +19,10 @@ class TodoProvider : BaseProvider() {
         else -> findTodo(command)
     }
 
+  override suspend fun matches(command: String): Boolean {
+    return command == "todo" || command.startsWith("todo.")
+  }
+
   private suspend fun findTodo(command: String): GoResult {
     return todo().find { it.line == command }?.let {
       if (it.url != null) {
