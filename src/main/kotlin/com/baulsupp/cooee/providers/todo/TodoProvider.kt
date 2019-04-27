@@ -11,6 +11,8 @@ import com.baulsupp.cooee.suggester.SuggestionType
 class TodoProvider : BaseProvider() {
   override val name = "todo"
 
+  val todoCommand = Suggestion("todo", name, description = "Todo Service", type = SuggestionType.COMMAND)
+
   override suspend fun go(command: String, vararg args: String): GoResult =
     when {
       command == "todo" -> Completed("todo added")
@@ -18,7 +20,7 @@ class TodoProvider : BaseProvider() {
     }
 
   private suspend fun findTodo(command: String): GoResult {
-    return todo().find { it.line ==  command }?.let {
+    return todo().find { it.line == command }?.let {
       if (it.url != null) {
         RedirectResult(it.url)
       } else {
@@ -28,10 +30,25 @@ class TodoProvider : BaseProvider() {
     } ?: Unmatched
   }
 
+  override suspend fun suggest(command: String) = TodoSuggester(this).suggest(command)
+
   override suspend fun todo(): List<Suggestion> {
     return listOf(
-      Suggestion("todo.a", name, "First Todo Desc", message = "First Todo Message", type = SuggestionType.INFO),
-      Suggestion("todo.c", name, "Third Todo Desc", url = "https://nba.com", type = SuggestionType.LINK)
+      Suggestion(
+        "todo.a",
+        name,
+        "First Todo Desc",
+        message = "First Todo Message",
+        type = SuggestionType.INFO,
+        color = "blue"
+      ),
+      Suggestion(
+        "todo.c", name,
+        "Third Todo Desc",
+        url = "https://nba.com",
+        type = SuggestionType.LINK,
+        color = "red"
+      )
     )
   }
 }

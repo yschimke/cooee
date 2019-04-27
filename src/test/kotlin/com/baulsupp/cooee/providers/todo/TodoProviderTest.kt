@@ -35,7 +35,7 @@ class TodoProviderTest {
   fun basicCommandCompletion() = runBlocking {
     assertThat(
       p.suggest("tod").map { it.line },
-      equalTo(listOf("todo"))
+      equalTo(listOf("todo.a", "todo.c", "todo"))
     )
   }
 
