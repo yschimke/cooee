@@ -406,6 +406,7 @@ class ApplicationTest {
   fun testTodos() {
     runBlocking {
       services.providerConfigStore.store("yuri@coo.ee", "test", mapOf())
+      services.providerConfigStore.store("yuri@coo.ee", "test", mapOf())
     }
 
     testRequest("/api/v0/todo", user = "yuri") {
