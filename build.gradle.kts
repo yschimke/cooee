@@ -44,6 +44,7 @@ repositories {
   maven { url = uri("https://kotlin.bintray.com/kotlin-js-wrappers") }
   maven { url = uri("https://dl.bintray.com/yschimke/baulsupp.com/") }
   maven { url = uri("https://dl.bintray.com/konrad-kaminski/maven") }
+  maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
 }
 
 tasks.create("downloadDependencies") {

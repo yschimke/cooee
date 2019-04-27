@@ -14,9 +14,9 @@ class TodoProvider : BaseProvider() {
   val todoCommand = Suggestion("todo", name, description = "Todo Service", type = SuggestionType.COMMAND)
 
   override suspend fun go(command: String, vararg args: String): GoResult =
-    when {
-      command == "todo" -> Completed("todo added")
-      else -> findTodo(command)
+    when (command) {
+        "todo" -> Completed("todo added")
+        else -> findTodo(command)
     }
 
   private suspend fun findTodo(command: String): GoResult {
@@ -26,7 +26,6 @@ class TodoProvider : BaseProvider() {
       } else {
         Completed(it.message ?: "None")
       }
-      Unmatched
     } ?: Unmatched
   }
 
@@ -43,7 +42,8 @@ class TodoProvider : BaseProvider() {
         color = "blue"
       ),
       Suggestion(
-        "todo.c", name,
+        "todo.c",
+        name,
         "Third Todo Desc",
         url = "https://nba.com",
         type = SuggestionType.LINK,
