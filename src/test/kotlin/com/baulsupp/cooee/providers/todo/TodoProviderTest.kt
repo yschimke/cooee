@@ -37,10 +37,15 @@ class TodoProviderTest {
   fun todoA() = runBlocking {
     login()
 
+    val createResult = p.go("todo", "test", "todo")
+
+    assertTrue(createResult is Completed)
+    assertThat(createResult.message, equalTo("todo.a added"))
+
     val result = p.go("todo.a")
 
     assertTrue(result is Completed)
-    assertThat(result.message, equalTo("First Todo Message"))
+    assertThat(result.message, equalTo("test todo"))
   }
 
   @Test
