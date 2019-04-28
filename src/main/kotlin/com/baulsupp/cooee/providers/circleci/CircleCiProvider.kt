@@ -6,8 +6,13 @@ import com.baulsupp.cooee.api.Unmatched
 import com.baulsupp.cooee.completion.ArgumentCompleter
 import com.baulsupp.cooee.completion.SimpleArgumentCompleter
 import com.baulsupp.cooee.providers.BaseProvider
+import com.baulsupp.cooee.providers.trello.BoardResponse
+import com.baulsupp.cooee.providers.trello.Boards
 import com.baulsupp.cooee.suggester.Suggestion
 import com.baulsupp.cooee.suggester.SuggestionType
+import com.baulsupp.okurl.kotlin.queryList
+
+data class RecentBuilds(val builds: List<Build>)
 
 class CircleCiProvider : BaseProvider() {
   override val name = "circleci"
@@ -34,4 +39,8 @@ class CircleCiProvider : BaseProvider() {
   override suspend fun suggest(command: String): List<Suggestion> {
     return CircleCiSuggester(this).suggest(command)
   }
+
+  suspend fun readRecentBuilds(): List<Build> = appServices.cache.get(user?.email, name, "builds") {
+    RecentBuilds(client.queryList("https://circleci.com/api/v1.1/recent-builds?limit=100&shallow=true", userToken))
+  }.builds
 }

@@ -3,9 +3,9 @@ package com.baulsupp.cooee.providers.circleci
 data class User(
   val vcsType: String?,
   val avatarUrl: String?,
-  val name: String,
-  val id: Int,
-  val login: String,
+  val name: String?,
+  val id: Int?,
+  val login: String?,
   val isUser: Boolean?
 )
 
@@ -22,12 +22,12 @@ data class Build(
   val authorName: String?,
   val fleet: String,
   val stopTime: String?,
-  val subject: String,
+  val subject: String?,
   val vcsUrl: String?,
   val why: String?,
   val committerDate: String?,
   val workflows: Workflows,
-  val body: String,
+  val body: String?,
   val branch: String,
   val platform: String,
   val lifecycle: String,
