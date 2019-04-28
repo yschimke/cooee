@@ -44,3 +44,4 @@ io.zipkin.reporter2:zipkin-sender-okhttp3=2.8.2
 org.zeroturnaround:zt-exec=1.10
 com.kitfox.svg:svg-salamander=1.0
 org.jfree:jfreesvg=3.3
+org.bouncycastle:bcprov-jdk15on=1.61
