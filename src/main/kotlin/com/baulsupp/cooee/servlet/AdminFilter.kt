@@ -20,7 +20,7 @@ class AdminFilter : Filter {
       }
     }
 
-    chain.doFilter(request, response);
+    chain.doFilter(request, response)
   }
 
   private fun isAdmin(request: HttpServletRequest): Boolean {

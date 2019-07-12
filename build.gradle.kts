@@ -2,12 +2,12 @@ import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  kotlin("jvm") version "1.3.31"
+  kotlin("jvm") version "1.3.41"
   war
   id("com.github.ben-manes.versions") version "0.21.0"
-  id("com.google.cloud.tools.appengine") version "2.0.0-rc6"
-  id("com.palantir.consistent-versions") version "1.5.0"
-  id("com.diffplug.gradle.spotless") version "3.23.0"
+  id("com.google.cloud.tools.appengine") version "2.0.1"
+  id("com.palantir.consistent-versions") version "1.9.2"
+  id("com.diffplug.gradle.spotless") version "3.23.1"
 }
 
 group = "cooee"
@@ -80,7 +80,6 @@ dependencies {
   implementation("io.ktor:ktor-client-gson")
   implementation("io.ktor:ktor-client-json-jvm")
   implementation("io.ktor:ktor-client-okhttp")
-  implementation("io.ktor:ktor-client-websocket")
   implementation("io.ktor:ktor-html-builder")
   implementation("io.ktor:ktor-http-jvm")
   implementation("io.ktor:ktor-http")

@@ -13,11 +13,10 @@ pluginManagement {
   }
 }
 
-//sourceControl {
+// sourceControl {
 //  gitRepository(uri("https://github.com/yschimke/okurl.git")) {
 //    producesModule("com.baulsupp:okurl")
 //  }
-//}
+// }
 
 rootProject.name = "cooee"
-

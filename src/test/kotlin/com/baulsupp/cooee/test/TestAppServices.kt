@@ -1,10 +1,8 @@
 package com.baulsupp.cooee.test
 
 import com.baulsupp.cooee.AppServices
-import com.baulsupp.cooee.features.CooeeFF4jProvider
 import com.baulsupp.cooee.cache.LocalCache
 import com.baulsupp.cooee.cache.MoshiTypedCache
-import com.baulsupp.cooee.features.FeatureCheck
 import com.baulsupp.cooee.providers.ProviderRegistry
 import com.baulsupp.cooee.users.JwtUserAuthenticator
 import com.baulsupp.cooee.users.UserEntry
@@ -14,8 +12,6 @@ import com.baulsupp.okurl.credentials.InMemoryCredentialsStore
 import io.ktor.config.MapApplicationConfig
 import io.ktor.util.KtorExperimentalAPI
 import okhttp3.OkHttpClient
-import okhttp3.logging.LoggingEventListener
-import org.ff4j.FF4j
 import org.slf4j.LoggerFactory
 
 class TestAppServices : AppServices {
@@ -46,7 +42,6 @@ class TestAppServices : AppServices {
 
   override val authenticationFlowCache = TestAuthenticationFlowCache()
 
-  @UseExperimental(KtorExperimentalAPI::class)
   override val config = MapApplicationConfig()
 
   override fun featureChecks(userEntry: UserEntry?) = checks
@@ -54,7 +49,7 @@ class TestAppServices : AppServices {
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
     val services = AuthenticatingInterceptor.defaultServices()
 
-    eventListenerFactory(LoggingEventListener.Factory { s -> log.info(s) })
+//    eventListenerFactory(LoggingEventListener.Factory { s -> log.info(s) })
     addInterceptor(RenewingInterceptor(credentialsStore, services))
     addNetworkInterceptor(AuthenticatingInterceptor(credentialsStore, services))
   }.build()

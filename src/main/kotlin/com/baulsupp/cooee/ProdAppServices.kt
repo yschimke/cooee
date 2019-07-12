@@ -17,7 +17,6 @@ import com.baulsupp.okurl.authenticator.RenewingInterceptor
 import io.ktor.application.Application
 import io.netty.channel.nio.NioEventLoopGroup
 import okhttp3.OkHttpClient
-import okhttp3.logging.LoggingEventListener
 import org.ff4j.cache.InMemoryCacheManager
 import org.litote.kmongo.coroutine.CoroutineDatabase
 import org.slf4j.Logger
@@ -75,7 +74,8 @@ class ProdAppServices(val application: Application) : AppServices {
   }
 
   override val client: OkHttpClient = OkHttpClient.Builder().apply {
-    eventListenerFactory(LoggingEventListener.Factory { s -> logger.info(s) })
+//    eventListener(object : LoggingEventListener {
+//    })
     addInterceptor(RenewingInterceptor(credentialsStore, services))
     addNetworkInterceptor(AuthenticatingInterceptor(credentialsStore, services))
   }.build()

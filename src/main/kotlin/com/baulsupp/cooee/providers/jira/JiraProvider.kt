@@ -17,6 +17,7 @@ import com.baulsupp.okurl.kotlin.request
 import com.baulsupp.okurl.services.atlassian.model.AccessibleResource
 import kotlinx.coroutines.*
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
 data class ProjectReference(val project: Project, val server: AccessibleResource) {
   val projectKey = project.key
@@ -156,10 +157,8 @@ class JiraProvider : BaseProvider() {
         userToken
       ) {
         post(
-          RequestBody.create(
-            JSON,
-            "{\"body\":{\"type\":\"doc\",\"version\":1,\"content\":[{\"type\": \"paragraph\",\"content\":[{\"type\": \"text\",\"text\": \"$comment\"}]}]}}"
-          )
+          "{\"body\":{\"type\":\"doc\",\"version\":1,\"content\":[{\"type\": \"paragraph\",\"content\":[{\"type\": \"text\",\"text\": \"$comment\"}]}]}}"
+            .toRequestBody(JSON)
         )
       }
     )

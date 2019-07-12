@@ -12,9 +12,11 @@ import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.hasItem
 import org.junit.Assert.assertThat
 import org.junit.Test
+import kotlin.test.Ignore
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
+@Ignore
 class JiraProviderTest {
   private val userEntry = UserEntry("token", "yuri", "yuri@coo.ee")
   val p = JiraProvider().apply {

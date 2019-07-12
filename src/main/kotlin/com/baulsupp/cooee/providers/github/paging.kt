@@ -23,7 +23,7 @@ suspend inline fun <reified T> okhttp3.OkHttpClient.queryGithubPages(
 
   val results = mutableListOf<T>()
 
-  firstResponse.body().use {
+  firstResponse.body.use {
     results.addAll(stringToModel(it!!.string()))
   }
 
