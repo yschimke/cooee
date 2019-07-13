@@ -61,7 +61,9 @@ tasks.create("downloadDependencies") {
 
 dependencies {
   implementation("ch.qos.logback:logback-classic")
-  implementation("com.baulsupp:okurl")
+  implementation("com.baulsupp:okurl") {
+    exclude(module = "kotlin-compiler-embeddable")
+  }
   implementation("com.google.cloud:google-cloud-logging-logback")
   implementation("com.google.appengine:appengine-api-1.0-sdk")
   implementation("io.lettuce:lettuce-core")
