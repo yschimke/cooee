@@ -6,6 +6,7 @@ plugins {
 	kotlin("jvm") version "1.4.0"
 	kotlin("plugin.spring") version "1.4.0"
 	id("com.squareup.wire") version "3.2.2"
+	id("com.diffplug.spotless") version "5.1.0"
 }
 
 group = "com.baulsupp.cooee"
@@ -39,8 +40,6 @@ dependencies {
 	implementation("com.squareup.wire:wire-runtime:3.2.2")
 	implementation("com.squareup.wire:wire-grpc-client:3.2.2")
 	implementation("com.squareup.wire:wire-moshi-adapter:3.2.2")
-
-//	developmentOnly("org.springframework.boot:spring-boot-devtools")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
 		exclude(group = "org.junit.vintage", module = "junit-vintage-engine")

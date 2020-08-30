@@ -12,6 +12,8 @@ import kotlin.jvm.JvmStatic
 enum class CommandStatus(
   override val value: Int
 ) : WireEnum {
+  UNDEFINED(0),
+
   CLIENT_ACTION(1),
 
   DONE(2),
@@ -32,6 +34,7 @@ enum class CommandStatus(
 
     @JvmStatic
     fun fromValue(value: Int): CommandStatus? = when (value) {
+      0 -> UNDEFINED
       1 -> CLIENT_ACTION
       2 -> DONE
       3 -> REDIRECT

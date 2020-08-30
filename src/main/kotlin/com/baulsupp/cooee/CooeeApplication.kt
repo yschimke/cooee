@@ -1,4 +1,4 @@
-package com.baulsupp.cooee.api
+package com.baulsupp.cooee
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
