@@ -1,0 +1,29 @@
+syntax = "proto2";
+
+package com.baulsupp.cooee.p;
+
+option java_package = "com.baulsupp.cooee.p";
+
+message ImageUrl {
+  optional string url = 1;
+}
+
+enum CommandStatus {
+  CLIENT_ACTION = 1;
+  DONE = 2;
+  REDIRECT = 3;
+  REQUEST_ERROR = 4;
+  SERVER_ERROR = 5;
+}
+
+message CommandRequest {
+  optional string command = 1;
+  repeated string parsed_command = 2;
+}
+
+message CommandResponse {
+  optional string location = 1;
+  optional string message = 2;
+  optional ImageUrl image_url = 3;
+  optional CommandStatus status = 4;
+}
