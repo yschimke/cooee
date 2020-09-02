@@ -15,5 +15,5 @@ class TodoController(val moshi: Moshi) {
   }
 
   private fun executeRequest(requestCommand: TodoRequest) =
-      TodoResponse(todos = listOf(CompletionSuggestion("todo A"), CompletionSuggestion("todo B")))
+      TodoResponse(todos = listOf(CommandSuggestion("todo A"), CommandSuggestion("todo B")))
 }

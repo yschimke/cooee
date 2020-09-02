@@ -15,5 +15,5 @@ class CompletionController(val moshi: Moshi) {
   }
 
   private fun executeRequest(requestCommand: CompletionRequest) =
-      CompletionResponse(completions = listOf(CompletionSuggestion(line = requestCommand.command + " A")))
+      CompletionResponse(completions = listOf(CompletionSuggestion(line = requestCommand.word + " A")))
 }
