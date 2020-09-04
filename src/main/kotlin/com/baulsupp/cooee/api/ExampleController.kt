@@ -15,8 +15,8 @@ import org.springframework.messaging.rsocket.retrieveFlow
 import org.springframework.stereotype.Controller
 
 @Controller("command")
-class CommandController() {
-  @MessageMapping("runCommand")
+class ExampleController(val moshi: Moshi) {
+  @MessageMapping("example")
   suspend fun requestResponse(request: CommandRequest, rSocketRequester: RSocketRequester): CommandResponse {
     println(request)
     val flow = rSocketRequester.route("x").data(CommandRequest("COMMAND")).retrieveFlow<String>()
