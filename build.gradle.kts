@@ -16,6 +16,7 @@ java.targetCompatibility = JavaVersion.VERSION_11
 
 repositories {
 	mavenCentral()
+	maven(url = "https://jitpack.io")
 }
 
 extra["testcontainersVersion"] = "1.14.3"
@@ -37,8 +38,16 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
+	implementation("com.squareup.okhttp3:okhttp:4.8.1")
+	implementation("com.github.yschimke:oksocial-output:5.6")
+	implementation("com.github.yschimke:okurl:2.16") {
+		isTransitive = false
+	}
+
 	implementation("com.squareup.wire:wire-runtime:3.2.2")
-	implementation("com.squareup.wire:wire-grpc-client:3.2.2")
+	implementation("com.squareup.wire:wire-grpc-client:3.2.2") {
+		exclude(group = "com.squareup.okhttp3")
+	}
 	implementation("com.squareup.wire:wire-moshi-adapter:3.2.2")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {

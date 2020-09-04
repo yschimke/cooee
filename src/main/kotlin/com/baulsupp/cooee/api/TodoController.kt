@@ -1,6 +1,7 @@
 package com.baulsupp.cooee.api
 
 import com.baulsupp.cooee.p.*
+import com.baulsupp.cooee.services.CombinedProvider
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -8,8 +9,8 @@ import kotlinx.coroutines.flow.flow
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.stereotype.Controller
 
-@Controller("todo")
-class TodoController(val moshi: Moshi) {
+@Controller
+class TodoController(val combinedProvider: CombinedProvider) {
   @MessageMapping("todo")
   suspend fun todo(request: TodoRequest): Flow<TodoResponse> {
     return flow {
@@ -25,7 +26,5 @@ class TodoController(val moshi: Moshi) {
           CommandSuggestion("todo D"))
       ))
     }
-
-
   }
 }

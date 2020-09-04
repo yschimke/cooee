@@ -1,12 +1,13 @@
 package com.baulsupp.cooee.api
 
 import com.baulsupp.cooee.p.*
+import com.baulsupp.cooee.services.CombinedProvider
 import com.squareup.moshi.Moshi
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.stereotype.Controller
 
-@Controller("completion")
-class CompletionController(val moshi: Moshi) {
+@Controller
+class CompletionController(val combinedProvider: CombinedProvider) {
   @MessageMapping("complete")
   suspend fun complete(request: CompletionRequest): CompletionResponse {
     return CompletionResponse(completions = listOf(

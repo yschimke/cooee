@@ -1,11 +1,19 @@
 package com.baulsupp.cooee
 
+import com.baulsupp.cooee.services.CombinedProvider
+import com.baulsupp.cooee.services.strava.StravaProvider
+import com.baulsupp.okurl.Main
+import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
+import com.baulsupp.okurl.credentials.CredentialsStore
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.squareup.wire.WireJsonAdapterFactory
+import okhttp3.OkHttpClient
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.context.event.ApplicationStartedEvent
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.context.event.EventListener
 
 @SpringBootApplication
 class CooeeApplication {
@@ -14,6 +22,24 @@ class CooeeApplication {
       .add(WireJsonAdapterFactory())
       .add(KotlinJsonAdapterFactory())
       .build()
+
+  @Bean
+  fun client(): OkHttpClient {
+    val builder = OkHttpClient.Builder()
+
+    val authenticatingInterceptor = AuthenticatingInterceptor(CredentialsStore.NONE)
+    builder.addNetworkInterceptor(authenticatingInterceptor)
+
+    return builder.build()
+  }
+
+  @Bean
+  fun combinedProvider() = CombinedProvider(StravaProvider())
+
+  @EventListener(classes = [ApplicationStartedEvent::class])
+  fun onApplicationEvent(event: ApplicationStartedEvent) {
+    Main.moshi = moshi()
+  }
 }
 
 fun main(args: Array<String>) {
