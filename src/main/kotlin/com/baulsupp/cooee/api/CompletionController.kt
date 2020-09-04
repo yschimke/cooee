@@ -8,12 +8,11 @@ import org.springframework.stereotype.Controller
 @Controller("completion")
 class CompletionController(val moshi: Moshi) {
   @MessageMapping("complete")
-  suspend fun requestResponse(request: String): String {
-    val requestCommand = moshi.adapter(CompletionRequest::class.java).fromJson(request)!!
-    val response = executeRequest(requestCommand)
-    return moshi.adapter(CompletionResponse::class.java).toJson(response)
+  suspend fun complete(request: CompletionRequest): CompletionResponse {
+    return CompletionResponse(completions = listOf(
+        CompletionSuggestion(line = request.line + " A"),
+        CompletionSuggestion(line = request.line + " B")
+    )
+    )
   }
-
-  private fun executeRequest(requestCommand: CompletionRequest) =
-      CompletionResponse(completions = listOf(CompletionSuggestion(line = requestCommand.word + " A")))
 }
