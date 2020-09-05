@@ -4,7 +4,6 @@ import com.baulsupp.cooee.p.*
 
 interface ProviderFunctions {
   suspend fun runCommand(request: CommandRequest): CommandResponse? = null
-  suspend fun matches(command: String): Boolean
   suspend fun suggest(command: CompletionRequest): CompletionResponse? = null
   suspend fun todo(): TodoResponse? = null
 }

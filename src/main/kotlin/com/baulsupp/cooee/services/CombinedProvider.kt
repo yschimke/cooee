@@ -1,28 +1,48 @@
 package com.baulsupp.cooee.services
 
 import com.baulsupp.cooee.api.ClientApi
+import com.baulsupp.cooee.cache.LocalCache
 import com.baulsupp.cooee.p.*
-import com.baulsupp.cooee.services.strava.StravaProvider
+import kotlinx.coroutines.async
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.supervisorScope
 import okhttp3.OkHttpClient
 
-open class CombinedProvider(val stravaProvider: StravaProvider): ProviderFunctions {
-  fun init(client: OkHttpClient, clientApi: ClientApi) {
-    stravaProvider.init(client, clientApi)
+open class CombinedProvider(vararg val providers: Provider): ProviderFunctions {
+  suspend fun init(client: OkHttpClient, clientApi: ClientApi, cache: LocalCache) {
+    supervisorScope {
+      providers.map {
+        async { it.init(client, clientApi, cache) }
+      }
+    }.joinAll()
   }
 
   override suspend fun runCommand(request: CommandRequest): CommandResponse? {
-    return stravaProvider.runCommand(request)
-  }
+    val matches = supervisorScope {
+      providers.map {
+        Pair(it, async { it.matches(request.single_command) })
+      }
+    }
 
-  override suspend fun matches(command: String): Boolean {
-    return stravaProvider.matches(command)
+    for ((provider, matches) in matches) {
+      try {
+        if (matches.await()) {
+          return provider.runCommand(request)
+        }
+      } catch (e: Exception) {
+        // TODO log, and notify client
+        System.err.println("TODO(${provider.name}): $e")
+      }
+    }
+
+    return null
   }
 
   override suspend fun suggest(command: CompletionRequest): CompletionResponse? {
-    return stravaProvider.suggest(command)
+    return null
   }
 
   override suspend fun todo(): TodoResponse? {
-    return stravaProvider.todo()
+    return null
   }
 }

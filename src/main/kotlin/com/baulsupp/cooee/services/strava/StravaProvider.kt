@@ -7,7 +7,7 @@ import com.baulsupp.cooee.services.Provider
 
 class StravaProvider : Provider("strava") {
   override suspend fun runCommand(request: CommandRequest): CommandResponse? = when {
-    request.parsed_command == listOf("strava") -> CommandRequest.redirect("https://www.strava.com/")
+    request.parsed_command == listOf("strava") -> CommandResponse.redirect("https://www.strava.com/")
     request.parsed_command.getOrNull(1) == "lastrun" -> lastRun(client, clientApi)
     else -> null
   }

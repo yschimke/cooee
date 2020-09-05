@@ -1,6 +1,8 @@
 package com.baulsupp.cooee
 
+import com.baulsupp.cooee.cache.LocalCache
 import com.baulsupp.cooee.services.CombinedProvider
+import com.baulsupp.cooee.services.github.GithubProvider
 import com.baulsupp.cooee.services.strava.StravaProvider
 import com.baulsupp.okurl.Main
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
@@ -24,6 +26,9 @@ class CooeeApplication {
       .build()
 
   @Bean
+  fun cache() = LocalCache()
+
+  @Bean
   fun client(): OkHttpClient {
     val builder = OkHttpClient.Builder()
 
@@ -34,7 +39,7 @@ class CooeeApplication {
   }
 
   @Bean
-  fun combinedProvider() = CombinedProvider(StravaProvider())
+  fun combinedProvider() = CombinedProvider(StravaProvider(), GithubProvider())
 
   @EventListener(classes = [ApplicationStartedEvent::class])
   fun onApplicationEvent(event: ApplicationStartedEvent) {
