@@ -1,8 +1,11 @@
 package com.baulsupp.cooee.services.github
 
+import com.baulsupp.cooee.p.LogRequest
+import com.baulsupp.cooee.p.LogSeverity
 import com.baulsupp.okurl.kotlin.postJsonBody
 import com.baulsupp.okurl.kotlin.query
 import com.baulsupp.okurl.kotlin.request
+import com.baulsupp.okurl.util.ClientException
 import kotlinx.coroutines.async
 
 data class Repos(val list: List<Repository>)
@@ -62,7 +65,16 @@ suspend fun GithubProvider.listStarredRepositories(): List<Repository> =
     }.list
 
 suspend fun GithubProvider.projects(): List<Repository> {
-  return (listUserRepositories() + listStarredRepositories()).distinctBy { it.url }
+  return try {
+    (listUserRepositories() + listStarredRepositories()).distinctBy { it.url }
+  } catch (ce: ClientException) {
+    if (ce.code == 401) {
+      clientApi.logToClient(LogRequest(message = "Unauthorized to github", severity = LogSeverity.WARN))
+      listOf()
+    } else {
+      throw ce
+    }
+  }
 }
 
 suspend fun GithubProvider.queryStarredRepos(): List<Repository> {

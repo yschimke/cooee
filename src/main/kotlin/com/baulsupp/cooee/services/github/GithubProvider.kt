@@ -66,8 +66,13 @@ class GithubProvider : Provider("github") {
 
   override suspend fun suggest(command: CompletionRequest): List<CompletionSuggestion> {
     return listOf(
-        CompletionSuggestion.command(CommandSuggestion(provider = "github", description = "Github Website"), "github"),
-    )
+        CompletionSuggestion.command(
+            CommandSuggestion(provider = "github", description = "Github Website"), "github"),
+    ) + projects().map {
+      CompletionSuggestion.command(CommandSuggestion(provider = "github",
+          description = it.description ?: "Github: ${it.full_name}", command = it.full_name, url = it.url),
+          it.full_name)
+    }
   }
 
 //  override suspend fun todo(): List<Suggestion> {
