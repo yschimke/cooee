@@ -13,7 +13,9 @@ import org.springframework.stereotype.Controller
 class CommandController(val client: OkHttpClient, val combinedProvider: CombinedProvider, val cache: LocalCache) {
   @MessageMapping("runCommand")
   suspend fun runCommand(request: CommandRequest, rSocketRequester: RSocketRequester): CommandResponse {
-    combinedProvider.init(client, ClientApi(rSocketRequester), cache)
+    val clientApi = ClientApi(rSocketRequester)
+
+    combinedProvider.init(client, clientApi, cache)
 
     val response = combinedProvider.runCommand(request)
 

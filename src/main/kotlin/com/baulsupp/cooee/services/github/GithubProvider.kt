@@ -2,11 +2,9 @@ package com.baulsupp.cooee.services.github
 
 import com.baulsupp.cooee.api.ClientApi
 import com.baulsupp.cooee.cache.LocalCache
-import com.baulsupp.cooee.p.CommandRequest
-import com.baulsupp.cooee.p.CommandResponse
-import com.baulsupp.cooee.p.redirect
-import com.baulsupp.cooee.p.single_command
+import com.baulsupp.cooee.p.*
 import com.baulsupp.cooee.services.Provider
+import com.baulsupp.cooee.services.strava.StravaProvider
 import com.baulsupp.okurl.credentials.NoToken
 import okhttp3.OkHttpClient
 
@@ -19,7 +17,7 @@ class GithubProvider : Provider("github") {
 
   override suspend fun runCommand(request: CommandRequest): CommandResponse? {
     if (request.parsed_command == listOf("github")) {
-      return CommandResponse.redirect("https://github.com/")
+      return githubWebsite
     }
 
     val r = "(\\w+)/(\\w+)(?:#(\\d+))?".toRegex()
@@ -66,6 +64,12 @@ class GithubProvider : Provider("github") {
     return command == "github" || projects().any { it.full_name == command }
   }
 
+  override suspend fun suggest(command: CompletionRequest): List<CompletionSuggestion> {
+    return listOf(
+        CompletionSuggestion.command(CommandSuggestion(provider = "github", description = "Github Website"), "github"),
+    )
+  }
+
 //  override suspend fun todo(): List<Suggestion> {
 //    val cutoff = Instant.now().minus(3, ChronoUnit.DAYS)
 //
@@ -78,4 +82,8 @@ class GithubProvider : Provider("github") {
 //      )
 //    }
 //  }
+
+  companion object {
+    val githubWebsite = CommandResponse.redirect("https://github.com/")
+  }
 }
