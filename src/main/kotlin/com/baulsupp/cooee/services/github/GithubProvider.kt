@@ -20,7 +20,7 @@ class GithubProvider : Provider("github") {
       return githubWebsite
     }
 
-    val r = "(\\w+)/(\\w+)(?:#(\\d+))?".toRegex()
+    val r = "(\\w+)/([\\w-]+)(?:#(\\d+))?".toRegex()
 
     val command = request.single_command
 
@@ -61,7 +61,9 @@ class GithubProvider : Provider("github") {
 //  }
 
   override suspend fun matches(command: String): Boolean {
-    return command == "github" || projects().any { it.full_name == command }
+    return command == "github" || projects().any {
+      it.full_name == command
+    }
   }
 
   override suspend fun suggest(command: CompletionRequest): List<CompletionSuggestion> {
@@ -70,7 +72,7 @@ class GithubProvider : Provider("github") {
             CommandSuggestion(provider = "github", description = "Github Website"), "github"),
     ) + projects().map {
       CompletionSuggestion.command(CommandSuggestion(provider = "github",
-          description = it.description ?: "Github: ${it.full_name}", command = it.full_name, url = it.url),
+          description = it.description ?: "Github: ${it.full_name}", command = it.full_name, url = "https://github.com/${it.full_name}"),
           it.full_name)
     }
   }
