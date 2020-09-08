@@ -2,16 +2,17 @@
 
 package com.baulsupp.cooee.cache
 
+import com.baulsupp.okurl.credentials.Token
 import java.util.concurrent.ConcurrentHashMap
 
-class LocalCache : ServiceCache {
-  val map = ConcurrentHashMap<String, String>()
+class LocalCache {
+  data class Key(val token: Token, val providerName: String, val key: String)
 
-  override suspend fun get(email: String?, providerName: String?, key: String): String? {
-    return map["$email:$providerName:$key"]
-  }
+  val map = ConcurrentHashMap<Key, Any>()
 
-  override suspend fun set(email: String?, providerName: String?, key: String, value: String) {
-    map["$email:$providerName:$key"] = value
+  inline fun <reified T: Any> get(token: Token, providerName: String, key: String, fetcher: () -> T): T {
+    return map.getOrPut(Key(token, providerName, key)) {
+      fetcher()
+    } as T
   }
 }

@@ -1,22 +1,16 @@
+rootProject.name = "cooee"
+
+// settings.gradle.kts
 pluginManagement {
   repositories {
     gradlePluginPortal()
-    google()
     mavenCentral()
   }
   resolutionStrategy {
     eachPlugin {
-      if (requested.id.id == "com.google.cloud.tools.appengine") {
-        useModule("com.google.cloud.tools:appengine-gradle-plugin:2.0.0-rc5")
+      if (requested.id.id == "com.squareup.wire") {
+        useModule("com.squareup.wire:wire-gradle-plugin:3.2.2")
       }
     }
   }
 }
-
-// sourceControl {
-//  gitRepository(uri("https://github.com/yschimke/okurl.git")) {
-//    producesModule("com.baulsupp:okurl")
-//  }
-// }
-
-rootProject.name = "cooee"
