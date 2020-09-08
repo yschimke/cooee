@@ -16,3 +16,5 @@ Tail - with responses
 windows CLI colouring
 
 signal API support
+
+nice flow for login, prompting etc. 
