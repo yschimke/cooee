@@ -37,9 +37,9 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
-	implementation("com.squareup.okhttp3:okhttp:4.8.1")
-	implementation("com.github.yschimke:oksocial-output:5.6")
-	implementation("com.github.yschimke:okurl:2.16") {
+	implementation("com.squareup.okhttp3:okhttp:4.9.0")
+	implementation("com.github.yschimke:oksocial-output:5.7")
+	implementation("com.github.yschimke:okurl:2.22") {
 		isTransitive = false
 	}
 
