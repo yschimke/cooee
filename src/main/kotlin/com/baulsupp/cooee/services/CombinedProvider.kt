@@ -88,11 +88,10 @@ open class CombinedProvider(vararg val providers: Provider) : ProviderFunctions 
   }
 
   override suspend fun suggest(request: CompletionRequest): List<CompletionSuggestion> {
-    val line = request.line ?: return listOf()
+    val line = request.line
 
     if (line.contains("\\s".toRegex())) {
       val command = line.split("\\s+".toRegex()).first()
-      println("command " + command)
       val provider = findByMatchingCommand(command) ?: return listOf()
       return provider.suggest(request)
     } else {

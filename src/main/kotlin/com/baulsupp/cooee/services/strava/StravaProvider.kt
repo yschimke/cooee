@@ -8,6 +8,7 @@ import com.baulsupp.cooee.p.CompletionSuggestion
 import com.baulsupp.cooee.p.command
 import com.baulsupp.cooee.p.redirect
 import com.baulsupp.cooee.services.Provider
+import com.baulsupp.okurl.services.strava.StravaAuthInterceptor
 
 class StravaProvider : Provider("strava") {
   override suspend fun runCommand(request: CommandRequest): CommandResponse? = when {
@@ -28,6 +29,7 @@ class StravaProvider : Provider("strava") {
   }
 
   companion object {
+    val serviceDefinition = StravaAuthInterceptor().serviceDefinition
     val stravaWebsite = CommandResponse.redirect("https://www.strava.com/")
   }
 }

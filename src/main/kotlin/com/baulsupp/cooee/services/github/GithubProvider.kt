@@ -12,13 +12,14 @@ import com.baulsupp.cooee.p.redirect
 import com.baulsupp.cooee.p.single_command
 import com.baulsupp.cooee.services.Provider
 import com.baulsupp.okurl.credentials.NoToken
+import com.baulsupp.okurl.services.github.GithubAuthInterceptor
 import okhttp3.OkHttpClient
 
 class GithubProvider : Provider("github") {
   override suspend fun init(client: OkHttpClient, clientApi: ClientApi, cache: LocalCache) {
     super.init(client, clientApi, cache)
 
-    this.token = token() ?: NoToken
+    this.token = token(serviceDefinition) ?: NoToken
   }
 
   override suspend fun runCommand(request: CommandRequest): CommandResponse? {
@@ -97,6 +98,7 @@ class GithubProvider : Provider("github") {
 //  }
 
   companion object {
+    val serviceDefinition = GithubAuthInterceptor().serviceDefinition
     val githubWebsite = CommandResponse.redirect("https://github.com/")
   }
 }

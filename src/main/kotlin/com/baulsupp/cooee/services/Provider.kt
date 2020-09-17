@@ -3,9 +3,9 @@ package com.baulsupp.cooee.services
 import com.baulsupp.cooee.api.ClientApi
 import com.baulsupp.cooee.cache.LocalCache
 import com.baulsupp.okurl.credentials.NoToken
+import com.baulsupp.okurl.credentials.ServiceDefinition
 import com.baulsupp.okurl.credentials.Token
 import com.baulsupp.okurl.credentials.TokenValue
-import com.baulsupp.okurl.services.github.GithubAuthInterceptor
 import okhttp3.OkHttpClient
 
 abstract class Provider(val name: String) : ProviderFunctions {
@@ -21,9 +21,9 @@ abstract class Provider(val name: String) : ProviderFunctions {
   }
 
   // TODO cache
-  suspend fun token(): Token {
+  suspend fun token(serviceDefinition: ServiceDefinition<*>): Token {
     val tokenString = clientApi.tokenRequest(name).token ?: return NoToken
-    return TokenValue(GithubAuthInterceptor().serviceDefinition.parseCredentialsString(tokenString))
+    return TokenValue(serviceDefinition.parseCredentialsString(tokenString)!!)
   }
 
   abstract suspend fun matches(command: String): Boolean

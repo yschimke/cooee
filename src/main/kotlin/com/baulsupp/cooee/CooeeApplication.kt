@@ -4,6 +4,7 @@ import com.baulsupp.cooee.cache.LocalCache
 import com.baulsupp.cooee.services.CombinedProvider
 import com.baulsupp.cooee.services.github.GithubProvider
 import com.baulsupp.cooee.services.strava.StravaProvider
+import com.baulsupp.cooee.services.twitter.TwitterProvider
 import com.baulsupp.cooee.util.WireProto3PropertyNamingStrategy
 import com.baulsupp.okurl.Main
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
@@ -42,7 +43,7 @@ class CooeeApplication {
   }
 
   @Bean
-  fun combinedProvider() = CombinedProvider(StravaProvider(), GithubProvider())
+  fun combinedProvider() = CombinedProvider(StravaProvider(), GithubProvider(), TwitterProvider(), )
 
   @EventListener(classes = [ApplicationStartedEvent::class])
   fun onApplicationEvent(event: ApplicationStartedEvent) {

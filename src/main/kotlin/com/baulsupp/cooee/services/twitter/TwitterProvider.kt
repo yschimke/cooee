@@ -8,6 +8,7 @@ import com.baulsupp.cooee.p.args
 import com.baulsupp.cooee.p.redirect
 import com.baulsupp.cooee.p.single_command
 import com.baulsupp.cooee.services.Provider
+import com.baulsupp.okurl.services.twitter.TwitterAuthInterceptor
 import okhttp3.OkHttpClient
 
 class TwitterProvider : Provider("twitter") {
@@ -16,7 +17,7 @@ class TwitterProvider : Provider("twitter") {
   override suspend fun init(client: OkHttpClient, clientApi: ClientApi, cache: LocalCache) {
     super.init(client, clientApi, cache)
 
-    token = token()
+    token = token(serviceDefinition)
 
     friends = queryFriends()
   }
@@ -40,5 +41,9 @@ class TwitterProvider : Provider("twitter") {
 
     // TODO exact match twitter username pattern
     return parts[0].startsWith("@") && friends.any { it.screen_name == parts[0].substring(1) }
+  }
+
+  companion object {
+    val serviceDefinition = TwitterAuthInterceptor().serviceDefinition
   }
 }
