@@ -2,6 +2,7 @@ package com.baulsupp.cooee
 
 import com.baulsupp.cooee.cache.LocalCache
 import com.baulsupp.cooee.services.CombinedProvider
+import com.baulsupp.cooee.services.cooee.CooeeProvider
 import com.baulsupp.cooee.services.github.GithubProvider
 import com.baulsupp.cooee.services.strava.StravaProvider
 import com.baulsupp.cooee.services.twitter.TwitterProvider
@@ -43,7 +44,7 @@ class CooeeApplication {
   }
 
   @Bean
-  fun combinedProvider() = CombinedProvider(StravaProvider(), GithubProvider(), TwitterProvider(), )
+  fun combinedProvider() = CombinedProvider(StravaProvider(), GithubProvider(), TwitterProvider(), CooeeProvider())
 
   @EventListener(classes = [ApplicationStartedEvent::class])
   fun onApplicationEvent(event: ApplicationStartedEvent) {

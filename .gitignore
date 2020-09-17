@@ -8,3 +8,4 @@
 buildSrc/build
 buildSrc/.gradle
 .DS_Store
+local.properties
