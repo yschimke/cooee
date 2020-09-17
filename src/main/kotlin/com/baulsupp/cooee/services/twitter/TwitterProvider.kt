@@ -2,7 +2,11 @@ package com.baulsupp.cooee.services.twitter
 
 import com.baulsupp.cooee.api.ClientApi
 import com.baulsupp.cooee.cache.LocalCache
-import com.baulsupp.cooee.p.*
+import com.baulsupp.cooee.p.CommandRequest
+import com.baulsupp.cooee.p.CommandResponse
+import com.baulsupp.cooee.p.args
+import com.baulsupp.cooee.p.redirect
+import com.baulsupp.cooee.p.single_command
 import com.baulsupp.cooee.services.Provider
 import okhttp3.OkHttpClient
 
@@ -18,7 +22,8 @@ class TwitterProvider : Provider("twitter") {
   }
 
   override suspend fun runCommand(request: CommandRequest): CommandResponse? {
-    val screenName = request.single_command.substring(1)
+    val command = request.single_command ?: return null
+    val screenName = command.substring(1)
 
     val friend = friends.find { it.screen_name == screenName } ?: return null
 

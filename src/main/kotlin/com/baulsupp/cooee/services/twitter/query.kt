@@ -1,6 +1,11 @@
 package com.baulsupp.cooee.services.twitter
 
-import com.baulsupp.okurl.kotlin.*
+import com.baulsupp.okurl.kotlin.End
+import com.baulsupp.okurl.kotlin.Next
+import com.baulsupp.okurl.kotlin.execute
+import com.baulsupp.okurl.kotlin.postJsonBody
+import com.baulsupp.okurl.kotlin.queryPages
+import com.baulsupp.okurl.kotlin.request
 import okhttp3.OkHttpClient
 
 suspend fun TwitterProvider.queryFriends(): List<Friend> {

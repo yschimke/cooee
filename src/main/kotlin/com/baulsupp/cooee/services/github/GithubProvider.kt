@@ -2,9 +2,15 @@ package com.baulsupp.cooee.services.github
 
 import com.baulsupp.cooee.api.ClientApi
 import com.baulsupp.cooee.cache.LocalCache
-import com.baulsupp.cooee.p.*
+import com.baulsupp.cooee.p.CommandRequest
+import com.baulsupp.cooee.p.CommandResponse
+import com.baulsupp.cooee.p.CommandSuggestion
+import com.baulsupp.cooee.p.CompletionRequest
+import com.baulsupp.cooee.p.CompletionSuggestion
+import com.baulsupp.cooee.p.command
+import com.baulsupp.cooee.p.redirect
+import com.baulsupp.cooee.p.single_command
 import com.baulsupp.cooee.services.Provider
-import com.baulsupp.cooee.services.strava.StravaProvider
 import com.baulsupp.okurl.credentials.NoToken
 import okhttp3.OkHttpClient
 
@@ -22,7 +28,7 @@ class GithubProvider : Provider("github") {
 
     val r = "(\\w+)/([\\w-]+)(?:#(\\d+))?".toRegex()
 
-    val command = request.single_command
+    val command = request.single_command ?: return null
 
     val result = r.matchEntire(command) ?: return null
 

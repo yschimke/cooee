@@ -6,7 +6,6 @@ import com.baulsupp.okurl.kotlin.postJsonBody
 import com.baulsupp.okurl.kotlin.query
 import com.baulsupp.okurl.kotlin.request
 import com.baulsupp.okurl.util.ClientException
-import kotlinx.coroutines.async
 
 data class Repos(val list: List<Repository>)
 

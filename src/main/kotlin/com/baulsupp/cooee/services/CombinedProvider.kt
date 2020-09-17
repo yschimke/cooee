@@ -2,7 +2,16 @@ package com.baulsupp.cooee.services
 
 import com.baulsupp.cooee.api.ClientApi
 import com.baulsupp.cooee.cache.LocalCache
-import com.baulsupp.cooee.p.*
+import com.baulsupp.cooee.p.CommandRequest
+import com.baulsupp.cooee.p.CommandResponse
+import com.baulsupp.cooee.p.CompletionRequest
+import com.baulsupp.cooee.p.CompletionSuggestion
+import com.baulsupp.cooee.p.LogRequest
+import com.baulsupp.cooee.p.LogSeverity
+import com.baulsupp.cooee.p.TodoResponse
+import com.baulsupp.cooee.p.done
+import com.baulsupp.cooee.p.single_command
+import com.baulsupp.cooee.p.warn
 import com.baulsupp.okurl.util.ClientException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.joinAll
@@ -23,7 +32,9 @@ open class CombinedProvider(vararg val providers: Provider) : ProviderFunctions 
   }
 
   override suspend fun runCommand(request: CommandRequest): CommandResponse? {
-    val provider = findByMatchingCommand(request.single_command) ?: return null
+    val command = request.single_command ?: return null
+
+    val provider = findByMatchingCommand(command) ?: return null
 
     try {
       return provider.runCommand(request)

@@ -3,9 +3,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
 	id("org.springframework.boot") version "2.3.3.RELEASE"
 	id("io.spring.dependency-management") version "1.0.10.RELEASE"
-	kotlin("jvm") version "1.4.0"
-	kotlin("plugin.spring") version "1.4.0"
-	id("com.squareup.wire") version "3.2.2"
+	kotlin("jvm") version "1.4.10"
+	kotlin("plugin.spring") version "1.4.10"
+	id("com.squareup.wire") version "3.3.0"
 	id("com.diffplug.spotless") version "5.1.0"
 }
 
@@ -48,11 +48,14 @@ dependencies {
 		isTransitive = false
 	}
 
-	implementation("com.squareup.wire:wire-runtime:3.2.2")
-	implementation("com.squareup.wire:wire-grpc-client:3.2.2") {
+	implementation("com.squareup.wire:wire-runtime:3.3.0")
+	implementation("com.squareup.wire:wire-moshi-adapter:3.3.0")
+	implementation("com.squareup.wire:wire-grpc-client:3.3.0") {
 		exclude(group = "com.squareup.okhttp3")
 	}
-	implementation("com.squareup.wire:wire-moshi-adapter:3.2.2")
+	implementation("com.squareup.wire:wire-moshi-adapter:3.3.0")
+
+	implementation("com.google.code.gson:gson:2.8.6")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
 		exclude(group = "org.junit.vintage", module = "junit-vintage-engine")

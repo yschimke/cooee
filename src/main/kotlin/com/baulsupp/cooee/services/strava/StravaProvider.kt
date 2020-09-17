@@ -1,6 +1,12 @@
 package com.baulsupp.cooee.services.strava
 
-import com.baulsupp.cooee.p.*
+import com.baulsupp.cooee.p.CommandRequest
+import com.baulsupp.cooee.p.CommandResponse
+import com.baulsupp.cooee.p.CommandSuggestion
+import com.baulsupp.cooee.p.CompletionRequest
+import com.baulsupp.cooee.p.CompletionSuggestion
+import com.baulsupp.cooee.p.command
+import com.baulsupp.cooee.p.redirect
 import com.baulsupp.cooee.services.Provider
 
 class StravaProvider : Provider("strava") {

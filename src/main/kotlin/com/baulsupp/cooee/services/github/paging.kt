@@ -5,7 +5,6 @@ import com.baulsupp.okurl.kotlin.execute
 import com.baulsupp.okurl.kotlin.listAdapter
 import com.baulsupp.okurl.kotlin.queryList
 import com.baulsupp.okurl.kotlin.request
-import com.squareup.moshi.Moshi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 
