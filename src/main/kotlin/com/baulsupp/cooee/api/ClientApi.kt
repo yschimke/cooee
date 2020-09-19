@@ -7,9 +7,9 @@ import org.springframework.messaging.rsocket.RSocketRequester
 import org.springframework.messaging.rsocket.retrieveAndAwait
 import org.springframework.messaging.rsocket.sendAndAwait
 
-class ClientApi(val rSocketRequester: RSocketRequester) {
-  suspend fun tokenRequest(service: String) =
-      rSocketRequester.route("token").data(TokenRequest(service = service)).retrieveAndAwait<TokenResponse>()
+class ClientApi(private val rSocketRequester: RSocketRequester) {
+  suspend fun tokenRequest(request: TokenRequest) =
+      rSocketRequester.route("token").data(request).retrieveAndAwait<TokenResponse>()
 
   suspend fun logToClient(log: LogRequest) =
       rSocketRequester.route("log").data(log).sendAndAwait()

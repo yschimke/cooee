@@ -10,10 +10,13 @@ import com.baulsupp.cooee.p.LogRequest
 import com.baulsupp.cooee.p.LogSeverity
 import com.baulsupp.cooee.p.TodoResponse
 import com.baulsupp.cooee.p.done
+import com.baulsupp.cooee.p.error
 import com.baulsupp.cooee.p.single_command
 import com.baulsupp.cooee.p.warn
 import com.baulsupp.okurl.util.ClientException
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.supervisorScope
 import okhttp3.OkHttpClient
@@ -31,7 +34,7 @@ open class CombinedProvider(vararg val providers: Provider) : ProviderFunctions 
     }.joinAll()
   }
 
-  override suspend fun runCommand(request: CommandRequest): CommandResponse? {
+  override suspend fun runCommand(request: CommandRequest): Flow<CommandResponse>? {
     val command = request.single_command ?: return null
 
     val provider = findByMatchingCommand(command) ?: return null
@@ -41,9 +44,9 @@ open class CombinedProvider(vararg val providers: Provider) : ProviderFunctions 
     } catch (ce: ClientException) {
       if (ce.code == 401) {
         clientApi.logToClient(LogRequest.warn("unauthorized"))
-        return CommandResponse()
+        return flowOf(CommandResponse.error("unauthorized"))
       }
-      return CommandResponse.done(message = ce.responseMessage)
+      return flowOf(CommandResponse.error(message = ce.responseMessage))
     }
   }
 

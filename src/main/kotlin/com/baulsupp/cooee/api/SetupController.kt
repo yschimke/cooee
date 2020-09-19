@@ -13,6 +13,6 @@ class SetupController {
 
   @ConnectMapping
   fun handle(requester: RSocketRequester, @AuthenticationPrincipal jwt: String) {
-    logger.info("connected $jwt")
+    logger.debug("connected $jwt")
   }
 }

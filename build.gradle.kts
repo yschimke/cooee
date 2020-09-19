@@ -30,6 +30,7 @@ wire {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-rsocket")
+	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.security:spring-security-rsocket")
@@ -42,9 +43,11 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
+	implementation("org.thymeleaf:thymeleaf-spring5:3.0.11.RELEASE")
+
 	implementation("com.squareup.okhttp3:okhttp:4.9.0")
 	implementation("com.github.yschimke:oksocial-output:5.7")
-	implementation("com.github.yschimke:okurl:2.22") {
+	implementation("com.github.yschimke:okurl:2.23") {
 		isTransitive = false
 	}
 
@@ -54,6 +57,9 @@ dependencies {
 		exclude(group = "com.squareup.okhttp3")
 	}
 	implementation("com.squareup.wire:wire-moshi-adapter:3.3.0")
+
+	implementation("com.squareup.moshi:moshi:1.10.0")
+	implementation("com.squareup.moshi:moshi-adapters:1.10.0")
 
 	implementation("com.google.code.gson:gson:2.8.6")
 
@@ -76,7 +82,7 @@ tasks.withType<Test> {
 
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
-		freeCompilerArgs = listOf("-Xjsr305=strict")
+		freeCompilerArgs = listOf("-Xjsr305=strict  -Xopt-in=kotlin.RequiresOptIn")
 		jvmTarget = "11"
 	}
 }

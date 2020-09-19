@@ -13,18 +13,14 @@ import com.baulsupp.cooee.p.single_command
 import com.baulsupp.cooee.services.Provider
 import com.baulsupp.okurl.credentials.NoToken
 import com.baulsupp.okurl.services.github.GithubAuthInterceptor
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import okhttp3.OkHttpClient
 
-class GithubProvider : Provider("github") {
-  override suspend fun init(client: OkHttpClient, clientApi: ClientApi, cache: LocalCache) {
-    super.init(client, clientApi, cache)
-
-    this.token = token(serviceDefinition) ?: NoToken
-  }
-
-  override suspend fun runCommand(request: CommandRequest): CommandResponse? {
+class GithubProvider : Provider("github", GithubAuthInterceptor().serviceDefinition) {
+  override suspend fun runCommand(request: CommandRequest): Flow<CommandResponse>? {
     if (request.parsed_command == listOf("github")) {
-      return githubWebsite
+      return flowOf(githubWebsite)
     }
 
     val r = "(\\w+)/([\\w-]+)(?:#(\\d+))?".toRegex()
@@ -36,9 +32,9 @@ class GithubProvider : Provider("github") {
     val (org, project, id) = result.destructured
 
     return if (id.isEmpty()) {
-      CommandResponse.redirect("https://github.com/$org/$project")
+      flowOf(CommandResponse.redirect("https://github.com/$org/$project"))
     } else {
-      CommandResponse.redirect("https://github.com/$org/$project/issues/$id")
+      flowOf(CommandResponse.redirect("https://github.com/$org/$project/issues/$id"))
     }
   }
 
@@ -98,7 +94,6 @@ class GithubProvider : Provider("github") {
 //  }
 
   companion object {
-    val serviceDefinition = GithubAuthInterceptor().serviceDefinition
     val githubWebsite = CommandResponse.redirect("https://github.com/")
   }
 }

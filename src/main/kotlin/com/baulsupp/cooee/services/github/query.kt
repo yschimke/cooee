@@ -42,7 +42,7 @@ val openPullRequests = """
   """.trimIndent()
 
 suspend fun GithubProvider.recentActivePullRequests(): List<PullRequest> =
-    cache.get(token, name, "pullRequestResponse") {
+    cache.get(token(), name, "pullRequestResponse") {
       client.query<PullRequestResponse>(request {
         url("https://api.github.com/graphql")
         postJsonBody(Query(openPullRequests))
@@ -50,14 +50,14 @@ suspend fun GithubProvider.recentActivePullRequests(): List<PullRequest> =
     }.data.viewer.pullRequests.nodes
 
 suspend fun GithubProvider.listUserRepositories(): List<Repository> =
-    cache.get(token, name, "userRepositories") {
+    cache.get(token(), name, "userRepositories") {
       Repos(
           queryUserRepos()
       )
     }.list
 
 suspend fun GithubProvider.listStarredRepositories(): List<Repository> =
-    cache.get(token, name, "starredRepositories") {
+    cache.get(token(), name, "starredRepositories") {
       Repos(
           queryStarredRepos()
       )
@@ -79,17 +79,17 @@ suspend fun GithubProvider.projects(): List<Repository> {
 suspend fun GithubProvider.queryStarredRepos(): List<Repository> {
   return client.queryGithubPages<Repository>(
       "https://api.github.com/user/starred?per_page=25",
-      tokenSet = token
+      tokenSet = token()
   ).filter { it.archived == false }
 }
 
 suspend fun GithubProvider.queryUserRepos(): List<Repository> {
   return client.queryGithubPages<Repository>(
       "https://api.github.com/user/repos?per_page=25",
-      tokenSet = token
+      tokenSet = token()
   ).filter { it.archived == false }
 }
 
-suspend fun GithubProvider.fetchUser(): User = cache.get(token, name, "user") {
-  client.query("https://api.github.com/user", token)
+suspend fun GithubProvider.fetchUser(): User = cache.get(token(), name, "user") {
+  client.query("https://api.github.com/user", token())
 }

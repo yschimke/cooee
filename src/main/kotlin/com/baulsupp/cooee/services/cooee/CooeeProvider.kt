@@ -12,12 +12,12 @@ import com.baulsupp.cooee.services.Provider
 import com.baulsupp.okurl.authenticator.oauth2.Oauth2ServiceDefinition
 import com.baulsupp.okurl.credentials.ServiceDefinition
 import com.baulsupp.okurl.services.strava.StravaAuthInterceptor
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 class CooeeProvider : Provider("cooee") {
-  override suspend fun runCommand(request: CommandRequest): CommandResponse? = when {
-    request.parsed_command == listOf("cooee") -> cooeeWebsite
-    request.parsed_command.getOrNull(1) == "login" -> CommandResponse.done("Logged In")
-    request.parsed_command.getOrNull(1) == "logout" -> CommandResponse.done("Logged Out")
+  override suspend fun runCommand(request: CommandRequest): Flow<CommandResponse>? = when {
+    request.parsed_command == listOf("cooee") -> flowOf(cooeeWebsite)
     else -> null
   }
 
@@ -28,13 +28,10 @@ class CooeeProvider : Provider("cooee") {
   override suspend fun suggest(command: CompletionRequest): List<CompletionSuggestion> {
     return listOf(
         CompletionSuggestion.command(CommandSuggestion(provider = "cooee", description = "Coo.ee Website"), "cooee"),
-        CompletionSuggestion.command(CommandSuggestion(provider = "cooee", description = "Login to Coo.ee"), "cooee", "login"),
-        CompletionSuggestion.command(CommandSuggestion(provider = "cooee", description = "Logout from Coo.ee"), "cooee", "logout")
     )
   }
 
   companion object {
-    val serviceDefinition = Oauth2ServiceDefinition("api.coo.ee", "Coo.ee", "cooee")
     val cooeeWebsite = CommandResponse.redirect("https://www.coo.ee/")
   }
 }
