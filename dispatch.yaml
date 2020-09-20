@@ -1,0 +1,7 @@
+dispatch:
+  - url: "stream.coo.ee/*"
+    service: cooee-stream
+  - url: "api.coo.ee/*"
+    service: default
+  - url: "coo.ee/*"
+    service: default
