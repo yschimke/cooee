@@ -5,6 +5,7 @@ import com.baulsupp.cooee.services.CombinedProvider
 import com.baulsupp.cooee.services.cooee.CooeeProvider
 import com.baulsupp.cooee.services.cooee.LoginProvider
 import com.baulsupp.cooee.services.dev.DevCommandProvider
+import com.baulsupp.cooee.services.dev.DevTableProvider
 import com.baulsupp.cooee.services.github.GithubProvider
 import com.baulsupp.cooee.services.strava.StravaProvider
 import com.baulsupp.cooee.services.twitter.TweetSearchProvider
@@ -47,7 +48,9 @@ class CooeeApplication {
   }
 
   @Bean
-  fun combinedProvider() = CombinedProvider(StravaProvider(), GithubProvider(), TwitterProvider(), LoginProvider(), CooeeProvider(), TweetSearchProvider(), DevCommandProvider())
+  fun combinedProvider() =
+      CombinedProvider(StravaProvider(), GithubProvider(), TwitterProvider(), LoginProvider(), CooeeProvider(),
+          TweetSearchProvider(), DevCommandProvider(), DevTableProvider())
 
   @EventListener(classes = [ApplicationStartedEvent::class])
   fun onApplicationEvent(event: ApplicationStartedEvent) {
