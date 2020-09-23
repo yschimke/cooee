@@ -8,8 +8,6 @@ import com.baulsupp.cooee.p.CompletionRequest
 import com.baulsupp.cooee.p.CompletionSuggestion
 import com.baulsupp.cooee.p.LogRequest
 import com.baulsupp.cooee.p.LogSeverity
-import com.baulsupp.cooee.p.TodoResponse
-import com.baulsupp.cooee.p.done
 import com.baulsupp.cooee.p.error
 import com.baulsupp.cooee.p.single_command
 import com.baulsupp.cooee.p.warn
@@ -100,9 +98,5 @@ open class CombinedProvider(vararg val providers: Provider) : ProviderFunctions 
     } else {
       return findAllSuggestions(request)
     }
-  }
-
-  override suspend fun todo(): TodoResponse? {
-    return null
   }
 }
