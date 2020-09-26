@@ -35,15 +35,14 @@ class LoginProvider : Provider("login") {
   }
 
   suspend fun login(service: String?): CommandResponse {
-    if (service == null) {
-      return login()
+    return if (service == null) {
+      login()
     } else {
-      return loginService(service)
+      loginService(service)
     }
   }
 
-  val config = mapOf(
-      "" to ""
+  val config = mapOf("" to ""
   )
 
   private fun optionParams(serviceFlow: Oauth2Flow<*>, state: String): Map<String, Any> {
@@ -53,8 +52,8 @@ class LoginProvider : Provider("login") {
 
     return options.map {
       val value: Any = when (it) {
-        is Prompt -> config.get(it.param)?.toString() ?: ""
-        is Scopes -> config.get(it.param)?.split(",").orEmpty()
+        is Prompt -> config[it.param] ?: ""
+        is Scopes -> config[it.param]?.split(",") ?: it.known
         is Callback -> "http://localhost:8080/callback"
         is State -> state
       }
@@ -75,6 +74,8 @@ class LoginProvider : Provider("login") {
 //    appServices.authenticationFlowCache.store(AuthenticationFlowInstance(state, token, request.service))
 
     val url = flow.start()
+
+    clientApi.tokenRequest(TokenRequest(service = service, login_url = url))
 
     println(url)
 
