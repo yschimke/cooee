@@ -1,5 +1,6 @@
 package com.baulsupp.cooee
 
+import com.baulsupp.cooee.cache.AuthFlowCache
 import com.baulsupp.cooee.cache.LocalCache
 import com.baulsupp.cooee.services.CombinedProvider
 import com.baulsupp.cooee.services.cooee.CooeeProvider
@@ -48,8 +49,11 @@ class CooeeApplication {
   }
 
   @Bean
-  fun combinedProvider() =
-      CombinedProvider(StravaProvider(), GithubProvider(), TwitterProvider(), LoginProvider(), CooeeProvider(),
+  fun authCache() = AuthFlowCache()
+
+  @Bean
+  fun combinedProvider(authFlowCache: AuthFlowCache) =
+      CombinedProvider(StravaProvider(), GithubProvider(), TwitterProvider(), LoginProvider(authFlowCache), CooeeProvider(),
           TweetSearchProvider(), DevCommandProvider(), DevTableProvider())
 
   @EventListener(classes = [ApplicationStartedEvent::class])
