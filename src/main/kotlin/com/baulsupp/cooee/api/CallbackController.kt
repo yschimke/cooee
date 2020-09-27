@@ -1,12 +1,14 @@
 package com.baulsupp.cooee.api
 
+import com.baulsupp.cooee.cache.AuthFlowCache
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
+import java.lang.IllegalStateException
 
 @Controller
-class CallbackController {
+class CallbackController(val authFlowCache: AuthFlowCache) {
     @GetMapping("/callback")
     fun callback(
         @RequestParam(name = "code", required = false) code: String?,
@@ -16,6 +18,16 @@ class CallbackController {
     ): String {
         model.addAttribute("code", code)
         model.addAttribute("error", error)
+
+        if (state != null) {
+            val result = authFlowCache.get(state)
+
+            if (code != null) {
+                result.complete(code)
+            } else {
+                result.completeExceptionally(IllegalStateException(error ?: "unspecified error"))
+            }
+        }
 
         return when {
           error != null -> "callbackError"

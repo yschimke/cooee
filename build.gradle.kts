@@ -5,7 +5,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.0.10.RELEASE"
 	kotlin("jvm") version "1.4.10"
 	kotlin("plugin.spring") version "1.4.10"
-	id("com.squareup.wire") version "3.3.0"
+	id("com.squareup.wire") version "3.4.0"
 	id("com.diffplug.spotless") version "5.1.0"
 }
 
@@ -51,12 +51,12 @@ dependencies {
 		isTransitive = false
 	}
 
-	implementation("com.squareup.wire:wire-runtime:3.3.0")
-	implementation("com.squareup.wire:wire-moshi-adapter:3.3.0")
-	implementation("com.squareup.wire:wire-grpc-client:3.3.0") {
+	implementation("com.squareup.wire:wire-runtime:3.4.0")
+	implementation("com.squareup.wire:wire-moshi-adapter:3.4.0")
+	implementation("com.squareup.wire:wire-grpc-client:3.4.0") {
 		exclude(group = "com.squareup.okhttp3")
 	}
-	implementation("com.squareup.wire:wire-moshi-adapter:3.3.0")
+	implementation("com.squareup.wire:wire-moshi-adapter:3.4.0")
 
 	implementation("com.squareup.moshi:moshi:1.10.0")
 	implementation("com.squareup.moshi:moshi-adapters:1.10.0")
