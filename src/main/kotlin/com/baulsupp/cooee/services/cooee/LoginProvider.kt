@@ -1,6 +1,7 @@
 package com.baulsupp.cooee.services.cooee
 
 import com.baulsupp.cooee.cache.AuthFlowCache
+import com.baulsupp.cooee.config.ProviderProperties
 import com.baulsupp.cooee.p.CommandRequest
 import com.baulsupp.cooee.p.CommandResponse
 import com.baulsupp.cooee.p.CommandSuggestion
@@ -25,7 +26,7 @@ import kotlinx.coroutines.flow.flow
 import java.lang.IllegalStateException
 import java.util.*
 
-class LoginProvider(val authFlowCache: AuthFlowCache) : Provider("login") {
+class LoginProvider(val authFlowCache: AuthFlowCache, val providerProperties: ProviderProperties) : Provider("login") {
   override suspend fun runCommand(request: CommandRequest): Flow<CommandResponse>? {
     val service = request.parsed_command.getOrNull(1)
 
@@ -44,26 +45,34 @@ class LoginProvider(val authFlowCache: AuthFlowCache) : Provider("login") {
     }
   }
 
-  val config = mapOf(
-      "strava.clientId" to "31260",
-  )
-
   private fun optionParams(serviceFlow: Oauth2Flow<*>, state: String): Map<String, Any> {
     val options = serviceFlow.options()
 
+    val config = providerProperties.secrets
 //    println(options.map { it.param })
 
     return options.map {
       val value: Any = when (it) {
-        is Prompt -> config[it.param] ?: ""
-        is Scopes -> config[it.param]?.split(",") ?: it.known
+        is Prompt -> readConfigValue(config, it)
+        is Scopes -> readConfigList(config, it) ?: it.known
         is Callback -> "http://localhost:8080/callback"
+//        is Callback -> "https://stream.coo.ee/callback"
         is State -> state
       }
 
       it.param to value
     }.toMap()
   }
+
+  private fun readConfigList(
+    config: Map<String, String>,
+    it: AuthOption<*>
+  ) = config[it.param.replace('.', '_')]?.split(",")
+
+  private fun readConfigValue(
+    config: Map<String, String>,
+    it: AuthOption<*>
+  ) = config[it.param.replace('.', '_')] ?: ""
 
   suspend fun loginService(service: String): CommandResponse {
     return coroutineScope {
