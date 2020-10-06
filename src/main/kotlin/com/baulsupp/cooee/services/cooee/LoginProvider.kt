@@ -48,31 +48,17 @@ class LoginProvider(val authFlowCache: AuthFlowCache, val providerProperties: Pr
   private fun optionParams(serviceFlow: Oauth2Flow<*>, state: String): Map<String, Any> {
     val options = serviceFlow.options()
 
-    val config = providerProperties.secrets
-//    println(options.map { it.param })
-
     return options.map {
       val value: Any = when (it) {
-        is Prompt -> readConfigValue(config, it)
-        is Scopes -> readConfigList(config, it) ?: it.known
-        is Callback -> "http://localhost:8080/callback"
-//        is Callback -> "https://stream.coo.ee/callback"
+        is Prompt -> providerProperties.readConfigValue(it)
+        is Scopes -> providerProperties.readConfigList(it) ?: it.known
+        is Callback -> providerProperties.callback
         is State -> state
       }
 
       it.param to value
     }.toMap()
   }
-
-  private fun readConfigList(
-    config: Map<String, String>,
-    it: AuthOption<*>
-  ) = config[it.param.replace('.', '_')]?.split(",")
-
-  private fun readConfigValue(
-    config: Map<String, String>,
-    it: AuthOption<*>
-  ) = config[it.param.replace('.', '_')] ?: ""
 
   suspend fun loginService(service: String): CommandResponse {
     return coroutineScope {
@@ -97,7 +83,6 @@ class LoginProvider(val authFlowCache: AuthFlowCache, val providerProperties: Pr
     flow.defineOptions(params)
 
     val url = flow.start()
-//    println(url)
 
     val result = authFlowCache.get(state)
 
@@ -105,10 +90,8 @@ class LoginProvider(val authFlowCache: AuthFlowCache, val providerProperties: Pr
         clientApi.tokenRequest(TokenRequest(service = service, login_url = url))
 
     val code = result.await()
-//    println(code)
 
     val newToken: T = flow.complete(code) as T
-//    println(newToken)
 
     val tokenString = authInterceptor.serviceDefinition.formatCredentialsString(newToken)
 
