@@ -5,18 +5,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "provider")
 class ProviderProperties {
-	val callback: String
-		get() = "https://stream.coo.ee/callback"
-			//"http://localhost:8080/callback"
-	// "https://stream.coo.ee/callback"
+	var callback: String = "https://stream.coo.ee/callback"
 
 	var secrets: Map<String, String> = mapOf()
 
 	fun readConfigList(
 		it: AuthOption<*>
-	) = secrets[it.param.replace(".", "")]?.split(",")
+	) = secrets[it.param.replace(".", "").toLowerCase()]?.split(",")
 
 	fun readConfigValue(
 		it: AuthOption<*>
-	) = secrets[it.param.replace(".", "")] ?: ""
+	) = secrets[it.param.replace(".", "").toLowerCase()] ?: ""
 }
