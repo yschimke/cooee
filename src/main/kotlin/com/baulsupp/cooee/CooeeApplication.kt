@@ -69,10 +69,9 @@ class CooeeApplication {
   fun combinedProvider(authFlowCache: AuthFlowCache, apolloClient: ApolloClient) =
       CombinedProvider(StravaProvider(), GithubProvider(apolloClient), LoginProvider(
           authFlowCache, providerSecrets()), CooeeProvider(),
-          DevCommandProvider(), DevTableProvider())
-
-//  TweetSearchProvider(),
-//  TwitterProvider(),
+          DevCommandProvider(), DevTableProvider(),
+          TweetSearchProvider(), TwitterProvider(),
+      )
 
   @EventListener(classes = [ApplicationStartedEvent::class])
   fun onApplicationEvent(event: ApplicationStartedEvent) {
