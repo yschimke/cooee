@@ -7,6 +7,7 @@ plugins {
 	kotlin("plugin.spring") version "1.4.10"
 	id("com.squareup.wire") version "3.4.0"
 	id("com.diffplug.spotless") version "5.1.0"
+	id("com.apollographql.apollo").version("2.4.1")
 }
 
 group = "com.baulsupp.cooee"
@@ -28,6 +29,15 @@ wire {
 	}
 }
 
+apollo {
+	generateKotlinModels.set(true)
+
+	service("github") {
+		sourceFolder.set("com/github/cooee")
+		rootPackageName.set("com.github.cooee")
+	}
+}
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-rsocket")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
@@ -44,9 +54,15 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
+	// The core runtime dependencies
+	implementation("com.apollographql.apollo:apollo-runtime:2.4.1")
+	// Coroutines extensions for easier asynchronicity handling
+	implementation("com.apollographql.apollo:apollo-coroutines-support:2.4.1")
+
 	implementation("org.thymeleaf:thymeleaf-spring5:3.0.11.RELEASE")
 
 	implementation("com.squareup.okhttp3:okhttp:4.9.0")
+	implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
 	implementation("com.github.yschimke:oksocial-output:5.7")
 	implementation("com.github.yschimke:okurl:2.23") {
 		isTransitive = false

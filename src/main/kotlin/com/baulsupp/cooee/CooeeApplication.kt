@@ -1,5 +1,6 @@
 package com.baulsupp.cooee
 
+import com.apollographql.apollo.ApolloClient
 import com.baulsupp.cooee.cache.AuthFlowCache
 import com.baulsupp.cooee.cache.LocalCache
 import com.baulsupp.cooee.config.ProviderProperties
@@ -20,6 +21,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.squareup.wire.WireJsonAdapterFactory
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import org.springframework.boot.Banner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
@@ -46,8 +48,16 @@ class CooeeApplication {
     val authenticatingInterceptor = AuthenticatingInterceptor(CredentialsStore.NONE)
     builder.addNetworkInterceptor(authenticatingInterceptor)
 
+//    builder.addNetworkInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.HEADERS))
+
     return builder.build()
   }
+
+  @Bean
+  fun githubApolloClient(okHttpClient: OkHttpClient) = ApolloClient.builder()
+      .serverUrl("https://api.github.com/graphql")
+      .okHttpClient(okHttpClient)
+      .build()
 
   @Bean
   fun authCache() = AuthFlowCache()
@@ -56,10 +66,12 @@ class CooeeApplication {
   fun providerSecrets() = ProviderProperties()
 
   @Bean
-  fun combinedProvider(authFlowCache: AuthFlowCache) =
-      CombinedProvider(StravaProvider(), GithubProvider(), TwitterProvider(), LoginProvider(
+  fun combinedProvider(authFlowCache: AuthFlowCache, apolloClient: ApolloClient) =
+      CombinedProvider(StravaProvider(), GithubProvider(apolloClient), LoginProvider(
           authFlowCache, providerSecrets()), CooeeProvider(),
-          TweetSearchProvider(), DevCommandProvider(), DevTableProvider())
+          DevCommandProvider(), DevTableProvider(),
+          TweetSearchProvider(), TwitterProvider(),
+      )
 
   @EventListener(classes = [ApplicationStartedEvent::class])
   fun onApplicationEvent(event: ApplicationStartedEvent) {
