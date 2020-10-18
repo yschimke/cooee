@@ -1,26 +1,38 @@
 package com.baulsupp.cooee.services.github
 
-import com.baulsupp.cooee.api.ClientApi
-import com.baulsupp.cooee.cache.LocalCache
+import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.api.Operation
+import com.apollographql.apollo.api.Query
+import com.apollographql.apollo.api.Response
+import com.apollographql.apollo.coroutines.await
+import com.apollographql.apollo.request.RequestHeaders
 import com.baulsupp.cooee.p.CommandRequest
 import com.baulsupp.cooee.p.CommandResponse
+import com.baulsupp.cooee.p.CommandStatus
 import com.baulsupp.cooee.p.CommandSuggestion
 import com.baulsupp.cooee.p.CompletionRequest
 import com.baulsupp.cooee.p.CompletionSuggestion
 import com.baulsupp.cooee.p.command
 import com.baulsupp.cooee.p.redirect
 import com.baulsupp.cooee.p.single_command
+import com.baulsupp.cooee.p.unmatched
 import com.baulsupp.cooee.services.Provider
-import com.baulsupp.okurl.credentials.NoToken
+import com.baulsupp.okurl.authenticator.oauth2.Oauth2Token
+import com.baulsupp.okurl.credentials.TokenValue
 import com.baulsupp.okurl.services.github.GithubAuthInterceptor
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOf
-import okhttp3.OkHttpClient
+import kotlinx.coroutines.flow.map
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
-class GithubProvider : Provider("github", GithubAuthInterceptor().serviceDefinition) {
+class GithubProvider(val apolloClient: ApolloClient) : Provider("github",
+    GithubAuthInterceptor().serviceDefinition) {
   override suspend fun runCommand(request: CommandRequest): Flow<CommandResponse>? {
-    if (request.parsed_command == listOf("github")) {
-      return flowOf(githubWebsite)
+    if (request.parsed_command.firstOrNull() == "github") {
+      return githubCommand(request.parsed_command.drop(1))
     }
 
     val r = "(\\w+)/([\\w-]+)(?:#(\\d+))?".toRegex()
@@ -38,34 +50,64 @@ class GithubProvider : Provider("github", GithubAuthInterceptor().serviceDefinit
     }
   }
 
-//  override fun commandCompleter(): CommandCompleter = object : CommandCompleter {
-//    override suspend fun suggestCommands(command: String): List<Suggestion> {
-//      return projects
-//        .map {
-//          Suggestion(
-//            it.full_name,
-//            provider = name,
-//            description = it.description ?: "Github: ${it.full_name}",
-//            type = SuggestionType.LINK,
-//            url = "https://github.com/${it.full_name}"
-//          )
-//        } + Suggestion(
-//        "github",
-//        provider = name,
-//        description = "Github",
-//        type = SuggestionType.LINK,
-//        url = "https://github.com"
-//      )
-//    }
-//
-//    override suspend fun matches(command: String): Boolean {
-//      return this@GithubProvider.matches(command)
-//    }
-//  }
+  suspend fun githubCommand(arguments: List<String>): Flow<CommandResponse> {
+    return when {
+      arguments.isEmpty() -> flowOf(githubWebsite)
+      arguments == listOf("pulls") -> pullsCommand()
+      else -> flowOf(CommandResponse.unmatched())
+    }
+  }
+
+  suspend fun pullsCommand(): Flow<CommandResponse> {
+    val from = Instant.now().minus(14, ChronoUnit.DAYS)
+
+    return pulls().asFlow().filter {
+      Instant.parse(it.updatedAt.toString()).isAfter(from)
+    }.map { pr ->
+
+//      val comments = pr.comments.nodes?.filterNotNull()
+
+//      val commentsTable = if (comments.isNullOrEmpty()) {
+//        null
+//      } else {
+//        Table(
+//            columns = listOf(
+//                TableColumn(name = "comment", values = comments.map { "${it.bodyText} (${it.author?.login})" })
+//            )
+//        )
+//      }
+
+      CommandResponse(status = CommandStatus.DONE, url = pr.permalink.toString(),
+          message = pr.repository.nameWithOwner + "#" + pr.number + "\t" + pr.title
+      )
+    }
+  }
+
+  suspend fun <D : Operation.Data, T, V : Operation.Variables> graphqlQuery(
+    meQuery: Query<D, T, V>
+  ): Response<T> {
+    val t = token()
+
+    return apolloClient
+        .query(meQuery)
+        .run {
+          val tokenString = ((t as? TokenValue)?.token as? Oauth2Token)?.accessToken
+          if (tokenString != null) {
+            toBuilder()
+                .requestHeaders(RequestHeaders.Builder()
+                    .addHeader("Authorization", "token $tokenString")
+                    .build())
+                .build()
+          } else {
+            this
+          }
+        }
+        .await()
+  }
 
   override suspend fun matches(command: String): Boolean {
     return command == "github" || projects().any {
-      it.full_name == command
+      it.nameWithOwner == command
     }
   }
 
@@ -75,23 +117,11 @@ class GithubProvider : Provider("github", GithubAuthInterceptor().serviceDefinit
             CommandSuggestion(provider = "github", description = "Github Website"), "github"),
     ) + projects().map {
       CompletionSuggestion.command(CommandSuggestion(provider = "github",
-          description = it.description ?: "Github: ${it.full_name}", command = it.full_name, url = "https://github.com/${it.full_name}"),
-          it.full_name)
+          description = it.description ?: "Github: ${it.nameWithOwner}", command = it.nameWithOwner,
+          url = "https://github.com/${it.nameWithOwner}"),
+          it.nameWithOwner)
     }
   }
-
-//  override suspend fun todo(): List<Suggestion> {
-//    val cutoff = Instant.now().minus(3, ChronoUnit.DAYS)
-//
-//    return recentActivePullRequests().filter {
-//      it.updatedAt.isAfter(cutoff)
-//    }.map {
-//      Suggestion(
-//        "${it.repository.nameWithOwner}#${it.number}", name, it.title, SuggestionType.LINK,
-//        url = it.permalink
-//      )
-//    }
-//  }
 
   companion object {
     val githubWebsite = CommandResponse.redirect("https://github.com/")

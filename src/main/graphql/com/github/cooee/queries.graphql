@@ -1,0 +1,51 @@
+query TopProjects {
+    viewer {
+        topRepositories(first:100, orderBy:{field: UPDATED_AT, direction:DESC}) {
+            nodes {
+                nameWithOwner
+                description
+            }
+        }
+    }
+}
+
+query OpenPullRequests {
+    viewer {
+        login
+        pullRequests(last: 30, states:[OPEN], orderBy: {field: UPDATED_AT, direction: ASC}) {
+            nodes {
+                number
+                permalink
+                state
+                title
+                createdAt
+                updatedAt
+                repository {
+                    nameWithOwner
+                }
+                author {
+                    login
+                    ... on User {
+                        name
+                    }
+                }
+                comments(last: 5) {
+                    nodes {
+                        author {
+                            login
+                            ... on User {
+                                name
+                            }
+                        }
+                        bodyText
+                    }
+                }
+                reviews(first: 2, states: [APPROVED, CHANGES_REQUESTED]) {
+                    nodes {
+                        state
+                    }
+                }
+            }
+        }
+    }
+}
