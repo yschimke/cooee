@@ -64,19 +64,6 @@ class GithubProvider(val apolloClient: ApolloClient) : Provider("github",
     return pulls().asFlow().filter {
       Instant.parse(it.updatedAt.toString()).isAfter(from)
     }.map { pr ->
-
-//      val comments = pr.comments.nodes?.filterNotNull()
-
-//      val commentsTable = if (comments.isNullOrEmpty()) {
-//        null
-//      } else {
-//        Table(
-//            columns = listOf(
-//                TableColumn(name = "comment", values = comments.map { "${it.bodyText} (${it.author?.login})" })
-//            )
-//        )
-//      }
-
       CommandResponse(status = CommandStatus.DONE, url = pr.permalink.toString(),
           message = pr.repository.nameWithOwner + "#" + pr.number + "\t" + pr.title
       )
@@ -106,9 +93,13 @@ class GithubProvider(val apolloClient: ApolloClient) : Provider("github",
   }
 
   override suspend fun matches(command: String): Boolean {
-    return command == "github" || projects().any {
+    return command == "github" || matchesPattern(command) && projects().any {
       it.nameWithOwner == command
     }
+  }
+
+  private fun matchesPattern(command: String): Boolean {
+    return command.matches("[a-zA-Z]+/[a-zA-Z]+(?:#\\d+)?".toRegex())
   }
 
   override suspend fun suggest(command: CompletionRequest): List<CompletionSuggestion> {

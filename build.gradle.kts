@@ -80,6 +80,7 @@ dependencies {
 
 	implementation("com.google.code.gson:gson:2.8.6")
 
+	testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
 		exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
 	}

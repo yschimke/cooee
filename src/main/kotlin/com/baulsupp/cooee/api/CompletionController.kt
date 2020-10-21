@@ -13,7 +13,7 @@ import org.springframework.stereotype.Controller
 class CompletionController(val client: OkHttpClient, val combinedProvider: CombinedProvider, val cache: LocalCache) {
   @MessageMapping("complete")
   suspend fun complete(request: CompletionRequest, rSocketRequester: RSocketRequester): CompletionResponse {
-    val clientApi = ClientApi(rSocketRequester)
+    val clientApi = RSocketClientApi(rSocketRequester)
 
     combinedProvider.init(client, clientApi, cache)
 
