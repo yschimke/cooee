@@ -9,6 +9,38 @@ query TopProjects {
     }
 }
 
+query Project($owner: String!, $repo: String!) {
+    repository(owner: $owner, name: $repo) {
+        name
+        description
+        url
+        homepageUrl
+    }
+}
+
+query Issue($owner: String!, $repo: String!, $number: Int!) {
+    repository(owner: $owner, name: $repo) {
+        issueOrPullRequest(number: $number) {
+            ... on Issue {
+                title
+                author {
+                    login
+                }
+                bodyText
+                url
+            }
+            ... on PullRequest {
+                title
+                author {
+                    login
+                }
+                bodyText
+                url
+            }
+        }
+    }
+}
+
 query OpenPullRequests {
     viewer {
         login

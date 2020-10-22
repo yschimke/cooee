@@ -66,12 +66,22 @@ class CooeeApplication {
   fun providerSecrets() = ProviderProperties()
 
   @Bean
-  fun combinedProvider(authFlowCache: AuthFlowCache, apolloClient: ApolloClient) =
-      CombinedProvider(StravaProvider(), GithubProvider(apolloClient), LoginProvider(
-          authFlowCache, providerSecrets()), CooeeProvider(),
+  fun combinedProvider(githubProvider: GithubProvider, loginProvider: LoginProvider) =
+      CombinedProvider(
+          StravaProvider(), githubProvider,
+          loginProvider,
+          CooeeProvider(),
           DevCommandProvider(), DevTableProvider(),
           TweetSearchProvider(), TwitterProvider(),
       )
+
+  @Bean
+  fun loginProvider(authFlowCache: AuthFlowCache) = LoginProvider(
+      authFlowCache, providerSecrets())
+
+  @Bean
+  fun githubProvider(apolloClient: ApolloClient) =
+      GithubProvider(apolloClient)
 
   @EventListener(classes = [ApplicationStartedEvent::class])
   fun onApplicationEvent(event: ApplicationStartedEvent) {

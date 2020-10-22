@@ -35,19 +35,39 @@ class GithubProvider(val apolloClient: ApolloClient) : Provider("github",
       return githubCommand(request.parsed_command.drop(1))
     }
 
-    val r = "(\\w+)/([\\w-]+)(?:#(\\d+))?".toRegex()
-
     val command = request.single_command ?: return null
 
-    val result = r.matchEntire(command) ?: return null
+    val result = issueProjectRegex.matchEntire(command) ?: return null
 
     val (org, project, id) = result.destructured
 
     return if (id.isEmpty()) {
-      flowOf(CommandResponse.redirect("https://github.com/$org/$project"))
+      flowOf(projectResponse(org, project))
     } else {
-      flowOf(CommandResponse.redirect("https://github.com/$org/$project/issues/$id"))
+      flowOf(issueResponse(org, project, id.toInt()))
     }
+  }
+
+  private suspend fun projectResponse(
+    org: String,
+    project: String
+  ): CommandResponse {
+    val projectDetails = project(org, project) ?: return CommandResponse.unmatched()
+
+    return CommandResponse(url = projectDetails.url.toString(), status = CommandStatus.DONE,
+        message = "${projectDetails.name}: ${projectDetails.description}")
+  }
+
+  private suspend fun issueResponse(
+    org: String,
+    project: String,
+    id: Int
+  ): CommandResponse {
+    val issueDetails = issue(org, project, id) ?: return CommandResponse.unmatched()
+
+    return CommandResponse(url = issueDetails.asIssue?.url?.toString() ?: issueDetails.asPullRequest?.url?.toString(),
+        status = CommandStatus.DONE,
+        message = "${issueDetails.asIssue?.title ?: issueDetails.asPullRequest?.title}")
   }
 
   suspend fun githubCommand(arguments: List<String>): Flow<CommandResponse> {
@@ -93,13 +113,11 @@ class GithubProvider(val apolloClient: ApolloClient) : Provider("github",
   }
 
   override suspend fun matches(command: String): Boolean {
-    return command == "github" || matchesPattern(command) && projects().any {
-      it.nameWithOwner == command
-    }
+    return command == "github" || matchesPattern(command)
   }
 
   private fun matchesPattern(command: String): Boolean {
-    return command.matches("[a-zA-Z]+/[a-zA-Z]+(?:#\\d+)?".toRegex())
+    return command.matches(issueProjectRegex)
   }
 
   override suspend fun suggest(command: CompletionRequest): List<CompletionSuggestion> {
@@ -116,5 +134,6 @@ class GithubProvider(val apolloClient: ApolloClient) : Provider("github",
 
   companion object {
     val githubWebsite = CommandResponse.redirect("https://github.com/")
+    val issueProjectRegex = "([a-zA-Z]+)/([a-zA-Z]+)(?:#(\\d+))?".toRegex()
   }
 }
