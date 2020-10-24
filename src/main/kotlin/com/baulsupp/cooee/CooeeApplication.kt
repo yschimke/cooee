@@ -71,8 +71,8 @@ class CooeeApplication {
           StravaProvider(), githubProvider,
           loginProvider,
           CooeeProvider(),
-          DevCommandProvider(), DevTableProvider(),
-          TweetSearchProvider(), TwitterProvider(),
+          DevCommandProvider(), DevTableProvider()
+//          TweetSearchProvider(), TwitterProvider(),
       )
 
   @Bean

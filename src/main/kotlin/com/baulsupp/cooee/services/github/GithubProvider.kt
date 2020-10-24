@@ -1,11 +1,6 @@
 package com.baulsupp.cooee.services.github
 
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.api.Operation
-import com.apollographql.apollo.api.Query
-import com.apollographql.apollo.api.Response
-import com.apollographql.apollo.coroutines.await
-import com.apollographql.apollo.request.RequestHeaders
 import com.baulsupp.cooee.p.CommandRequest
 import com.baulsupp.cooee.p.CommandResponse
 import com.baulsupp.cooee.p.CommandStatus
@@ -13,12 +8,11 @@ import com.baulsupp.cooee.p.CommandSuggestion
 import com.baulsupp.cooee.p.CompletionRequest
 import com.baulsupp.cooee.p.CompletionSuggestion
 import com.baulsupp.cooee.p.command
+import com.baulsupp.cooee.p.done
 import com.baulsupp.cooee.p.redirect
 import com.baulsupp.cooee.p.single_command
 import com.baulsupp.cooee.p.unmatched
 import com.baulsupp.cooee.services.Provider
-import com.baulsupp.okurl.authenticator.oauth2.Oauth2Token
-import com.baulsupp.okurl.credentials.TokenValue
 import com.baulsupp.okurl.services.github.GithubAuthInterceptor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -31,8 +25,10 @@ import java.time.temporal.ChronoUnit
 class GithubProvider(val apolloClient: ApolloClient) : Provider("github",
     GithubAuthInterceptor().serviceDefinition) {
   override suspend fun runCommand(request: CommandRequest): Flow<CommandResponse>? {
+    val arguments = request.parsed_command.drop(1)
+
     if (request.parsed_command.firstOrNull() == "github") {
-      return githubCommand(request.parsed_command.drop(1))
+      return githubCommand(arguments)
     }
 
     val command = request.single_command ?: return null
@@ -41,10 +37,19 @@ class GithubProvider(val apolloClient: ApolloClient) : Provider("github",
 
     val (org, project, id) = result.destructured
 
-    return if (id.isEmpty()) {
-      flowOf(projectResponse(org, project))
-    } else {
-      flowOf(issueResponse(org, project, id.toInt()))
+    return when {
+      id.isEmpty() -> {
+        flowOf(projectResponse(org, project))
+      }
+      arguments.isEmpty() -> {
+        flowOf(issueResponse(org, project, id.toInt()))
+      }
+      arguments.firstOrNull() == "comment" -> {
+        flowOf(commentResponse(org, project, id.toInt(), arguments.drop(1).joinToString(" ")))
+      }
+      else -> {
+        flowOf(CommandResponse.unmatched())
+      }
     }
   }
 
@@ -70,6 +75,21 @@ class GithubProvider(val apolloClient: ApolloClient) : Provider("github",
         message = "${issueDetails.asIssue?.title ?: issueDetails.asPullRequest?.title}")
   }
 
+  private suspend fun commentResponse(
+    org: String,
+    project: String,
+    id: Int,
+    comment: String
+  ): CommandResponse {
+    val success = comment(org, project, id, comment)
+
+    if (!success) {
+      return CommandResponse.unmatched()
+    }
+
+    return CommandResponse.done("Commented")
+  }
+
   suspend fun githubCommand(arguments: List<String>): Flow<CommandResponse> {
     return when {
       arguments.isEmpty() -> flowOf(githubWebsite)
@@ -88,28 +108,6 @@ class GithubProvider(val apolloClient: ApolloClient) : Provider("github",
           message = pr.repository.nameWithOwner + "#" + pr.number + "\t" + pr.title
       )
     }
-  }
-
-  suspend fun <D : Operation.Data, T, V : Operation.Variables> graphqlQuery(
-    meQuery: Query<D, T, V>
-  ): Response<T> {
-    val t = token()
-
-    return apolloClient
-        .query(meQuery)
-        .run {
-          val tokenString = ((t as? TokenValue)?.token as? Oauth2Token)?.accessToken
-          if (tokenString != null) {
-            toBuilder()
-                .requestHeaders(RequestHeaders.Builder()
-                    .addHeader("Authorization", "token $tokenString")
-                    .build())
-                .build()
-          } else {
-            this
-          }
-        }
-        .await()
   }
 
   override suspend fun matches(command: String): Boolean {
@@ -134,6 +132,6 @@ class GithubProvider(val apolloClient: ApolloClient) : Provider("github",
 
   companion object {
     val githubWebsite = CommandResponse.redirect("https://github.com/")
-    val issueProjectRegex = "([a-zA-Z]+)/([a-zA-Z]+)(?:#(\\d+))?".toRegex()
+    val issueProjectRegex = "([-a-zA-Z]+)/([-a-zA-Z]+)(?:#(\\d+))?".toRegex()
   }
 }

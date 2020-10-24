@@ -1,6 +1,5 @@
-package com.baulsupp.cooee.services.github
+package com.baulsupp.cooee.services.strava
 
-import com.apollographql.apollo.ApolloClient
 import com.baulsupp.cooee.CooeeApplication
 import com.baulsupp.cooee.api.ClientApi
 import com.baulsupp.cooee.cache.LocalCache
@@ -25,13 +24,12 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(ProviderServicesExtension::class)
-class GithubProviderTest {
-  lateinit var provider: GithubProvider
+class StravaProviderTest {
+  lateinit var provider: StravaProvider
 
   suspend fun token(
     credentialsStore: CredentialsStore,
@@ -44,7 +42,6 @@ class GithubProviderTest {
   @BeforeEach
   fun init(
     credentialsStore: CredentialsStore,
-    apolloClient: ApolloClient,
     okHttpClient: OkHttpClient,
     localCache: LocalCache,
     app: CooeeApplication
@@ -52,7 +49,7 @@ class GithubProviderTest {
     // TODO fix
     Main.moshi = app.moshi()
 
-    provider = GithubProvider(apolloClient)
+    provider = StravaProvider()
 
     val clientApi = object : ClientApi {
       override suspend fun tokenRequest(request: TokenRequest): TokenResponse {
@@ -71,30 +68,29 @@ class GithubProviderTest {
   }
 
   @Test
-  fun testGithubMatches() = runBlockingTest {
-    assertTrue(provider.matches("github"))
+  fun pageMatches() = runBlockingTest {
+    assertTrue(provider.matches("strava"))
   }
 
   @Test
-  fun testProjectMatches() = runBlockingTest {
-    assertTrue(provider.matches("yschimke/okurl"))
+  fun otherNoMatches() = runBlockingTest {
+    assertFalse(provider.matches("github"))
   }
 
   @Test
-  fun testIssueMatches() = runBlockingTest {
-    assertTrue(provider.matches("yschimke/okurl#1"))
+  fun page() = runBlockingTest {
+    val response = provider.runCommand(CommandRequest(parsed_command = listOf("strava")))!!.first()
+
+    assertEquals(CommandStatus.REDIRECT, response.status)
+    assertEquals("https://www.strava.com/", response.url)
   }
 
   @Test
-  fun testNonMatch() = runBlockingTest {
-    assertFalse(provider.matches("yschimke-okurl-1"))
-  }
-
-  @Test
-  fun testProject() = runBlocking {
-    val response = provider.runCommand(CommandRequest(parsed_command = listOf("yschimke/cooee")))!!.first()
+  fun last() = runBlocking {
+    val response =
+        provider.runCommand(CommandRequest(parsed_command = listOf("strava", "last")))!!.first()
 
     assertEquals(CommandStatus.DONE, response.status)
-    assertEquals("cooee: Coo.ee codebase", response.message)
+    assertTrue(response.message!!.startsWith("Distance"))
   }
 }
