@@ -97,4 +97,14 @@ class GithubProviderTest {
     assertEquals(CommandStatus.DONE, response.status)
     assertEquals("cooee: Coo.ee codebase", response.message)
   }
+
+  @Test
+  fun testReleases() = runBlocking {
+    val response = provider.runCommand(CommandRequest(parsed_command = listOf("yschimke/okurl", "releases")))!!.first()
+
+    assertEquals(CommandStatus.DONE, response.status)
+    assertEquals(null, response.message)
+    assertEquals(listOf("Release", "Date", "URL", "Assets"), response.table?.columns?.map { it.name })
+    assertTrue(response.table?.columns?.first()?.values.orEmpty().size > 1)
+  }
 }

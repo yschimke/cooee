@@ -7,6 +7,8 @@ import com.baulsupp.cooee.p.CommandStatus
 import com.baulsupp.cooee.p.CommandSuggestion
 import com.baulsupp.cooee.p.CompletionRequest
 import com.baulsupp.cooee.p.CompletionSuggestion
+import com.baulsupp.cooee.p.Table
+import com.baulsupp.cooee.p.TableColumn
 import com.baulsupp.cooee.p.command
 import com.baulsupp.cooee.p.done
 import com.baulsupp.cooee.p.redirect
@@ -38,14 +40,17 @@ class GithubProvider(val apolloClient: ApolloClient) : Provider("github",
     val (org, project, id) = result.destructured
 
     return when {
-      id.isEmpty() -> {
-        flowOf(projectResponse(org, project))
+      id.isNotEmpty() -> {
+        flowOf(issueResponse(org, project, id.toInt()))
       }
       arguments.isEmpty() -> {
-        flowOf(issueResponse(org, project, id.toInt()))
+        flowOf(projectResponse(org, project))
       }
       arguments.firstOrNull() == "comment" -> {
         flowOf(commentResponse(org, project, id.toInt(), arguments.drop(1).joinToString(" ")))
+      }
+      arguments.firstOrNull() == "releases" -> {
+        flowOf(releasesResponse(org, project))
       }
       else -> {
         flowOf(CommandResponse.unmatched())
@@ -61,6 +66,23 @@ class GithubProvider(val apolloClient: ApolloClient) : Provider("github",
 
     return CommandResponse(url = projectDetails.url.toString(), status = CommandStatus.DONE,
         message = "${projectDetails.name}: ${projectDetails.description}")
+  }
+
+  private suspend fun releasesResponse(
+    org: String,
+    project: String
+  ): CommandResponse {
+    val releaseDetails = projectsReleases(org, project)
+
+    return CommandResponse(status = CommandStatus.DONE,
+        table = Table(columns = listOf(
+            TableColumn(name = "Release", values = releaseDetails.map { it.name.orEmpty() }),
+            TableColumn(name = "Date", values = releaseDetails.map { it.createdAt.toString() }),
+            TableColumn(name = "URL", values = releaseDetails.map { it.url.toString() }),
+            TableColumn(name = "Assets", values = releaseDetails.map {
+              it.releaseAssets?.nodes?.mapNotNull { asset -> asset?.name }?.joinToString().orEmpty()
+            }),
+        )))
   }
 
   private suspend fun issueResponse(

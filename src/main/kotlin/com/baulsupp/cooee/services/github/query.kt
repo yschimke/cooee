@@ -7,11 +7,25 @@ import com.github.cooee.AddCommentMutation
 import com.github.cooee.IssueQuery
 import com.github.cooee.OpenPullRequestsQuery
 import com.github.cooee.ProjectQuery
+import com.github.cooee.ProjectReleasesQuery
 import com.github.cooee.TopProjectsQuery
 
 suspend fun GithubProvider.projects(): List<TopProjectsQuery.Node> = try {
   apolloClient.graphqlQuery(TopProjectsQuery(),
       token()).data?.viewer?.topRepositories?.nodes?.mapNotNull {
+    it
+  }.orEmpty()
+} catch (ahe: ApolloHttpException) {
+  clientApi.logToClient(LogRequest(message = "failed $ahe", severity = LogSeverity.WARN))
+  listOf()
+}
+
+suspend fun GithubProvider.projectsReleases(
+  owner: String,
+  project: String
+): List<ProjectReleasesQuery.Node> = try {
+  apolloClient.graphqlQuery(ProjectReleasesQuery(owner, project), token())
+      .data?.repository?.releases?.nodes?.mapNotNull {
     it
   }.orEmpty()
 } catch (ahe: ApolloHttpException) {
