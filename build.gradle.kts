@@ -1,26 +1,46 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("org.springframework.boot") version "2.3.3.RELEASE"
-	id("io.spring.dependency-management") version "1.0.10.RELEASE"
-	kotlin("jvm") version "1.4.10"
-	kotlin("plugin.spring") version "1.4.10"
+	id("org.springframework.boot") version "2.4.3"
+	id("io.spring.dependency-management") version "1.0.11.RELEASE"
+	id("com.google.cloud.tools.appengine") version "2.4.1"
+	kotlin("jvm") version "1.4.31"
+	kotlin("plugin.spring") version "1.4.30"
 	id("com.squareup.wire") version "3.4.0"
 	id("com.diffplug.spotless") version "5.1.0"
-	id("com.apollographql.apollo").version("2.4.1")
+	id("com.apollographql.apollo").version("2.5.5")
 }
 
 group = "com.baulsupp.cooee"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_11
-java.targetCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_1_8
+java.targetCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
 	mavenCentral()
-	maven(url = "https://jitpack.io")
+	maven(url = "https://jitpack.io") {
+		group = "com.github.yschimke"
+	}
 }
 
-extra["testcontainersVersion"] = "1.14.3"
+appengine {
+	deploy {
+		version = "GCLOUD_CONFIG"
+		projectId = "GCLOUD_CONFIG"
+	}
+}
+
+extra["springCloudGcpVersion"] = "2.0.1"
+extra["springCloudVersion"] = "2020.0.1"
+extra["testcontainersVersion"] = "1.15.1"
+
+dependencyManagement {
+	imports {
+		mavenBom("com.google.cloud:spring-cloud-gcp-dependencies:${property("springCloudGcpVersion")}")
+		mavenBom("org.testcontainers:testcontainers-bom:${property("testcontainersVersion")}")
+		mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+	}
+}
 
 wire {
 	kotlin {
@@ -47,7 +67,7 @@ dependencies {
 	implementation("org.springframework.security:spring-security-messaging")
 	implementation("org.springframework.boot:spring-boot-starter-logging")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-	implementation("org.springframework.cloud:spring-cloud-gcp-starter-secretmanager:1.2.5.RELEASE")
+	implementation("com.google.cloud:spring-cloud-gcp-starter-secretmanager")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -55,16 +75,14 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
 	// The core runtime dependencies
-	implementation("com.apollographql.apollo:apollo-runtime:2.4.1")
+	implementation("com.apollographql.apollo:apollo-runtime:2.5.5")
 	// Coroutines extensions for easier asynchronicity handling
-	implementation("com.apollographql.apollo:apollo-coroutines-support:2.4.1")
+	implementation("com.apollographql.apollo:apollo-coroutines-support:2.5.5")
 
-	implementation("org.thymeleaf:thymeleaf-spring5:3.0.11.RELEASE")
-
-	implementation("com.squareup.okhttp3:okhttp:4.9.0")
-	implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
+	implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
+	implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
 	implementation("com.github.yschimke:oksocial-output:5.7")
-	implementation("com.github.yschimke:okurl:2.23") {
+	implementation("com.github.yschimke:okurl:2.29") {
 		isTransitive = false
 	}
 
@@ -75,8 +93,8 @@ dependencies {
 	}
 	implementation("com.squareup.wire:wire-moshi-adapter:3.4.0")
 
-	implementation("com.squareup.moshi:moshi:1.10.0")
-	implementation("com.squareup.moshi:moshi-adapters:1.10.0")
+	implementation("com.squareup.moshi:moshi:1.11.0")
+	implementation("com.squareup.moshi:moshi-adapters:1.11.0")
 
 	implementation("com.google.code.gson:gson:2.8.6")
 
@@ -100,7 +118,7 @@ tasks.withType<Test> {
 
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
-		freeCompilerArgs = listOf("-Xjsr305=strict  -Xopt-in=kotlin.RequiresOptIn")
-		jvmTarget = "11"
+		freeCompilerArgs = listOf("-Xjsr305=strict -Xopt-in=kotlin.RequiresOptIn")
+		jvmTarget = "1.8"
 	}
 }
