@@ -95,7 +95,5 @@ class CooeeApplication {
 }
 
 fun main(args: Array<String>) {
-  runApplication<CooeeApplication>(*args) {
-    setBannerMode(Banner.Mode.OFF)
-  }
+  runApplication<CooeeApplication>(*args)
 }
