@@ -80,7 +80,7 @@ open class CombinedProvider(vararg val providers: Provider) : ProviderFunctions 
       try {
         suggestions.await()
       } catch (e: Exception) {
-        val log: LogRequest = LogRequest(message = e.toString(), severity = LogSeverity.WARN)
+        val log = LogRequest(message = e.toString(), severity = LogSeverity.WARN)
         clientApi.logToClient(log)
         System.err.println("TODO(${provider.name}): $e")
         listOf()

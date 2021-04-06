@@ -10,6 +10,7 @@ import com.baulsupp.cooee.services.cooee.LoginProvider
 import com.baulsupp.cooee.services.dev.DevCommandProvider
 import com.baulsupp.cooee.services.dev.DevTableProvider
 import com.baulsupp.cooee.services.github.GithubProvider
+import com.baulsupp.cooee.services.remote.RemoteProvider
 import com.baulsupp.cooee.services.strava.StravaProvider
 import com.baulsupp.cooee.services.twitter.TweetSearchProvider
 import com.baulsupp.cooee.services.twitter.TwitterProvider
@@ -26,6 +27,7 @@ import org.springframework.boot.Banner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
 import org.springframework.boot.context.event.ApplicationStartedEvent
+import org.springframework.boot.context.metrics.buffering.BufferingApplicationStartup
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.context.event.EventListener
@@ -66,22 +68,24 @@ class CooeeApplication {
   fun providerSecrets() = ProviderProperties()
 
   @Bean
-  fun combinedProvider(githubProvider: GithubProvider, loginProvider: LoginProvider) =
+  fun combinedProvider(githubProvider: GithubProvider, loginProvider: LoginProvider, remoteProvider: RemoteProvider) =
       CombinedProvider(
           StravaProvider(), githubProvider,
           loginProvider,
           CooeeProvider(),
-          DevCommandProvider(), DevTableProvider()
+          DevCommandProvider(), DevTableProvider(),
+          remoteProvider
 //          TweetSearchProvider(), TwitterProvider(),
       )
 
   @Bean
-  fun loginProvider(authFlowCache: AuthFlowCache) = LoginProvider(
-      authFlowCache, providerSecrets())
+  fun loginProvider(authFlowCache: AuthFlowCache) = LoginProvider(authFlowCache, providerSecrets())
 
   @Bean
-  fun githubProvider(apolloClient: ApolloClient) =
-      GithubProvider(apolloClient)
+  fun githubProvider(apolloClient: ApolloClient) = GithubProvider(apolloClient)
+
+  @Bean
+  fun remoteProvider() = RemoteProvider()
 
   @EventListener(classes = [ApplicationStartedEvent::class])
   fun onApplicationEvent(event: ApplicationStartedEvent) {
@@ -95,5 +99,7 @@ class CooeeApplication {
 }
 
 fun main(args: Array<String>) {
-  runApplication<CooeeApplication>(*args)
+  runApplication<CooeeApplication>(*args) {
+    setApplicationStartup(BufferingApplicationStartup(10000))
+  }
 }
