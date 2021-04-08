@@ -11,9 +11,6 @@ import com.baulsupp.cooee.services.dev.DevCommandProvider
 import com.baulsupp.cooee.services.dev.DevTableProvider
 import com.baulsupp.cooee.services.github.GithubProvider
 import com.baulsupp.cooee.services.remote.RemoteProvider
-import com.baulsupp.cooee.services.strava.StravaProvider
-import com.baulsupp.cooee.services.twitter.TweetSearchProvider
-import com.baulsupp.cooee.services.twitter.TwitterProvider
 import com.baulsupp.cooee.util.WireProto3PropertyNamingStrategy
 import com.baulsupp.okurl.Main
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
@@ -22,8 +19,6 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.squareup.wire.WireJsonAdapterFactory
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import org.springframework.boot.Banner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
 import org.springframework.boot.context.event.ApplicationStartedEvent
@@ -70,7 +65,7 @@ class CooeeApplication {
   @Bean
   fun combinedProvider(githubProvider: GithubProvider, loginProvider: LoginProvider, remoteProvider: RemoteProvider) =
       CombinedProvider(
-          StravaProvider(), githubProvider,
+          githubProvider,
           loginProvider,
           CooeeProvider(),
           DevCommandProvider(), DevTableProvider(),

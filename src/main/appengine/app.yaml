@@ -9,6 +9,7 @@ resources:
   disk_size_gb: 10
 automatic_scaling:
   min_instances: 0
+  max_instances: 1
   target_concurrent_requests: 100
 instance_class: F2
 env_variables:

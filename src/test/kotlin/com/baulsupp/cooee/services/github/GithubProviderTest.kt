@@ -6,7 +6,10 @@ import com.baulsupp.cooee.api.ClientApi
 import com.baulsupp.cooee.cache.LocalCache
 import com.baulsupp.cooee.junit5.ProviderServicesExtension
 import com.baulsupp.cooee.p.CommandRequest
+import com.baulsupp.cooee.p.CommandResponse
 import com.baulsupp.cooee.p.CommandStatus
+import com.baulsupp.cooee.p.CompletionRequest
+import com.baulsupp.cooee.p.CompletionResponse
 import com.baulsupp.cooee.p.LogRequest
 import com.baulsupp.cooee.p.TokenRequest
 import com.baulsupp.cooee.p.TokenResponse
@@ -16,6 +19,7 @@ import com.baulsupp.okurl.authenticator.oauth2.Oauth2Token
 import com.baulsupp.okurl.credentials.CredentialsStore
 import com.baulsupp.okurl.credentials.DefaultToken
 import com.baulsupp.okurl.credentials.ServiceDefinition
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
@@ -25,7 +29,6 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
@@ -62,6 +65,14 @@ class GithubProviderTest {
       }
 
       override suspend fun logToClient(log: LogRequest) {
+      }
+
+      override suspend fun commandRequest(request: CommandRequest): Flow<CommandResponse> {
+        TODO("Not yet implemented")
+      }
+
+      override suspend fun complete(request: CompletionRequest): CompletionResponse {
+        TODO("Not yet implemented")
       }
     }
 
