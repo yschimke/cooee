@@ -9,19 +9,20 @@ import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
 import com.squareup.wire.Syntax.PROTO_3
 import com.squareup.wire.WireField
-import com.squareup.wire.internal.checkElementsNotNull
-import com.squareup.wire.internal.immutableCopyOf
-import com.squareup.wire.internal.sanitize
+import com.squareup.wire.`internal`.checkElementsNotNull
+import com.squareup.wire.`internal`.immutableCopyOf
+import com.squareup.wire.`internal`.sanitize
 import kotlin.Any
 import kotlin.Boolean
 import kotlin.Int
 import kotlin.Long
 import kotlin.String
+import kotlin.Unit
 import kotlin.collections.List
 import kotlin.jvm.JvmField
 import okio.ByteString
 
-class RegisterServerRequest(
+public class RegisterServerRequest(
   commands: List<String> = emptyList(),
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<RegisterServerRequest, RegisterServerRequest.Builder>(ADAPTER, unknownFields) {
@@ -31,16 +32,16 @@ class RegisterServerRequest(
     label = WireField.Label.REPEATED
   )
   @JvmField
-  val commands: List<String> = immutableCopyOf("commands", commands)
+  public val commands: List<String> = immutableCopyOf("commands", commands)
 
-  override fun newBuilder(): Builder {
+  public override fun newBuilder(): Builder {
     val builder = Builder()
     builder.commands = commands
     builder.addUnknownFields(unknownFields)
     return builder
   }
 
-  override fun equals(other: Any?): Boolean {
+  public override fun equals(other: Any?): Boolean {
     if (other === this) return true
     if (other !is RegisterServerRequest) return false
     if (unknownFields != other.unknownFields) return false
@@ -48,7 +49,7 @@ class RegisterServerRequest(
     return true
   }
 
-  override fun hashCode(): Int {
+  public override fun hashCode(): Int {
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
@@ -58,52 +59,53 @@ class RegisterServerRequest(
     return result
   }
 
-  override fun toString(): String {
+  public override fun toString(): String {
     val result = mutableListOf<String>()
     if (commands.isNotEmpty()) result += """commands=${sanitize(commands)}"""
     return result.joinToString(prefix = "RegisterServerRequest{", separator = ", ", postfix = "}")
   }
 
-  fun copy(commands: List<String> = this.commands, unknownFields: ByteString = this.unknownFields):
-      RegisterServerRequest = RegisterServerRequest(commands, unknownFields)
+  public fun copy(commands: List<String> = this.commands, unknownFields: ByteString =
+      this.unknownFields): RegisterServerRequest = RegisterServerRequest(commands, unknownFields)
 
-  class Builder : Message.Builder<RegisterServerRequest, Builder>() {
+  public class Builder : Message.Builder<RegisterServerRequest, Builder>() {
     @JvmField
-    var commands: List<String> = emptyList()
+    public var commands: List<String> = emptyList()
 
-    fun commands(commands: List<String>): Builder {
+    public fun commands(commands: List<String>): Builder {
       checkElementsNotNull(commands)
       this.commands = commands
       return this
     }
 
-    override fun build(): RegisterServerRequest = RegisterServerRequest(
+    public override fun build(): RegisterServerRequest = RegisterServerRequest(
       commands = commands,
       unknownFields = buildUnknownFields()
     )
   }
 
-  companion object {
+  public companion object {
     @JvmField
-    val ADAPTER: ProtoAdapter<RegisterServerRequest> = object : ProtoAdapter<RegisterServerRequest>(
+    public val ADAPTER: ProtoAdapter<RegisterServerRequest> = object :
+        ProtoAdapter<RegisterServerRequest>(
       FieldEncoding.LENGTH_DELIMITED, 
       RegisterServerRequest::class, 
       "type.googleapis.com/com.baulsupp.cooee.p.RegisterServerRequest", 
       PROTO_3, 
       null
     ) {
-      override fun encodedSize(value: RegisterServerRequest): Int {
+      public override fun encodedSize(value: RegisterServerRequest): Int {
         var size = value.unknownFields.size
         size += ProtoAdapter.STRING.asRepeated().encodedSizeWithTag(1, value.commands)
         return size
       }
 
-      override fun encode(writer: ProtoWriter, value: RegisterServerRequest) {
+      public override fun encode(writer: ProtoWriter, value: RegisterServerRequest): Unit {
         ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 1, value.commands)
         writer.writeBytes(value.unknownFields)
       }
 
-      override fun decode(reader: ProtoReader): RegisterServerRequest {
+      public override fun decode(reader: ProtoReader): RegisterServerRequest {
         val commands = mutableListOf<String>()
         val unknownFields = reader.forEachTag { tag ->
           when (tag) {
@@ -117,7 +119,7 @@ class RegisterServerRequest(
         )
       }
 
-      override fun redact(value: RegisterServerRequest): RegisterServerRequest = value.copy(
+      public override fun redact(value: RegisterServerRequest): RegisterServerRequest = value.copy(
         unknownFields = ByteString.EMPTY
       )
     }

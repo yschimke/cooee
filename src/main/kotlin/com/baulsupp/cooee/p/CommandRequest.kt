@@ -9,20 +9,21 @@ import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
 import com.squareup.wire.Syntax.PROTO_3
 import com.squareup.wire.WireField
-import com.squareup.wire.internal.checkElementsNotNull
-import com.squareup.wire.internal.immutableCopyOf
-import com.squareup.wire.internal.sanitize
+import com.squareup.wire.`internal`.checkElementsNotNull
+import com.squareup.wire.`internal`.immutableCopyOf
+import com.squareup.wire.`internal`.sanitize
 import kotlin.Any
 import kotlin.Boolean
 import kotlin.Int
 import kotlin.Long
 import kotlin.String
+import kotlin.Unit
 import kotlin.collections.List
 import kotlin.hashCode
 import kotlin.jvm.JvmField
 import okio.ByteString
 
-class CommandRequest(
+public class CommandRequest(
   parsed_command: List<String> = emptyList(),
   @field:WireField(
     tag = 2,
@@ -31,7 +32,7 @@ class CommandRequest(
     jsonName = "responseType"
   )
   @JvmField
-  val response_type: ResponseType = ResponseType.DEFAULT_RESPONSE,
+  public val response_type: ResponseType = ResponseType.DEFAULT_RESPONSE,
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<CommandRequest, CommandRequest.Builder>(ADAPTER, unknownFields) {
   @field:WireField(
@@ -41,9 +42,9 @@ class CommandRequest(
     jsonName = "parsedCommand"
   )
   @JvmField
-  val parsed_command: List<String> = immutableCopyOf("parsed_command", parsed_command)
+  public val parsed_command: List<String> = immutableCopyOf("parsed_command", parsed_command)
 
-  override fun newBuilder(): Builder {
+  public override fun newBuilder(): Builder {
     val builder = Builder()
     builder.parsed_command = parsed_command
     builder.response_type = response_type
@@ -51,7 +52,7 @@ class CommandRequest(
     return builder
   }
 
-  override fun equals(other: Any?): Boolean {
+  public override fun equals(other: Any?): Boolean {
     if (other === this) return true
     if (other !is CommandRequest) return false
     if (unknownFields != other.unknownFields) return false
@@ -60,7 +61,7 @@ class CommandRequest(
     return true
   }
 
-  override fun hashCode(): Int {
+  public override fun hashCode(): Int {
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
@@ -71,54 +72,54 @@ class CommandRequest(
     return result
   }
 
-  override fun toString(): String {
+  public override fun toString(): String {
     val result = mutableListOf<String>()
     if (parsed_command.isNotEmpty()) result += """parsed_command=${sanitize(parsed_command)}"""
     result += """response_type=$response_type"""
     return result.joinToString(prefix = "CommandRequest{", separator = ", ", postfix = "}")
   }
 
-  fun copy(
+  public fun copy(
     parsed_command: List<String> = this.parsed_command,
     response_type: ResponseType = this.response_type,
     unknownFields: ByteString = this.unknownFields
   ): CommandRequest = CommandRequest(parsed_command, response_type, unknownFields)
 
-  class Builder : Message.Builder<CommandRequest, Builder>() {
+  public class Builder : Message.Builder<CommandRequest, Builder>() {
     @JvmField
-    var parsed_command: List<String> = emptyList()
+    public var parsed_command: List<String> = emptyList()
 
     @JvmField
-    var response_type: ResponseType = ResponseType.DEFAULT_RESPONSE
+    public var response_type: ResponseType = ResponseType.DEFAULT_RESPONSE
 
-    fun parsed_command(parsed_command: List<String>): Builder {
+    public fun parsed_command(parsed_command: List<String>): Builder {
       checkElementsNotNull(parsed_command)
       this.parsed_command = parsed_command
       return this
     }
 
-    fun response_type(response_type: ResponseType): Builder {
+    public fun response_type(response_type: ResponseType): Builder {
       this.response_type = response_type
       return this
     }
 
-    override fun build(): CommandRequest = CommandRequest(
+    public override fun build(): CommandRequest = CommandRequest(
       parsed_command = parsed_command,
       response_type = response_type,
       unknownFields = buildUnknownFields()
     )
   }
 
-  companion object {
+  public companion object {
     @JvmField
-    val ADAPTER: ProtoAdapter<CommandRequest> = object : ProtoAdapter<CommandRequest>(
+    public val ADAPTER: ProtoAdapter<CommandRequest> = object : ProtoAdapter<CommandRequest>(
       FieldEncoding.LENGTH_DELIMITED, 
       CommandRequest::class, 
       "type.googleapis.com/com.baulsupp.cooee.p.CommandRequest", 
       PROTO_3, 
       null
     ) {
-      override fun encodedSize(value: CommandRequest): Int {
+      public override fun encodedSize(value: CommandRequest): Int {
         var size = value.unknownFields.size
         size += ProtoAdapter.STRING.asRepeated().encodedSizeWithTag(1, value.parsed_command)
         if (value.response_type != ResponseType.DEFAULT_RESPONSE) size +=
@@ -126,14 +127,14 @@ class CommandRequest(
         return size
       }
 
-      override fun encode(writer: ProtoWriter, value: CommandRequest) {
+      public override fun encode(writer: ProtoWriter, value: CommandRequest): Unit {
         ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 1, value.parsed_command)
         if (value.response_type != ResponseType.DEFAULT_RESPONSE)
             ResponseType.ADAPTER.encodeWithTag(writer, 2, value.response_type)
         writer.writeBytes(value.unknownFields)
       }
 
-      override fun decode(reader: ProtoReader): CommandRequest {
+      public override fun decode(reader: ProtoReader): CommandRequest {
         val parsed_command = mutableListOf<String>()
         var response_type: ResponseType = ResponseType.DEFAULT_RESPONSE
         val unknownFields = reader.forEachTag { tag ->
@@ -154,7 +155,7 @@ class CommandRequest(
         )
       }
 
-      override fun redact(value: CommandRequest): CommandRequest = value.copy(
+      public override fun redact(value: CommandRequest): CommandRequest = value.copy(
         unknownFields = ByteString.EMPTY
       )
     }

@@ -9,49 +9,50 @@ import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
 import com.squareup.wire.Syntax.PROTO_3
 import com.squareup.wire.WireField
-import com.squareup.wire.internal.checkElementsNotNull
-import com.squareup.wire.internal.immutableCopyOf
-import com.squareup.wire.internal.redactElements
-import com.squareup.wire.internal.sanitize
+import com.squareup.wire.`internal`.checkElementsNotNull
+import com.squareup.wire.`internal`.immutableCopyOf
+import com.squareup.wire.`internal`.redactElements
+import com.squareup.wire.`internal`.sanitize
 import kotlin.Any
 import kotlin.Boolean
 import kotlin.Int
 import kotlin.Long
 import kotlin.String
+import kotlin.Unit
 import kotlin.collections.List
 import kotlin.hashCode
 import kotlin.jvm.JvmField
 import okio.ByteString
 
-class CommandSuggestion(
+public class CommandSuggestion(
   @field:WireField(
     tag = 1,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
     label = WireField.Label.OMIT_IDENTITY
   )
   @JvmField
-  val command: String = "",
+  public val command: String = "",
   @field:WireField(
     tag = 2,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
     label = WireField.Label.OMIT_IDENTITY
   )
   @JvmField
-  val provider: String = "",
+  public val provider: String = "",
   @field:WireField(
     tag = 3,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
     label = WireField.Label.OMIT_IDENTITY
   )
   @JvmField
-  val description: String = "",
+  public val description: String = "",
   @field:WireField(
     tag = 4,
     adapter = "com.baulsupp.cooee.p.SuggestionType#ADAPTER",
     label = WireField.Label.OMIT_IDENTITY
   )
   @JvmField
-  val type: SuggestionType = SuggestionType.UNKNOWN,
+  public val type: SuggestionType = SuggestionType.UNKNOWN,
   children: List<CommandSuggestion> = emptyList(),
   @field:WireField(
     tag = 6,
@@ -59,14 +60,14 @@ class CommandSuggestion(
     label = WireField.Label.OMIT_IDENTITY
   )
   @JvmField
-  val url: String? = null,
+  public val url: String? = null,
   @field:WireField(
     tag = 7,
     adapter = "com.squareup.wire.ProtoAdapter#STRING_VALUE",
     label = WireField.Label.OMIT_IDENTITY
   )
   @JvmField
-  val message: String? = null,
+  public val message: String? = null,
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<CommandSuggestion, CommandSuggestion.Builder>(ADAPTER, unknownFields) {
   @field:WireField(
@@ -75,9 +76,9 @@ class CommandSuggestion(
     label = WireField.Label.REPEATED
   )
   @JvmField
-  val children: List<CommandSuggestion> = immutableCopyOf("children", children)
+  public val children: List<CommandSuggestion> = immutableCopyOf("children", children)
 
-  override fun newBuilder(): Builder {
+  public override fun newBuilder(): Builder {
     val builder = Builder()
     builder.command = command
     builder.provider = provider
@@ -90,7 +91,7 @@ class CommandSuggestion(
     return builder
   }
 
-  override fun equals(other: Any?): Boolean {
+  public override fun equals(other: Any?): Boolean {
     if (other === this) return true
     if (other !is CommandSuggestion) return false
     if (unknownFields != other.unknownFields) return false
@@ -104,7 +105,7 @@ class CommandSuggestion(
     return true
   }
 
-  override fun hashCode(): Int {
+  public override fun hashCode(): Int {
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
@@ -120,7 +121,7 @@ class CommandSuggestion(
     return result
   }
 
-  override fun toString(): String {
+  public override fun toString(): String {
     val result = mutableListOf<String>()
     result += """command=${sanitize(command)}"""
     result += """provider=${sanitize(provider)}"""
@@ -132,7 +133,7 @@ class CommandSuggestion(
     return result.joinToString(prefix = "CommandSuggestion{", separator = ", ", postfix = "}")
   }
 
-  fun copy(
+  public fun copy(
     command: String = this.command,
     provider: String = this.provider,
     description: String = this.description,
@@ -144,65 +145,65 @@ class CommandSuggestion(
   ): CommandSuggestion = CommandSuggestion(command, provider, description, type, children, url,
       message, unknownFields)
 
-  class Builder : Message.Builder<CommandSuggestion, Builder>() {
+  public class Builder : Message.Builder<CommandSuggestion, Builder>() {
     @JvmField
-    var command: String = ""
+    public var command: String = ""
 
     @JvmField
-    var provider: String = ""
+    public var provider: String = ""
 
     @JvmField
-    var description: String = ""
+    public var description: String = ""
 
     @JvmField
-    var type: SuggestionType = SuggestionType.UNKNOWN
+    public var type: SuggestionType = SuggestionType.UNKNOWN
 
     @JvmField
-    var children: List<CommandSuggestion> = emptyList()
+    public var children: List<CommandSuggestion> = emptyList()
 
     @JvmField
-    var url: String? = null
+    public var url: String? = null
 
     @JvmField
-    var message: String? = null
+    public var message: String? = null
 
-    fun command(command: String): Builder {
+    public fun command(command: String): Builder {
       this.command = command
       return this
     }
 
-    fun provider(provider: String): Builder {
+    public fun provider(provider: String): Builder {
       this.provider = provider
       return this
     }
 
-    fun description(description: String): Builder {
+    public fun description(description: String): Builder {
       this.description = description
       return this
     }
 
-    fun type(type: SuggestionType): Builder {
+    public fun type(type: SuggestionType): Builder {
       this.type = type
       return this
     }
 
-    fun children(children: List<CommandSuggestion>): Builder {
+    public fun children(children: List<CommandSuggestion>): Builder {
       checkElementsNotNull(children)
       this.children = children
       return this
     }
 
-    fun url(url: String?): Builder {
+    public fun url(url: String?): Builder {
       this.url = url
       return this
     }
 
-    fun message(message: String?): Builder {
+    public fun message(message: String?): Builder {
       this.message = message
       return this
     }
 
-    override fun build(): CommandSuggestion = CommandSuggestion(
+    public override fun build(): CommandSuggestion = CommandSuggestion(
       command = command,
       provider = provider,
       description = description,
@@ -214,16 +215,16 @@ class CommandSuggestion(
     )
   }
 
-  companion object {
+  public companion object {
     @JvmField
-    val ADAPTER: ProtoAdapter<CommandSuggestion> = object : ProtoAdapter<CommandSuggestion>(
+    public val ADAPTER: ProtoAdapter<CommandSuggestion> = object : ProtoAdapter<CommandSuggestion>(
       FieldEncoding.LENGTH_DELIMITED, 
       CommandSuggestion::class, 
       "type.googleapis.com/com.baulsupp.cooee.p.CommandSuggestion", 
       PROTO_3, 
       null
     ) {
-      override fun encodedSize(value: CommandSuggestion): Int {
+      public override fun encodedSize(value: CommandSuggestion): Int {
         var size = value.unknownFields.size
         if (value.command != "") size += ProtoAdapter.STRING.encodedSizeWithTag(1, value.command)
         if (value.provider != "") size += ProtoAdapter.STRING.encodedSizeWithTag(2, value.provider)
@@ -238,7 +239,7 @@ class CommandSuggestion(
         return size
       }
 
-      override fun encode(writer: ProtoWriter, value: CommandSuggestion) {
+      public override fun encode(writer: ProtoWriter, value: CommandSuggestion): Unit {
         if (value.command != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.command)
         if (value.provider != "") ProtoAdapter.STRING.encodeWithTag(writer, 2, value.provider)
         if (value.description != "") ProtoAdapter.STRING.encodeWithTag(writer, 3, value.description)
@@ -250,7 +251,7 @@ class CommandSuggestion(
         writer.writeBytes(value.unknownFields)
       }
 
-      override fun decode(reader: ProtoReader): CommandSuggestion {
+      public override fun decode(reader: ProtoReader): CommandSuggestion {
         var command: String = ""
         var provider: String = ""
         var description: String = ""
@@ -286,7 +287,7 @@ class CommandSuggestion(
         )
       }
 
-      override fun redact(value: CommandSuggestion): CommandSuggestion = value.copy(
+      public override fun redact(value: CommandSuggestion): CommandSuggestion = value.copy(
         children = value.children.redactElements(CommandSuggestion.ADAPTER),
         url = value.url?.let(ProtoAdapter.STRING_VALUE::redact),
         message = value.message?.let(ProtoAdapter.STRING_VALUE::redact),

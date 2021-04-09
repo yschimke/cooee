@@ -9,24 +9,25 @@ import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
 import com.squareup.wire.Syntax.PROTO_3
 import com.squareup.wire.WireField
-import com.squareup.wire.internal.sanitize
+import com.squareup.wire.`internal`.sanitize
 import kotlin.Any
 import kotlin.Boolean
 import kotlin.Int
 import kotlin.Long
 import kotlin.String
+import kotlin.Unit
 import kotlin.hashCode
 import kotlin.jvm.JvmField
 import okio.ByteString
 
-class TokenUpdate(
+public class TokenUpdate(
   @field:WireField(
     tag = 1,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
     label = WireField.Label.OMIT_IDENTITY
   )
   @JvmField
-  val service: String = "",
+  public val service: String = "",
   @field:WireField(
     tag = 2,
     adapter = "com.squareup.wire.ProtoAdapter#STRING_VALUE",
@@ -34,17 +35,17 @@ class TokenUpdate(
     jsonName = "tokenSet"
   )
   @JvmField
-  val token_set: String? = null,
+  public val token_set: String? = null,
   @field:WireField(
     tag = 3,
     adapter = "com.squareup.wire.ProtoAdapter#STRING_VALUE",
     label = WireField.Label.OMIT_IDENTITY
   )
   @JvmField
-  val token: String? = null,
+  public val token: String? = null,
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<TokenUpdate, TokenUpdate.Builder>(ADAPTER, unknownFields) {
-  override fun newBuilder(): Builder {
+  public override fun newBuilder(): Builder {
     val builder = Builder()
     builder.service = service
     builder.token_set = token_set
@@ -53,7 +54,7 @@ class TokenUpdate(
     return builder
   }
 
-  override fun equals(other: Any?): Boolean {
+  public override fun equals(other: Any?): Boolean {
     if (other === this) return true
     if (other !is TokenUpdate) return false
     if (unknownFields != other.unknownFields) return false
@@ -63,7 +64,7 @@ class TokenUpdate(
     return true
   }
 
-  override fun hashCode(): Int {
+  public override fun hashCode(): Int {
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
@@ -75,7 +76,7 @@ class TokenUpdate(
     return result
   }
 
-  override fun toString(): String {
+  public override fun toString(): String {
     val result = mutableListOf<String>()
     result += """service=${sanitize(service)}"""
     if (token_set != null) result += """token_set=$token_set"""
@@ -83,39 +84,39 @@ class TokenUpdate(
     return result.joinToString(prefix = "TokenUpdate{", separator = ", ", postfix = "}")
   }
 
-  fun copy(
+  public fun copy(
     service: String = this.service,
     token_set: String? = this.token_set,
     token: String? = this.token,
     unknownFields: ByteString = this.unknownFields
   ): TokenUpdate = TokenUpdate(service, token_set, token, unknownFields)
 
-  class Builder : Message.Builder<TokenUpdate, Builder>() {
+  public class Builder : Message.Builder<TokenUpdate, Builder>() {
     @JvmField
-    var service: String = ""
+    public var service: String = ""
 
     @JvmField
-    var token_set: String? = null
+    public var token_set: String? = null
 
     @JvmField
-    var token: String? = null
+    public var token: String? = null
 
-    fun service(service: String): Builder {
+    public fun service(service: String): Builder {
       this.service = service
       return this
     }
 
-    fun token_set(token_set: String?): Builder {
+    public fun token_set(token_set: String?): Builder {
       this.token_set = token_set
       return this
     }
 
-    fun token(token: String?): Builder {
+    public fun token(token: String?): Builder {
       this.token = token
       return this
     }
 
-    override fun build(): TokenUpdate = TokenUpdate(
+    public override fun build(): TokenUpdate = TokenUpdate(
       service = service,
       token_set = token_set,
       token = token,
@@ -123,16 +124,16 @@ class TokenUpdate(
     )
   }
 
-  companion object {
+  public companion object {
     @JvmField
-    val ADAPTER: ProtoAdapter<TokenUpdate> = object : ProtoAdapter<TokenUpdate>(
+    public val ADAPTER: ProtoAdapter<TokenUpdate> = object : ProtoAdapter<TokenUpdate>(
       FieldEncoding.LENGTH_DELIMITED, 
       TokenUpdate::class, 
       "type.googleapis.com/com.baulsupp.cooee.p.TokenUpdate", 
       PROTO_3, 
       null
     ) {
-      override fun encodedSize(value: TokenUpdate): Int {
+      public override fun encodedSize(value: TokenUpdate): Int {
         var size = value.unknownFields.size
         if (value.service != "") size += ProtoAdapter.STRING.encodedSizeWithTag(1, value.service)
         if (value.token_set != null) size += ProtoAdapter.STRING_VALUE.encodedSizeWithTag(2,
@@ -142,7 +143,7 @@ class TokenUpdate(
         return size
       }
 
-      override fun encode(writer: ProtoWriter, value: TokenUpdate) {
+      public override fun encode(writer: ProtoWriter, value: TokenUpdate): Unit {
         if (value.service != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.service)
         if (value.token_set != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 2,
             value.token_set)
@@ -150,7 +151,7 @@ class TokenUpdate(
         writer.writeBytes(value.unknownFields)
       }
 
-      override fun decode(reader: ProtoReader): TokenUpdate {
+      public override fun decode(reader: ProtoReader): TokenUpdate {
         var service: String = ""
         var token_set: String? = null
         var token: String? = null
@@ -170,7 +171,7 @@ class TokenUpdate(
         )
       }
 
-      override fun redact(value: TokenUpdate): TokenUpdate = value.copy(
+      public override fun redact(value: TokenUpdate): TokenUpdate = value.copy(
         token_set = value.token_set?.let(ProtoAdapter.STRING_VALUE::redact),
         token = value.token?.let(ProtoAdapter.STRING_VALUE::redact),
         unknownFields = ByteString.EMPTY

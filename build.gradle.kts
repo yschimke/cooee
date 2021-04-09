@@ -6,7 +6,7 @@ plugins {
 	id("com.google.cloud.tools.appengine") version "2.4.1"
 	kotlin("jvm") version "1.4.31"
 	kotlin("plugin.spring") version "1.4.30"
-	id("com.squareup.wire") version "3.4.0"
+	id("com.squareup.wire") version "3.7.0"
 	id("com.diffplug.spotless") version "5.1.0"
 	id("com.apollographql.apollo").version("2.5.5")
 }
@@ -82,20 +82,20 @@ dependencies {
 
 	implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
 	implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
-	implementation("com.github.yschimke:oksocial-output:5.7")
-	implementation("com.github.yschimke:okurl:2.29") {
+	implementation("com.github.yschimke:oksocial-output:6.2")
+	implementation("com.github.yschimke:okurl:2.31") {
 		isTransitive = false
 	}
 
-	implementation("com.squareup.wire:wire-runtime:3.4.0")
-	implementation("com.squareup.wire:wire-moshi-adapter:3.4.0")
-	implementation("com.squareup.wire:wire-grpc-client:3.4.0") {
+	implementation("com.squareup.wire:wire-runtime:3.7.0")
+	implementation("com.squareup.wire:wire-moshi-adapter:3.7.0")
+	implementation("com.squareup.wire:wire-grpc-client:3.7.0") {
 		exclude(group = "com.squareup.okhttp3")
 	}
-	implementation("com.squareup.wire:wire-moshi-adapter:3.4.0")
+	implementation("com.squareup.wire:wire-moshi-adapter:3.7.0")
 
-	implementation("com.squareup.moshi:moshi:1.11.0")
-	implementation("com.squareup.moshi:moshi-adapters:1.11.0")
+	implementation("com.squareup.moshi:moshi:1.12.0")
+	implementation("com.squareup.moshi:moshi-adapters:1.12.0")
 
 	implementation("com.google.code.gson:gson:2.8.6")
 
