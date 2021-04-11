@@ -2,6 +2,8 @@ dispatch:
   - url: "stream.coo.ee/*"
     service: cooee-stream
   - url: "api.coo.ee/*"
-    service: default
+    service: cooee-stream
   - url: "coo.ee/*"
-    service: default
+    service: cooee-stream
+  - url: "www.coo.ee/*"
+    service: cooee-stream
