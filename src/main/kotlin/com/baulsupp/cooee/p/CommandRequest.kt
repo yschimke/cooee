@@ -19,7 +19,6 @@ import kotlin.Long
 import kotlin.String
 import kotlin.Unit
 import kotlin.collections.List
-import kotlin.hashCode
 import kotlin.jvm.JvmField
 import okio.ByteString
 
@@ -66,7 +65,7 @@ public class CommandRequest(
     if (result == 0) {
       result = unknownFields.hashCode()
       result = result * 37 + parsed_command.hashCode()
-      result = result * 37 + response_type.hashCode()
+      result = result * 37 + (response_type?.hashCode() ?: 0)
       super.hashCode = result
     }
     return result
@@ -119,7 +118,7 @@ public class CommandRequest(
       PROTO_3, 
       null
     ) {
-      public override fun encodedSize(value: CommandRequest): Int {
+      public override fun encodedSize(`value`: CommandRequest): Int {
         var size = value.unknownFields.size
         size += ProtoAdapter.STRING.asRepeated().encodedSizeWithTag(1, value.parsed_command)
         if (value.response_type != ResponseType.DEFAULT_RESPONSE) size +=
@@ -127,7 +126,7 @@ public class CommandRequest(
         return size
       }
 
-      public override fun encode(writer: ProtoWriter, value: CommandRequest): Unit {
+      public override fun encode(writer: ProtoWriter, `value`: CommandRequest): Unit {
         ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 1, value.parsed_command)
         if (value.response_type != ResponseType.DEFAULT_RESPONSE)
             ResponseType.ADAPTER.encodeWithTag(writer, 2, value.response_type)
@@ -155,7 +154,7 @@ public class CommandRequest(
         )
       }
 
-      public override fun redact(value: CommandRequest): CommandRequest = value.copy(
+      public override fun redact(`value`: CommandRequest): CommandRequest = value.copy(
         unknownFields = ByteString.EMPTY
       )
     }

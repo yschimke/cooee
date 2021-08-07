@@ -16,7 +16,6 @@ import kotlin.Int
 import kotlin.Long
 import kotlin.String
 import kotlin.Unit
-import kotlin.hashCode
 import kotlin.jvm.JvmField
 import okio.ByteString
 
@@ -78,10 +77,10 @@ public class TokenRequest(
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
-      result = result * 37 + service.hashCode()
-      result = result * 37 + token_set.hashCode()
-      result = result * 37 + login_url.hashCode()
-      result = result * 37 + token.hashCode()
+      result = result * 37 + (service?.hashCode() ?: 0)
+      result = result * 37 + (token_set?.hashCode() ?: 0)
+      result = result * 37 + (login_url?.hashCode() ?: 0)
+      result = result * 37 + (token?.hashCode() ?: 0)
       super.hashCode = result
     }
     return result
@@ -155,7 +154,7 @@ public class TokenRequest(
       PROTO_3, 
       null
     ) {
-      public override fun encodedSize(value: TokenRequest): Int {
+      public override fun encodedSize(`value`: TokenRequest): Int {
         var size = value.unknownFields.size
         if (value.service != "") size += ProtoAdapter.STRING.encodedSizeWithTag(1, value.service)
         if (value.token_set != null) size += ProtoAdapter.STRING_VALUE.encodedSizeWithTag(2,
@@ -167,7 +166,7 @@ public class TokenRequest(
         return size
       }
 
-      public override fun encode(writer: ProtoWriter, value: TokenRequest): Unit {
+      public override fun encode(writer: ProtoWriter, `value`: TokenRequest): Unit {
         if (value.service != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.service)
         if (value.token_set != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 2,
             value.token_set)
@@ -200,7 +199,7 @@ public class TokenRequest(
         )
       }
 
-      public override fun redact(value: TokenRequest): TokenRequest = value.copy(
+      public override fun redact(`value`: TokenRequest): TokenRequest = value.copy(
         token_set = value.token_set?.let(ProtoAdapter.STRING_VALUE::redact),
         login_url = value.login_url?.let(ProtoAdapter.STRING_VALUE::redact),
         token = value.token?.let(ProtoAdapter.STRING_VALUE::redact),

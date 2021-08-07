@@ -19,7 +19,6 @@ import kotlin.Long
 import kotlin.String
 import kotlin.Unit
 import kotlin.collections.List
-import kotlin.hashCode
 import kotlin.jvm.JvmField
 import okio.ByteString
 
@@ -63,7 +62,7 @@ public class TableColumn(
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
-      result = result * 37 + name.hashCode()
+      result = result * 37 + (name?.hashCode() ?: 0)
       result = result * 37 + values.hashCode()
       super.hashCode = result
     }
@@ -117,14 +116,14 @@ public class TableColumn(
       PROTO_3, 
       null
     ) {
-      public override fun encodedSize(value: TableColumn): Int {
+      public override fun encodedSize(`value`: TableColumn): Int {
         var size = value.unknownFields.size
         if (value.name != "") size += ProtoAdapter.STRING.encodedSizeWithTag(1, value.name)
         size += ProtoAdapter.STRING.asRepeated().encodedSizeWithTag(2, value.values)
         return size
       }
 
-      public override fun encode(writer: ProtoWriter, value: TableColumn): Unit {
+      public override fun encode(writer: ProtoWriter, `value`: TableColumn): Unit {
         if (value.name != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.name)
         ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 2, value.values)
         writer.writeBytes(value.unknownFields)
@@ -147,7 +146,7 @@ public class TableColumn(
         )
       }
 
-      public override fun redact(value: TableColumn): TableColumn = value.copy(
+      public override fun redact(`value`: TableColumn): TableColumn = value.copy(
         unknownFields = ByteString.EMPTY
       )
     }

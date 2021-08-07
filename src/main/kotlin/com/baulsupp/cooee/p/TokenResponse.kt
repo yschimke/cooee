@@ -15,7 +15,6 @@ import kotlin.Int
 import kotlin.Long
 import kotlin.String
 import kotlin.Unit
-import kotlin.hashCode
 import kotlin.jvm.JvmField
 import okio.ByteString
 
@@ -58,8 +57,8 @@ public class TokenResponse(
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
-      result = result * 37 + token.hashCode()
-      result = result * 37 + login_attempted.hashCode()
+      result = result * 37 + (token?.hashCode() ?: 0)
+      result = result * 37 + (login_attempted?.hashCode() ?: 0)
       super.hashCode = result
     }
     return result
@@ -111,7 +110,7 @@ public class TokenResponse(
       PROTO_3, 
       null
     ) {
-      public override fun encodedSize(value: TokenResponse): Int {
+      public override fun encodedSize(`value`: TokenResponse): Int {
         var size = value.unknownFields.size
         if (value.token != null) size += TokenUpdate.ADAPTER.encodedSizeWithTag(1, value.token)
         if (value.login_attempted != false) size += ProtoAdapter.BOOL.encodedSizeWithTag(2,
@@ -119,7 +118,7 @@ public class TokenResponse(
         return size
       }
 
-      public override fun encode(writer: ProtoWriter, value: TokenResponse): Unit {
+      public override fun encode(writer: ProtoWriter, `value`: TokenResponse): Unit {
         if (value.token != null) TokenUpdate.ADAPTER.encodeWithTag(writer, 1, value.token)
         if (value.login_attempted != false) ProtoAdapter.BOOL.encodeWithTag(writer, 2,
             value.login_attempted)
@@ -143,7 +142,7 @@ public class TokenResponse(
         )
       }
 
-      public override fun redact(value: TokenResponse): TokenResponse = value.copy(
+      public override fun redact(`value`: TokenResponse): TokenResponse = value.copy(
         token = value.token?.let(TokenUpdate.ADAPTER::redact),
         unknownFields = ByteString.EMPTY
       )

@@ -1,20 +1,24 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("org.springframework.boot") version "2.4.3"
+	id("org.springframework.boot") version "2.5.3"
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
-	id("com.google.cloud.tools.appengine") version "2.4.1"
-	kotlin("jvm") version "1.4.31"
-	kotlin("plugin.spring") version "1.4.30"
-	id("com.squareup.wire") version "3.7.0"
+	id("com.google.cloud.tools.jib") version "3.1.2"
+	kotlin("jvm") version "1.5.21"
+	kotlin("plugin.spring") version "1.5.21"
+	id("com.squareup.wire") version "4.0.0-alpha.3"
 	id("com.diffplug.spotless") version "5.1.0"
 	id("com.apollographql.apollo").version("2.5.5")
 }
 
 group = "com.baulsupp.cooee"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_1_8
-java.targetCompatibility = JavaVersion.VERSION_1_8
+
+java {
+	toolchain {
+		languageVersion.set(JavaLanguageVersion.of(11))
+	}
+}
 
 repositories {
 	mavenCentral()
@@ -23,16 +27,9 @@ repositories {
 	}
 }
 
-appengine {
-	deploy {
-		version = "GCLOUD_CONFIG"
-		projectId = "GCLOUD_CONFIG"
-	}
-}
-
-extra["springCloudGcpVersion"] = "2.0.1"
-extra["springCloudVersion"] = "2020.0.1"
-extra["testcontainersVersion"] = "1.15.1"
+extra["springCloudGcpVersion"] = "2.0.3"
+extra["springCloudVersion"] = "2020.0.3"
+extra["testcontainersVersion"] = "1.15.3"
 
 dependencyManagement {
 	imports {
@@ -55,6 +52,31 @@ apollo {
 	service("github") {
 		sourceFolder.set("com/github/cooee")
 		rootPackageName.set("com.github.cooee")
+	}
+}
+
+jib {
+	from.image = "gcr.io/distroless/java:11"
+
+	to {
+		image = "gcr.io/coo-ee/app"
+		credHelper = "gcr"
+		auth {
+			username = "oauth2accesstoken"
+			password = gcloudAuthToken()
+		}
+	}
+	container {
+		ports = listOf("8080")
+		mainClass = "com.baulsupp.cooee.CooeeApplicationKt"
+
+		// good defauls intended for Java 8 (>= 8u191) containers
+		jvmFlags = listOf(
+			"-server",
+			"-Djava.awt.headless=true",
+			"-XX:+UseG1GC",
+			"-XX:MaxGCPauseMillis=100",
+		)
 	}
 }
 
@@ -120,6 +142,16 @@ tasks.withType<Test> {
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict -Xopt-in=kotlin.RequiresOptIn")
-		jvmTarget = "1.8"
+		jvmTarget = "11"
 	}
+}
+
+fun gcloudAuthToken() = try {
+	ProcessBuilder("gcloud auth print-access-token".split(' '))
+		.redirectOutput(ProcessBuilder.Redirect.PIPE)
+		.start()
+		.inputStream.bufferedReader().readText().trim()
+} catch (e: Exception) {
+	e.printStackTrace()
+	null
 }

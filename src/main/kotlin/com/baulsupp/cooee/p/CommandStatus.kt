@@ -11,7 +11,7 @@ import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
 public enum class CommandStatus(
-  public override val value: Int
+  public override val `value`: Int
 ) : WireEnum {
   UNDEFINED(0),
   CLIENT_ACTION(1),
@@ -29,11 +29,11 @@ public enum class CommandStatus(
       PROTO_3, 
       CommandStatus.UNDEFINED
     ) {
-      public override fun fromValue(value: Int): CommandStatus? = CommandStatus.fromValue(value)
+      public override fun fromValue(`value`: Int): CommandStatus? = CommandStatus.fromValue(value)
     }
 
     @JvmStatic
-    public fun fromValue(value: Int): CommandStatus? = when (value) {
+    public fun fromValue(`value`: Int): CommandStatus? = when (value) {
       0 -> UNDEFINED
       1 -> CLIENT_ACTION
       2 -> DONE

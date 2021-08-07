@@ -93,13 +93,13 @@ public class Table(
       PROTO_3, 
       null
     ) {
-      public override fun encodedSize(value: Table): Int {
+      public override fun encodedSize(`value`: Table): Int {
         var size = value.unknownFields.size
         size += TableColumn.ADAPTER.asRepeated().encodedSizeWithTag(1, value.columns)
         return size
       }
 
-      public override fun encode(writer: ProtoWriter, value: Table): Unit {
+      public override fun encode(writer: ProtoWriter, `value`: Table): Unit {
         TableColumn.ADAPTER.asRepeated().encodeWithTag(writer, 1, value.columns)
         writer.writeBytes(value.unknownFields)
       }
@@ -118,7 +118,7 @@ public class Table(
         )
       }
 
-      public override fun redact(value: Table): Table = value.copy(
+      public override fun redact(`value`: Table): Table = value.copy(
         columns = value.columns.redactElements(TableColumn.ADAPTER),
         unknownFields = ByteString.EMPTY
       )

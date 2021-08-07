@@ -95,13 +95,13 @@ public class CompletionResponse(
       PROTO_3, 
       null
     ) {
-      public override fun encodedSize(value: CompletionResponse): Int {
+      public override fun encodedSize(`value`: CompletionResponse): Int {
         var size = value.unknownFields.size
         size += CompletionSuggestion.ADAPTER.asRepeated().encodedSizeWithTag(1, value.completions)
         return size
       }
 
-      public override fun encode(writer: ProtoWriter, value: CompletionResponse): Unit {
+      public override fun encode(writer: ProtoWriter, `value`: CompletionResponse): Unit {
         CompletionSuggestion.ADAPTER.asRepeated().encodeWithTag(writer, 1, value.completions)
         writer.writeBytes(value.unknownFields)
       }
@@ -120,7 +120,7 @@ public class CompletionResponse(
         )
       }
 
-      public override fun redact(value: CompletionResponse): CompletionResponse = value.copy(
+      public override fun redact(`value`: CompletionResponse): CompletionResponse = value.copy(
         completions = value.completions.redactElements(CompletionSuggestion.ADAPTER),
         unknownFields = ByteString.EMPTY
       )

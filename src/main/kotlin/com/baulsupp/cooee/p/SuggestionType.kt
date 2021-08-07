@@ -11,7 +11,7 @@ import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
 public enum class SuggestionType(
-  public override val value: Int
+  public override val `value`: Int
 ) : WireEnum {
   UNKNOWN(0),
   /**
@@ -43,11 +43,11 @@ public enum class SuggestionType(
       PROTO_3, 
       SuggestionType.UNKNOWN
     ) {
-      public override fun fromValue(value: Int): SuggestionType? = SuggestionType.fromValue(value)
+      public override fun fromValue(`value`: Int): SuggestionType? = SuggestionType.fromValue(value)
     }
 
     @JvmStatic
-    public fun fromValue(value: Int): SuggestionType? = when (value) {
+    public fun fromValue(`value`: Int): SuggestionType? = when (value) {
       0 -> UNKNOWN
       1 -> LINK
       2 -> COMMAND

@@ -16,7 +16,6 @@ import kotlin.Int
 import kotlin.Long
 import kotlin.String
 import kotlin.Unit
-import kotlin.hashCode
 import kotlin.jvm.JvmField
 import okio.ByteString
 
@@ -49,7 +48,7 @@ public class ImageUrl(
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
-      result = result * 37 + url.hashCode()
+      result = result * 37 + (url?.hashCode() ?: 0)
       super.hashCode = result
     }
     return result
@@ -88,13 +87,13 @@ public class ImageUrl(
       PROTO_3, 
       null
     ) {
-      public override fun encodedSize(value: ImageUrl): Int {
+      public override fun encodedSize(`value`: ImageUrl): Int {
         var size = value.unknownFields.size
         if (value.url != "") size += ProtoAdapter.STRING.encodedSizeWithTag(1, value.url)
         return size
       }
 
-      public override fun encode(writer: ProtoWriter, value: ImageUrl): Unit {
+      public override fun encode(writer: ProtoWriter, `value`: ImageUrl): Unit {
         if (value.url != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.url)
         writer.writeBytes(value.unknownFields)
       }
@@ -113,7 +112,7 @@ public class ImageUrl(
         )
       }
 
-      public override fun redact(value: ImageUrl): ImageUrl = value.copy(
+      public override fun redact(`value`: ImageUrl): ImageUrl = value.copy(
         unknownFields = ByteString.EMPTY
       )
     }

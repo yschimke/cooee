@@ -15,7 +15,6 @@ import kotlin.Int
 import kotlin.Long
 import kotlin.String
 import kotlin.Unit
-import kotlin.hashCode
 import kotlin.jvm.JvmField
 import okio.ByteString
 
@@ -85,11 +84,11 @@ public class CommandResponse(
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
-      result = result * 37 + url.hashCode()
-      result = result * 37 + message.hashCode()
-      result = result * 37 + image_url.hashCode()
-      result = result * 37 + status.hashCode()
-      result = result * 37 + table.hashCode()
+      result = result * 37 + (url?.hashCode() ?: 0)
+      result = result * 37 + (message?.hashCode() ?: 0)
+      result = result * 37 + (image_url?.hashCode() ?: 0)
+      result = result * 37 + (status?.hashCode() ?: 0)
+      result = result * 37 + (table?.hashCode() ?: 0)
       super.hashCode = result
     }
     return result
@@ -174,7 +173,7 @@ public class CommandResponse(
       PROTO_3, 
       null
     ) {
-      public override fun encodedSize(value: CommandResponse): Int {
+      public override fun encodedSize(`value`: CommandResponse): Int {
         var size = value.unknownFields.size
         if (value.url != null) size += ProtoAdapter.STRING_VALUE.encodedSizeWithTag(1, value.url)
         if (value.message != null) size += ProtoAdapter.STRING_VALUE.encodedSizeWithTag(2,
@@ -186,7 +185,7 @@ public class CommandResponse(
         return size
       }
 
-      public override fun encode(writer: ProtoWriter, value: CommandResponse): Unit {
+      public override fun encode(writer: ProtoWriter, `value`: CommandResponse): Unit {
         if (value.url != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 1, value.url)
         if (value.message != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 2, value.message)
         if (value.image_url != null) ImageUrl.ADAPTER.encodeWithTag(writer, 3, value.image_url)
@@ -226,7 +225,7 @@ public class CommandResponse(
         )
       }
 
-      public override fun redact(value: CommandResponse): CommandResponse = value.copy(
+      public override fun redact(`value`: CommandResponse): CommandResponse = value.copy(
         url = value.url?.let(ProtoAdapter.STRING_VALUE::redact),
         message = value.message?.let(ProtoAdapter.STRING_VALUE::redact),
         image_url = value.image_url?.let(ImageUrl.ADAPTER::redact),

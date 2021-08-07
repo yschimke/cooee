@@ -94,13 +94,13 @@ public class RegisterServerRequest(
       PROTO_3, 
       null
     ) {
-      public override fun encodedSize(value: RegisterServerRequest): Int {
+      public override fun encodedSize(`value`: RegisterServerRequest): Int {
         var size = value.unknownFields.size
         size += ProtoAdapter.STRING.asRepeated().encodedSizeWithTag(1, value.commands)
         return size
       }
 
-      public override fun encode(writer: ProtoWriter, value: RegisterServerRequest): Unit {
+      public override fun encode(writer: ProtoWriter, `value`: RegisterServerRequest): Unit {
         ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 1, value.commands)
         writer.writeBytes(value.unknownFields)
       }
@@ -119,7 +119,8 @@ public class RegisterServerRequest(
         )
       }
 
-      public override fun redact(value: RegisterServerRequest): RegisterServerRequest = value.copy(
+      public override fun redact(`value`: RegisterServerRequest): RegisterServerRequest =
+          value.copy(
         unknownFields = ByteString.EMPTY
       )
     }

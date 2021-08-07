@@ -20,7 +20,6 @@ import kotlin.Long
 import kotlin.String
 import kotlin.Unit
 import kotlin.collections.List
-import kotlin.hashCode
 import kotlin.jvm.JvmField
 import okio.ByteString
 
@@ -109,13 +108,13 @@ public class CommandSuggestion(
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
-      result = result * 37 + command.hashCode()
-      result = result * 37 + provider.hashCode()
-      result = result * 37 + description.hashCode()
-      result = result * 37 + type.hashCode()
+      result = result * 37 + (command?.hashCode() ?: 0)
+      result = result * 37 + (provider?.hashCode() ?: 0)
+      result = result * 37 + (description?.hashCode() ?: 0)
+      result = result * 37 + (type?.hashCode() ?: 0)
       result = result * 37 + children.hashCode()
-      result = result * 37 + url.hashCode()
-      result = result * 37 + message.hashCode()
+      result = result * 37 + (url?.hashCode() ?: 0)
+      result = result * 37 + (message?.hashCode() ?: 0)
       super.hashCode = result
     }
     return result
@@ -224,7 +223,7 @@ public class CommandSuggestion(
       PROTO_3, 
       null
     ) {
-      public override fun encodedSize(value: CommandSuggestion): Int {
+      public override fun encodedSize(`value`: CommandSuggestion): Int {
         var size = value.unknownFields.size
         if (value.command != "") size += ProtoAdapter.STRING.encodedSizeWithTag(1, value.command)
         if (value.provider != "") size += ProtoAdapter.STRING.encodedSizeWithTag(2, value.provider)
@@ -239,7 +238,7 @@ public class CommandSuggestion(
         return size
       }
 
-      public override fun encode(writer: ProtoWriter, value: CommandSuggestion): Unit {
+      public override fun encode(writer: ProtoWriter, `value`: CommandSuggestion): Unit {
         if (value.command != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.command)
         if (value.provider != "") ProtoAdapter.STRING.encodeWithTag(writer, 2, value.provider)
         if (value.description != "") ProtoAdapter.STRING.encodeWithTag(writer, 3, value.description)
@@ -287,7 +286,7 @@ public class CommandSuggestion(
         )
       }
 
-      public override fun redact(value: CommandSuggestion): CommandSuggestion = value.copy(
+      public override fun redact(`value`: CommandSuggestion): CommandSuggestion = value.copy(
         children = value.children.redactElements(CommandSuggestion.ADAPTER),
         url = value.url?.let(ProtoAdapter.STRING_VALUE::redact),
         message = value.message?.let(ProtoAdapter.STRING_VALUE::redact),

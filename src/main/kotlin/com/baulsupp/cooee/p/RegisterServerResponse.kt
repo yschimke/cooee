@@ -16,7 +16,6 @@ import kotlin.Int
 import kotlin.Long
 import kotlin.String
 import kotlin.Unit
-import kotlin.hashCode
 import kotlin.jvm.JvmField
 import okio.ByteString
 
@@ -49,7 +48,7 @@ public class RegisterServerResponse(
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
-      result = result * 37 + uuid.hashCode()
+      result = result * 37 + (uuid?.hashCode() ?: 0)
       super.hashCode = result
     }
     return result
@@ -89,13 +88,13 @@ public class RegisterServerResponse(
       PROTO_3, 
       null
     ) {
-      public override fun encodedSize(value: RegisterServerResponse): Int {
+      public override fun encodedSize(`value`: RegisterServerResponse): Int {
         var size = value.unknownFields.size
         if (value.uuid != "") size += ProtoAdapter.STRING.encodedSizeWithTag(1, value.uuid)
         return size
       }
 
-      public override fun encode(writer: ProtoWriter, value: RegisterServerResponse): Unit {
+      public override fun encode(writer: ProtoWriter, `value`: RegisterServerResponse): Unit {
         if (value.uuid != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.uuid)
         writer.writeBytes(value.unknownFields)
       }
@@ -114,7 +113,7 @@ public class RegisterServerResponse(
         )
       }
 
-      public override fun redact(value: RegisterServerResponse): RegisterServerResponse =
+      public override fun redact(`value`: RegisterServerResponse): RegisterServerResponse =
           value.copy(
         unknownFields = ByteString.EMPTY
       )

@@ -1,6 +1,6 @@
 steps:
-  - name: 'gcr.io/cloud-builders/gradle'
-    args: ['appengineStage']
-  - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['app', 'deploy', 'build/staged-app/app.yaml']
-timeout: '1600s'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    args: [ "./gradlew", "jib", "--image=gcr.io/coo-ee/app" ]
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    args: [ "gcloud", "run", "deploy", "app", "--image=gcr.io/coo-ee/app", "--region=europe-west4" ]

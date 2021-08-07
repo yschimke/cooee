@@ -16,7 +16,6 @@ import kotlin.Int
 import kotlin.Long
 import kotlin.String
 import kotlin.Unit
-import kotlin.hashCode
 import kotlin.jvm.JvmField
 import okio.ByteString
 
@@ -76,10 +75,10 @@ public class CompletionSuggestion(
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
-      result = result * 37 + word.hashCode()
-      result = result * 37 + line.hashCode()
-      result = result * 37 + command.hashCode()
-      result = result * 37 + provider.hashCode()
+      result = result * 37 + (word?.hashCode() ?: 0)
+      result = result * 37 + (line?.hashCode() ?: 0)
+      result = result * 37 + (command?.hashCode() ?: 0)
+      result = result * 37 + (provider?.hashCode() ?: 0)
       super.hashCode = result
     }
     return result
@@ -154,7 +153,7 @@ public class CompletionSuggestion(
       PROTO_3, 
       null
     ) {
-      public override fun encodedSize(value: CompletionSuggestion): Int {
+      public override fun encodedSize(`value`: CompletionSuggestion): Int {
         var size = value.unknownFields.size
         if (value.word != "") size += ProtoAdapter.STRING.encodedSizeWithTag(1, value.word)
         if (value.line != "") size += ProtoAdapter.STRING.encodedSizeWithTag(2, value.line)
@@ -164,7 +163,7 @@ public class CompletionSuggestion(
         return size
       }
 
-      public override fun encode(writer: ProtoWriter, value: CompletionSuggestion): Unit {
+      public override fun encode(writer: ProtoWriter, `value`: CompletionSuggestion): Unit {
         if (value.word != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.word)
         if (value.line != "") ProtoAdapter.STRING.encodeWithTag(writer, 2, value.line)
         if (value.command != null) CommandSuggestion.ADAPTER.encodeWithTag(writer, 3, value.command)
@@ -195,7 +194,7 @@ public class CompletionSuggestion(
         )
       }
 
-      public override fun redact(value: CompletionSuggestion): CompletionSuggestion = value.copy(
+      public override fun redact(`value`: CompletionSuggestion): CompletionSuggestion = value.copy(
         command = value.command?.let(CommandSuggestion.ADAPTER::redact),
         unknownFields = ByteString.EMPTY
       )

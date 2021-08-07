@@ -16,7 +16,6 @@ import kotlin.Int
 import kotlin.Long
 import kotlin.String
 import kotlin.Unit
-import kotlin.hashCode
 import kotlin.jvm.JvmField
 import okio.ByteString
 
@@ -58,8 +57,8 @@ public class LogRequest(
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
-      result = result * 37 + message.hashCode()
-      result = result * 37 + severity.hashCode()
+      result = result * 37 + (message?.hashCode() ?: 0)
+      result = result * 37 + (severity?.hashCode() ?: 0)
       super.hashCode = result
     }
     return result
@@ -111,7 +110,7 @@ public class LogRequest(
       PROTO_3, 
       null
     ) {
-      public override fun encodedSize(value: LogRequest): Int {
+      public override fun encodedSize(`value`: LogRequest): Int {
         var size = value.unknownFields.size
         if (value.message != "") size += ProtoAdapter.STRING.encodedSizeWithTag(1, value.message)
         if (value.severity != LogSeverity.FATAL) size += LogSeverity.ADAPTER.encodedSizeWithTag(2,
@@ -119,7 +118,7 @@ public class LogRequest(
         return size
       }
 
-      public override fun encode(writer: ProtoWriter, value: LogRequest): Unit {
+      public override fun encode(writer: ProtoWriter, `value`: LogRequest): Unit {
         if (value.message != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.message)
         if (value.severity != LogSeverity.FATAL) LogSeverity.ADAPTER.encodeWithTag(writer, 2,
             value.severity)
@@ -147,7 +146,7 @@ public class LogRequest(
         )
       }
 
-      public override fun redact(value: LogRequest): LogRequest = value.copy(
+      public override fun redact(`value`: LogRequest): LogRequest = value.copy(
         unknownFields = ByteString.EMPTY
       )
     }

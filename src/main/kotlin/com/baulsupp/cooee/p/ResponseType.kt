@@ -11,7 +11,7 @@ import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
 public enum class ResponseType(
-  public override val value: Int
+  public override val `value`: Int
 ) : WireEnum {
   DEFAULT_RESPONSE(0),
   REQUEST_RESPONSE(1),
@@ -25,11 +25,11 @@ public enum class ResponseType(
       PROTO_3, 
       ResponseType.DEFAULT_RESPONSE
     ) {
-      public override fun fromValue(value: Int): ResponseType? = ResponseType.fromValue(value)
+      public override fun fromValue(`value`: Int): ResponseType? = ResponseType.fromValue(value)
     }
 
     @JvmStatic
-    public fun fromValue(value: Int): ResponseType? = when (value) {
+    public fun fromValue(`value`: Int): ResponseType? = when (value) {
       0 -> DEFAULT_RESPONSE
       1 -> REQUEST_RESPONSE
       2 -> STREAM_RESPONSE
