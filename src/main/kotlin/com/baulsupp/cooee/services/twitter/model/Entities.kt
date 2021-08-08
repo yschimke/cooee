@@ -6,6 +6,4 @@ data class Entities(
   val urls: List<Url>? = null,
   val userMention: List<UserMention>? = null,
   val symbols: List<Symbol>? = null
-) {
-
-}
+)

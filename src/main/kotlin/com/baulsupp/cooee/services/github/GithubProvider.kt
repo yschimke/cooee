@@ -80,7 +80,7 @@ class GithubProvider(val apolloClient: ApolloClient) : Provider("github",
             TableColumn(name = "Date", values = releaseDetails.map { it.createdAt.toString() }),
             TableColumn(name = "URL", values = releaseDetails.map { it.url.toString() }),
             TableColumn(name = "Assets", values = releaseDetails.map {
-              it.releaseAssets?.nodes?.mapNotNull { asset -> asset?.name }?.joinToString().orEmpty()
+              it.releaseAssets.nodes?.mapNotNull { asset -> asset?.name }?.joinToString().orEmpty()
             }),
         )))
   }

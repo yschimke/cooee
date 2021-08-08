@@ -1,7 +1,7 @@
-package com.baulsupp.cooee.config;
+package com.baulsupp.cooee.config
 
 import com.baulsupp.okurl.authenticator.authflow.AuthOption
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "provider")
 data class ProviderProperties(

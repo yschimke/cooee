@@ -95,6 +95,6 @@ class CooeeApplication {
 
 fun main(args: Array<String>) {
   runApplication<CooeeApplication>(*args) {
-    setApplicationStartup(BufferingApplicationStartup(10000))
+      applicationStartup = BufferingApplicationStartup(10000)
   }
 }
