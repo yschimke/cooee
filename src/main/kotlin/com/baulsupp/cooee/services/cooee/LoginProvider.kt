@@ -20,6 +20,7 @@ import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
 import com.baulsupp.okurl.authenticator.authflow.*
 import com.baulsupp.okurl.authenticator.oauth2.Oauth2Flow
 import com.baulsupp.okurl.authenticator.oauth2.Oauth2ServiceDefinition
+import com.baulsupp.okurl.services.ServiceList
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -62,7 +63,7 @@ class LoginProvider(val authFlowCache: AuthFlowCache, val providerProperties: Pr
 
   suspend fun loginService(service: String): CommandResponse {
     return coroutineScope {
-      val serviceDefinition = AuthenticatingInterceptor.defaultServices().find {
+      val serviceDefinition = ServiceList.defaultServices().find {
         it.serviceDefinition.shortName() == service
       } ?: throw IllegalStateException("unknown service $service")
 

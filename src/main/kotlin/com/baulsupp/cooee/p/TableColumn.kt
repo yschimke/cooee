@@ -7,6 +7,7 @@ import com.squareup.wire.Message
 import com.squareup.wire.ProtoAdapter
 import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
+import com.squareup.wire.ReverseProtoWriter
 import com.squareup.wire.Syntax.PROTO_3
 import com.squareup.wire.WireField
 import com.squareup.wire.`internal`.checkElementsNotNull
@@ -26,17 +27,17 @@ public class TableColumn(
   @field:WireField(
     tag = 1,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
-    label = WireField.Label.OMIT_IDENTITY
+    label = WireField.Label.OMIT_IDENTITY,
   )
   @JvmField
   public val name: String = "",
   values: List<String> = emptyList(),
-  unknownFields: ByteString = ByteString.EMPTY
+  unknownFields: ByteString = ByteString.EMPTY,
 ) : Message<TableColumn, TableColumn.Builder>(ADAPTER, unknownFields) {
   @field:WireField(
     tag = 2,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
-    label = WireField.Label.REPEATED
+    label = WireField.Label.REPEATED,
   )
   @JvmField
   public val values: List<String> = immutableCopyOf("values", values)
@@ -62,7 +63,7 @@ public class TableColumn(
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
-      result = result * 37 + (name?.hashCode() ?: 0)
+      result = result * 37 + name.hashCode()
       result = result * 37 + values.hashCode()
       super.hashCode = result
     }
@@ -79,7 +80,7 @@ public class TableColumn(
   public fun copy(
     name: String = this.name,
     values: List<String> = this.values,
-    unknownFields: ByteString = this.unknownFields
+    unknownFields: ByteString = this.unknownFields,
   ): TableColumn = TableColumn(name, values, unknownFields)
 
   public class Builder : Message.Builder<TableColumn, Builder>() {
@@ -114,7 +115,8 @@ public class TableColumn(
       TableColumn::class, 
       "type.googleapis.com/com.baulsupp.cooee.p.TableColumn", 
       PROTO_3, 
-      null
+      null, 
+      "api.proto"
     ) {
       public override fun encodedSize(`value`: TableColumn): Int {
         var size = value.unknownFields.size
@@ -127,6 +129,12 @@ public class TableColumn(
         if (value.name != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.name)
         ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 2, value.values)
         writer.writeBytes(value.unknownFields)
+      }
+
+      public override fun encode(writer: ReverseProtoWriter, `value`: TableColumn): Unit {
+        writer.writeBytes(value.unknownFields)
+        ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 2, value.values)
+        if (value.name != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.name)
       }
 
       public override fun decode(reader: ProtoReader): TableColumn {

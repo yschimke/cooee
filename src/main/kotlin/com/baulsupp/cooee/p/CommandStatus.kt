@@ -11,7 +11,7 @@ import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
 public enum class CommandStatus(
-  public override val `value`: Int
+  public override val `value`: Int,
 ) : WireEnum {
   UNDEFINED(0),
   CLIENT_ACTION(1),

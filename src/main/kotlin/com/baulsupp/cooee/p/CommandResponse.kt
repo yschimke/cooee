@@ -7,6 +7,7 @@ import com.squareup.wire.Message
 import com.squareup.wire.ProtoAdapter
 import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
+import com.squareup.wire.ReverseProtoWriter
 import com.squareup.wire.Syntax.PROTO_3
 import com.squareup.wire.WireField
 import kotlin.Any
@@ -22,14 +23,12 @@ public class CommandResponse(
   @field:WireField(
     tag = 1,
     adapter = "com.squareup.wire.ProtoAdapter#STRING_VALUE",
-    label = WireField.Label.OMIT_IDENTITY
   )
   @JvmField
   public val url: String? = null,
   @field:WireField(
     tag = 2,
     adapter = "com.squareup.wire.ProtoAdapter#STRING_VALUE",
-    label = WireField.Label.OMIT_IDENTITY
   )
   @JvmField
   public val message: String? = null,
@@ -37,25 +36,25 @@ public class CommandResponse(
     tag = 3,
     adapter = "com.baulsupp.cooee.p.ImageUrl#ADAPTER",
     label = WireField.Label.OMIT_IDENTITY,
-    jsonName = "imageUrl"
+    jsonName = "imageUrl",
   )
   @JvmField
   public val image_url: ImageUrl? = null,
   @field:WireField(
     tag = 4,
     adapter = "com.baulsupp.cooee.p.CommandStatus#ADAPTER",
-    label = WireField.Label.OMIT_IDENTITY
+    label = WireField.Label.OMIT_IDENTITY,
   )
   @JvmField
   public val status: CommandStatus = CommandStatus.UNDEFINED,
   @field:WireField(
     tag = 5,
     adapter = "com.baulsupp.cooee.p.Table#ADAPTER",
-    label = WireField.Label.OMIT_IDENTITY
+    label = WireField.Label.OMIT_IDENTITY,
   )
   @JvmField
   public val table: Table? = null,
-  unknownFields: ByteString = ByteString.EMPTY
+  unknownFields: ByteString = ByteString.EMPTY,
 ) : Message<CommandResponse, CommandResponse.Builder>(ADAPTER, unknownFields) {
   public override fun newBuilder(): Builder {
     val builder = Builder()
@@ -87,7 +86,7 @@ public class CommandResponse(
       result = result * 37 + (url?.hashCode() ?: 0)
       result = result * 37 + (message?.hashCode() ?: 0)
       result = result * 37 + (image_url?.hashCode() ?: 0)
-      result = result * 37 + (status?.hashCode() ?: 0)
+      result = result * 37 + status.hashCode()
       result = result * 37 + (table?.hashCode() ?: 0)
       super.hashCode = result
     }
@@ -110,7 +109,7 @@ public class CommandResponse(
     image_url: ImageUrl? = this.image_url,
     status: CommandStatus = this.status,
     table: Table? = this.table,
-    unknownFields: ByteString = this.unknownFields
+    unknownFields: ByteString = this.unknownFields,
   ): CommandResponse = CommandResponse(url, message, image_url, status, table, unknownFields)
 
   public class Builder : Message.Builder<CommandResponse, Builder>() {
@@ -171,7 +170,8 @@ public class CommandResponse(
       CommandResponse::class, 
       "type.googleapis.com/com.baulsupp.cooee.p.CommandResponse", 
       PROTO_3, 
-      null
+      null, 
+      "api.proto"
     ) {
       public override fun encodedSize(`value`: CommandResponse): Int {
         var size = value.unknownFields.size
@@ -193,6 +193,16 @@ public class CommandResponse(
             value.status)
         if (value.table != null) Table.ADAPTER.encodeWithTag(writer, 5, value.table)
         writer.writeBytes(value.unknownFields)
+      }
+
+      public override fun encode(writer: ReverseProtoWriter, `value`: CommandResponse): Unit {
+        writer.writeBytes(value.unknownFields)
+        if (value.table != null) Table.ADAPTER.encodeWithTag(writer, 5, value.table)
+        if (value.status != CommandStatus.UNDEFINED) CommandStatus.ADAPTER.encodeWithTag(writer, 4,
+            value.status)
+        if (value.image_url != null) ImageUrl.ADAPTER.encodeWithTag(writer, 3, value.image_url)
+        if (value.message != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 2, value.message)
+        if (value.url != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 1, value.url)
       }
 
       public override fun decode(reader: ProtoReader): CommandResponse {

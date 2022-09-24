@@ -11,7 +11,7 @@ import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
 public enum class LogSeverity(
-  public override val `value`: Int
+  public override val `value`: Int,
 ) : WireEnum {
   FATAL(0),
   SEVERE(1),

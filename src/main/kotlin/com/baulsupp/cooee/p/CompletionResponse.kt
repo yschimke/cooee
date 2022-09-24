@@ -7,6 +7,7 @@ import com.squareup.wire.Message
 import com.squareup.wire.ProtoAdapter
 import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
+import com.squareup.wire.ReverseProtoWriter
 import com.squareup.wire.Syntax.PROTO_3
 import com.squareup.wire.WireField
 import com.squareup.wire.`internal`.checkElementsNotNull
@@ -24,12 +25,12 @@ import okio.ByteString
 
 public class CompletionResponse(
   completions: List<CompletionSuggestion> = emptyList(),
-  unknownFields: ByteString = ByteString.EMPTY
+  unknownFields: ByteString = ByteString.EMPTY,
 ) : Message<CompletionResponse, CompletionResponse.Builder>(ADAPTER, unknownFields) {
   @field:WireField(
     tag = 1,
     adapter = "com.baulsupp.cooee.p.CompletionSuggestion#ADAPTER",
-    label = WireField.Label.REPEATED
+    label = WireField.Label.REPEATED,
   )
   @JvmField
   public val completions: List<CompletionSuggestion> = immutableCopyOf("completions", completions)
@@ -93,7 +94,8 @@ public class CompletionResponse(
       CompletionResponse::class, 
       "type.googleapis.com/com.baulsupp.cooee.p.CompletionResponse", 
       PROTO_3, 
-      null
+      null, 
+      "api.proto"
     ) {
       public override fun encodedSize(`value`: CompletionResponse): Int {
         var size = value.unknownFields.size
@@ -104,6 +106,11 @@ public class CompletionResponse(
       public override fun encode(writer: ProtoWriter, `value`: CompletionResponse): Unit {
         CompletionSuggestion.ADAPTER.asRepeated().encodeWithTag(writer, 1, value.completions)
         writer.writeBytes(value.unknownFields)
+      }
+
+      public override fun encode(writer: ReverseProtoWriter, `value`: CompletionResponse): Unit {
+        writer.writeBytes(value.unknownFields)
+        CompletionSuggestion.ADAPTER.asRepeated().encodeWithTag(writer, 1, value.completions)
       }
 
       public override fun decode(reader: ProtoReader): CompletionResponse {

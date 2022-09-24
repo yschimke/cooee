@@ -7,6 +7,7 @@ import com.squareup.wire.Message
 import com.squareup.wire.ProtoAdapter
 import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
+import com.squareup.wire.ReverseProtoWriter
 import com.squareup.wire.Syntax.PROTO_3
 import com.squareup.wire.WireField
 import com.squareup.wire.`internal`.checkElementsNotNull
@@ -27,28 +28,28 @@ public class CommandSuggestion(
   @field:WireField(
     tag = 1,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
-    label = WireField.Label.OMIT_IDENTITY
+    label = WireField.Label.OMIT_IDENTITY,
   )
   @JvmField
   public val command: String = "",
   @field:WireField(
     tag = 2,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
-    label = WireField.Label.OMIT_IDENTITY
+    label = WireField.Label.OMIT_IDENTITY,
   )
   @JvmField
   public val provider: String = "",
   @field:WireField(
     tag = 3,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
-    label = WireField.Label.OMIT_IDENTITY
+    label = WireField.Label.OMIT_IDENTITY,
   )
   @JvmField
   public val description: String = "",
   @field:WireField(
     tag = 4,
     adapter = "com.baulsupp.cooee.p.SuggestionType#ADAPTER",
-    label = WireField.Label.OMIT_IDENTITY
+    label = WireField.Label.OMIT_IDENTITY,
   )
   @JvmField
   public val type: SuggestionType = SuggestionType.UNKNOWN,
@@ -56,23 +57,21 @@ public class CommandSuggestion(
   @field:WireField(
     tag = 6,
     adapter = "com.squareup.wire.ProtoAdapter#STRING_VALUE",
-    label = WireField.Label.OMIT_IDENTITY
   )
   @JvmField
   public val url: String? = null,
   @field:WireField(
     tag = 7,
     adapter = "com.squareup.wire.ProtoAdapter#STRING_VALUE",
-    label = WireField.Label.OMIT_IDENTITY
   )
   @JvmField
   public val message: String? = null,
-  unknownFields: ByteString = ByteString.EMPTY
+  unknownFields: ByteString = ByteString.EMPTY,
 ) : Message<CommandSuggestion, CommandSuggestion.Builder>(ADAPTER, unknownFields) {
   @field:WireField(
     tag = 5,
     adapter = "com.baulsupp.cooee.p.CommandSuggestion#ADAPTER",
-    label = WireField.Label.REPEATED
+    label = WireField.Label.REPEATED,
   )
   @JvmField
   public val children: List<CommandSuggestion> = immutableCopyOf("children", children)
@@ -108,10 +107,10 @@ public class CommandSuggestion(
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
-      result = result * 37 + (command?.hashCode() ?: 0)
-      result = result * 37 + (provider?.hashCode() ?: 0)
-      result = result * 37 + (description?.hashCode() ?: 0)
-      result = result * 37 + (type?.hashCode() ?: 0)
+      result = result * 37 + command.hashCode()
+      result = result * 37 + provider.hashCode()
+      result = result * 37 + description.hashCode()
+      result = result * 37 + type.hashCode()
       result = result * 37 + children.hashCode()
       result = result * 37 + (url?.hashCode() ?: 0)
       result = result * 37 + (message?.hashCode() ?: 0)
@@ -140,7 +139,7 @@ public class CommandSuggestion(
     children: List<CommandSuggestion> = this.children,
     url: String? = this.url,
     message: String? = this.message,
-    unknownFields: ByteString = this.unknownFields
+    unknownFields: ByteString = this.unknownFields,
   ): CommandSuggestion = CommandSuggestion(command, provider, description, type, children, url,
       message, unknownFields)
 
@@ -221,7 +220,8 @@ public class CommandSuggestion(
       CommandSuggestion::class, 
       "type.googleapis.com/com.baulsupp.cooee.p.CommandSuggestion", 
       PROTO_3, 
-      null
+      null, 
+      "api.proto"
     ) {
       public override fun encodedSize(`value`: CommandSuggestion): Int {
         var size = value.unknownFields.size
@@ -248,6 +248,18 @@ public class CommandSuggestion(
         if (value.url != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 6, value.url)
         if (value.message != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 7, value.message)
         writer.writeBytes(value.unknownFields)
+      }
+
+      public override fun encode(writer: ReverseProtoWriter, `value`: CommandSuggestion): Unit {
+        writer.writeBytes(value.unknownFields)
+        if (value.message != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 7, value.message)
+        if (value.url != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 6, value.url)
+        CommandSuggestion.ADAPTER.asRepeated().encodeWithTag(writer, 5, value.children)
+        if (value.type != SuggestionType.UNKNOWN) SuggestionType.ADAPTER.encodeWithTag(writer, 4,
+            value.type)
+        if (value.description != "") ProtoAdapter.STRING.encodeWithTag(writer, 3, value.description)
+        if (value.provider != "") ProtoAdapter.STRING.encodeWithTag(writer, 2, value.provider)
+        if (value.command != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.command)
       }
 
       public override fun decode(reader: ProtoReader): CommandSuggestion {

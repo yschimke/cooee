@@ -7,6 +7,7 @@ import com.squareup.wire.Message
 import com.squareup.wire.ProtoAdapter
 import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
+import com.squareup.wire.ReverseProtoWriter
 import com.squareup.wire.Syntax.PROTO_3
 import com.squareup.wire.WireField
 import com.squareup.wire.`internal`.checkElementsNotNull
@@ -24,12 +25,12 @@ import okio.ByteString
 
 public class Table(
   columns: List<TableColumn> = emptyList(),
-  unknownFields: ByteString = ByteString.EMPTY
+  unknownFields: ByteString = ByteString.EMPTY,
 ) : Message<Table, Table.Builder>(ADAPTER, unknownFields) {
   @field:WireField(
     tag = 1,
     adapter = "com.baulsupp.cooee.p.TableColumn#ADAPTER",
-    label = WireField.Label.REPEATED
+    label = WireField.Label.REPEATED,
   )
   @JvmField
   public val columns: List<TableColumn> = immutableCopyOf("columns", columns)
@@ -91,7 +92,8 @@ public class Table(
       Table::class, 
       "type.googleapis.com/com.baulsupp.cooee.p.Table", 
       PROTO_3, 
-      null
+      null, 
+      "api.proto"
     ) {
       public override fun encodedSize(`value`: Table): Int {
         var size = value.unknownFields.size
@@ -102,6 +104,11 @@ public class Table(
       public override fun encode(writer: ProtoWriter, `value`: Table): Unit {
         TableColumn.ADAPTER.asRepeated().encodeWithTag(writer, 1, value.columns)
         writer.writeBytes(value.unknownFields)
+      }
+
+      public override fun encode(writer: ReverseProtoWriter, `value`: Table): Unit {
+        writer.writeBytes(value.unknownFields)
+        TableColumn.ADAPTER.asRepeated().encodeWithTag(writer, 1, value.columns)
       }
 
       public override fun decode(reader: ProtoReader): Table {

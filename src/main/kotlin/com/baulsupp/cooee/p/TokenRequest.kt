@@ -7,6 +7,7 @@ import com.squareup.wire.Message
 import com.squareup.wire.ProtoAdapter
 import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
+import com.squareup.wire.ReverseProtoWriter
 import com.squareup.wire.Syntax.PROTO_3
 import com.squareup.wire.WireField
 import com.squareup.wire.`internal`.sanitize
@@ -23,34 +24,31 @@ public class TokenRequest(
   @field:WireField(
     tag = 1,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
-    label = WireField.Label.OMIT_IDENTITY
+    label = WireField.Label.OMIT_IDENTITY,
   )
   @JvmField
   public val service: String = "",
   @field:WireField(
     tag = 2,
     adapter = "com.squareup.wire.ProtoAdapter#STRING_VALUE",
-    label = WireField.Label.OMIT_IDENTITY,
-    jsonName = "tokenSet"
+    jsonName = "tokenSet",
   )
   @JvmField
   public val token_set: String? = null,
   @field:WireField(
     tag = 3,
     adapter = "com.squareup.wire.ProtoAdapter#STRING_VALUE",
-    label = WireField.Label.OMIT_IDENTITY,
-    jsonName = "loginUrl"
+    jsonName = "loginUrl",
   )
   @JvmField
   public val login_url: String? = null,
   @field:WireField(
     tag = 4,
     adapter = "com.squareup.wire.ProtoAdapter#STRING_VALUE",
-    label = WireField.Label.OMIT_IDENTITY
   )
   @JvmField
   public val token: String? = null,
-  unknownFields: ByteString = ByteString.EMPTY
+  unknownFields: ByteString = ByteString.EMPTY,
 ) : Message<TokenRequest, TokenRequest.Builder>(ADAPTER, unknownFields) {
   public override fun newBuilder(): Builder {
     val builder = Builder()
@@ -77,7 +75,7 @@ public class TokenRequest(
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
-      result = result * 37 + (service?.hashCode() ?: 0)
+      result = result * 37 + service.hashCode()
       result = result * 37 + (token_set?.hashCode() ?: 0)
       result = result * 37 + (login_url?.hashCode() ?: 0)
       result = result * 37 + (token?.hashCode() ?: 0)
@@ -100,7 +98,7 @@ public class TokenRequest(
     token_set: String? = this.token_set,
     login_url: String? = this.login_url,
     token: String? = this.token,
-    unknownFields: ByteString = this.unknownFields
+    unknownFields: ByteString = this.unknownFields,
   ): TokenRequest = TokenRequest(service, token_set, login_url, token, unknownFields)
 
   public class Builder : Message.Builder<TokenRequest, Builder>() {
@@ -152,7 +150,8 @@ public class TokenRequest(
       TokenRequest::class, 
       "type.googleapis.com/com.baulsupp.cooee.p.TokenRequest", 
       PROTO_3, 
-      null
+      null, 
+      "api.proto"
     ) {
       public override fun encodedSize(`value`: TokenRequest): Int {
         var size = value.unknownFields.size
@@ -174,6 +173,16 @@ public class TokenRequest(
             value.login_url)
         if (value.token != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 4, value.token)
         writer.writeBytes(value.unknownFields)
+      }
+
+      public override fun encode(writer: ReverseProtoWriter, `value`: TokenRequest): Unit {
+        writer.writeBytes(value.unknownFields)
+        if (value.token != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 4, value.token)
+        if (value.login_url != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 3,
+            value.login_url)
+        if (value.token_set != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 2,
+            value.token_set)
+        if (value.service != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.service)
       }
 
       public override fun decode(reader: ProtoReader): TokenRequest {

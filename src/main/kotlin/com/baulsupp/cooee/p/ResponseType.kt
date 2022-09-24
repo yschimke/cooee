@@ -11,7 +11,7 @@ import kotlin.jvm.JvmField
 import kotlin.jvm.JvmStatic
 
 public enum class ResponseType(
-  public override val `value`: Int
+  public override val `value`: Int,
 ) : WireEnum {
   DEFAULT_RESPONSE(0),
   REQUEST_RESPONSE(1),

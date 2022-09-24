@@ -7,6 +7,7 @@ import com.squareup.wire.Message
 import com.squareup.wire.ProtoAdapter
 import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
+import com.squareup.wire.ReverseProtoWriter
 import com.squareup.wire.Syntax.PROTO_3
 import com.squareup.wire.WireField
 import com.squareup.wire.`internal`.checkElementsNotNull
@@ -28,17 +29,17 @@ public class CommandRequest(
     tag = 2,
     adapter = "com.baulsupp.cooee.p.ResponseType#ADAPTER",
     label = WireField.Label.OMIT_IDENTITY,
-    jsonName = "responseType"
+    jsonName = "responseType",
   )
   @JvmField
   public val response_type: ResponseType = ResponseType.DEFAULT_RESPONSE,
-  unknownFields: ByteString = ByteString.EMPTY
+  unknownFields: ByteString = ByteString.EMPTY,
 ) : Message<CommandRequest, CommandRequest.Builder>(ADAPTER, unknownFields) {
   @field:WireField(
     tag = 1,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
     label = WireField.Label.REPEATED,
-    jsonName = "parsedCommand"
+    jsonName = "parsedCommand",
   )
   @JvmField
   public val parsed_command: List<String> = immutableCopyOf("parsed_command", parsed_command)
@@ -65,7 +66,7 @@ public class CommandRequest(
     if (result == 0) {
       result = unknownFields.hashCode()
       result = result * 37 + parsed_command.hashCode()
-      result = result * 37 + (response_type?.hashCode() ?: 0)
+      result = result * 37 + response_type.hashCode()
       super.hashCode = result
     }
     return result
@@ -81,7 +82,7 @@ public class CommandRequest(
   public fun copy(
     parsed_command: List<String> = this.parsed_command,
     response_type: ResponseType = this.response_type,
-    unknownFields: ByteString = this.unknownFields
+    unknownFields: ByteString = this.unknownFields,
   ): CommandRequest = CommandRequest(parsed_command, response_type, unknownFields)
 
   public class Builder : Message.Builder<CommandRequest, Builder>() {
@@ -116,7 +117,8 @@ public class CommandRequest(
       CommandRequest::class, 
       "type.googleapis.com/com.baulsupp.cooee.p.CommandRequest", 
       PROTO_3, 
-      null
+      null, 
+      "api.proto"
     ) {
       public override fun encodedSize(`value`: CommandRequest): Int {
         var size = value.unknownFields.size
@@ -131,6 +133,13 @@ public class CommandRequest(
         if (value.response_type != ResponseType.DEFAULT_RESPONSE)
             ResponseType.ADAPTER.encodeWithTag(writer, 2, value.response_type)
         writer.writeBytes(value.unknownFields)
+      }
+
+      public override fun encode(writer: ReverseProtoWriter, `value`: CommandRequest): Unit {
+        writer.writeBytes(value.unknownFields)
+        if (value.response_type != ResponseType.DEFAULT_RESPONSE)
+            ResponseType.ADAPTER.encodeWithTag(writer, 2, value.response_type)
+        ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 1, value.parsed_command)
       }
 
       public override fun decode(reader: ProtoReader): CommandRequest {

@@ -12,7 +12,6 @@ import com.baulsupp.cooee.services.dev.DevTableProvider
 import com.baulsupp.cooee.services.github.GithubProvider
 import com.baulsupp.cooee.services.remote.RemoteProvider
 import com.baulsupp.cooee.util.WireProto3PropertyNamingStrategy
-import com.baulsupp.okurl.Main
 import com.baulsupp.okurl.authenticator.AuthenticatingInterceptor
 import com.baulsupp.okurl.credentials.CredentialsStore
 import com.squareup.moshi.Moshi
@@ -84,7 +83,7 @@ class CooeeApplication {
 
   @EventListener(classes = [ApplicationStartedEvent::class])
   fun onApplicationEvent(event: ApplicationStartedEvent) {
-    Main.moshi = moshi()
+//    Main.moshi = moshi()
   }
 
   @Bean

@@ -7,6 +7,7 @@ import com.squareup.wire.Message
 import com.squareup.wire.ProtoAdapter
 import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
+import com.squareup.wire.ReverseProtoWriter
 import com.squareup.wire.Syntax.PROTO_3
 import com.squareup.wire.WireField
 import com.squareup.wire.`internal`.sanitize
@@ -23,32 +24,32 @@ public class CompletionSuggestion(
   @field:WireField(
     tag = 1,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
-    label = WireField.Label.OMIT_IDENTITY
+    label = WireField.Label.OMIT_IDENTITY,
   )
   @JvmField
   public val word: String = "",
   @field:WireField(
     tag = 2,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
-    label = WireField.Label.OMIT_IDENTITY
+    label = WireField.Label.OMIT_IDENTITY,
   )
   @JvmField
   public val line: String = "",
   @field:WireField(
     tag = 3,
     adapter = "com.baulsupp.cooee.p.CommandSuggestion#ADAPTER",
-    label = WireField.Label.OMIT_IDENTITY
+    label = WireField.Label.OMIT_IDENTITY,
   )
   @JvmField
   public val command: CommandSuggestion? = null,
   @field:WireField(
     tag = 4,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
-    label = WireField.Label.OMIT_IDENTITY
+    label = WireField.Label.OMIT_IDENTITY,
   )
   @JvmField
   public val provider: String = "",
-  unknownFields: ByteString = ByteString.EMPTY
+  unknownFields: ByteString = ByteString.EMPTY,
 ) : Message<CompletionSuggestion, CompletionSuggestion.Builder>(ADAPTER, unknownFields) {
   public override fun newBuilder(): Builder {
     val builder = Builder()
@@ -75,10 +76,10 @@ public class CompletionSuggestion(
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
-      result = result * 37 + (word?.hashCode() ?: 0)
-      result = result * 37 + (line?.hashCode() ?: 0)
+      result = result * 37 + word.hashCode()
+      result = result * 37 + line.hashCode()
       result = result * 37 + (command?.hashCode() ?: 0)
-      result = result * 37 + (provider?.hashCode() ?: 0)
+      result = result * 37 + provider.hashCode()
       super.hashCode = result
     }
     return result
@@ -98,7 +99,7 @@ public class CompletionSuggestion(
     line: String = this.line,
     command: CommandSuggestion? = this.command,
     provider: String = this.provider,
-    unknownFields: ByteString = this.unknownFields
+    unknownFields: ByteString = this.unknownFields,
   ): CompletionSuggestion = CompletionSuggestion(word, line, command, provider, unknownFields)
 
   public class Builder : Message.Builder<CompletionSuggestion, Builder>() {
@@ -151,7 +152,8 @@ public class CompletionSuggestion(
       CompletionSuggestion::class, 
       "type.googleapis.com/com.baulsupp.cooee.p.CompletionSuggestion", 
       PROTO_3, 
-      null
+      null, 
+      "api.proto"
     ) {
       public override fun encodedSize(`value`: CompletionSuggestion): Int {
         var size = value.unknownFields.size
@@ -169,6 +171,14 @@ public class CompletionSuggestion(
         if (value.command != null) CommandSuggestion.ADAPTER.encodeWithTag(writer, 3, value.command)
         if (value.provider != "") ProtoAdapter.STRING.encodeWithTag(writer, 4, value.provider)
         writer.writeBytes(value.unknownFields)
+      }
+
+      public override fun encode(writer: ReverseProtoWriter, `value`: CompletionSuggestion): Unit {
+        writer.writeBytes(value.unknownFields)
+        if (value.provider != "") ProtoAdapter.STRING.encodeWithTag(writer, 4, value.provider)
+        if (value.command != null) CommandSuggestion.ADAPTER.encodeWithTag(writer, 3, value.command)
+        if (value.line != "") ProtoAdapter.STRING.encodeWithTag(writer, 2, value.line)
+        if (value.word != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.word)
       }
 
       public override fun decode(reader: ProtoReader): CompletionSuggestion {

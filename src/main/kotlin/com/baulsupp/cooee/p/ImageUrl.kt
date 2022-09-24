@@ -7,6 +7,7 @@ import com.squareup.wire.Message
 import com.squareup.wire.ProtoAdapter
 import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
+import com.squareup.wire.ReverseProtoWriter
 import com.squareup.wire.Syntax.PROTO_3
 import com.squareup.wire.WireField
 import com.squareup.wire.`internal`.sanitize
@@ -23,11 +24,11 @@ public class ImageUrl(
   @field:WireField(
     tag = 1,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
-    label = WireField.Label.OMIT_IDENTITY
+    label = WireField.Label.OMIT_IDENTITY,
   )
   @JvmField
   public val url: String = "",
-  unknownFields: ByteString = ByteString.EMPTY
+  unknownFields: ByteString = ByteString.EMPTY,
 ) : Message<ImageUrl, ImageUrl.Builder>(ADAPTER, unknownFields) {
   public override fun newBuilder(): Builder {
     val builder = Builder()
@@ -48,7 +49,7 @@ public class ImageUrl(
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
-      result = result * 37 + (url?.hashCode() ?: 0)
+      result = result * 37 + url.hashCode()
       super.hashCode = result
     }
     return result
@@ -85,7 +86,8 @@ public class ImageUrl(
       ImageUrl::class, 
       "type.googleapis.com/com.baulsupp.cooee.p.ImageUrl", 
       PROTO_3, 
-      null
+      null, 
+      "api.proto"
     ) {
       public override fun encodedSize(`value`: ImageUrl): Int {
         var size = value.unknownFields.size
@@ -96,6 +98,11 @@ public class ImageUrl(
       public override fun encode(writer: ProtoWriter, `value`: ImageUrl): Unit {
         if (value.url != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.url)
         writer.writeBytes(value.unknownFields)
+      }
+
+      public override fun encode(writer: ReverseProtoWriter, `value`: ImageUrl): Unit {
+        writer.writeBytes(value.unknownFields)
+        if (value.url != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.url)
       }
 
       public override fun decode(reader: ProtoReader): ImageUrl {

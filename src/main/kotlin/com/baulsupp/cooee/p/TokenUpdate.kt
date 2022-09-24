@@ -7,6 +7,7 @@ import com.squareup.wire.Message
 import com.squareup.wire.ProtoAdapter
 import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
+import com.squareup.wire.ReverseProtoWriter
 import com.squareup.wire.Syntax.PROTO_3
 import com.squareup.wire.WireField
 import com.squareup.wire.`internal`.sanitize
@@ -23,26 +24,24 @@ public class TokenUpdate(
   @field:WireField(
     tag = 1,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
-    label = WireField.Label.OMIT_IDENTITY
+    label = WireField.Label.OMIT_IDENTITY,
   )
   @JvmField
   public val service: String = "",
   @field:WireField(
     tag = 2,
     adapter = "com.squareup.wire.ProtoAdapter#STRING_VALUE",
-    label = WireField.Label.OMIT_IDENTITY,
-    jsonName = "tokenSet"
+    jsonName = "tokenSet",
   )
   @JvmField
   public val token_set: String? = null,
   @field:WireField(
     tag = 3,
     adapter = "com.squareup.wire.ProtoAdapter#STRING_VALUE",
-    label = WireField.Label.OMIT_IDENTITY
   )
   @JvmField
   public val token: String? = null,
-  unknownFields: ByteString = ByteString.EMPTY
+  unknownFields: ByteString = ByteString.EMPTY,
 ) : Message<TokenUpdate, TokenUpdate.Builder>(ADAPTER, unknownFields) {
   public override fun newBuilder(): Builder {
     val builder = Builder()
@@ -67,7 +66,7 @@ public class TokenUpdate(
     var result = super.hashCode
     if (result == 0) {
       result = unknownFields.hashCode()
-      result = result * 37 + (service?.hashCode() ?: 0)
+      result = result * 37 + service.hashCode()
       result = result * 37 + (token_set?.hashCode() ?: 0)
       result = result * 37 + (token?.hashCode() ?: 0)
       super.hashCode = result
@@ -87,7 +86,7 @@ public class TokenUpdate(
     service: String = this.service,
     token_set: String? = this.token_set,
     token: String? = this.token,
-    unknownFields: ByteString = this.unknownFields
+    unknownFields: ByteString = this.unknownFields,
   ): TokenUpdate = TokenUpdate(service, token_set, token, unknownFields)
 
   public class Builder : Message.Builder<TokenUpdate, Builder>() {
@@ -130,7 +129,8 @@ public class TokenUpdate(
       TokenUpdate::class, 
       "type.googleapis.com/com.baulsupp.cooee.p.TokenUpdate", 
       PROTO_3, 
-      null
+      null, 
+      "api.proto"
     ) {
       public override fun encodedSize(`value`: TokenUpdate): Int {
         var size = value.unknownFields.size
@@ -148,6 +148,14 @@ public class TokenUpdate(
             value.token_set)
         if (value.token != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 3, value.token)
         writer.writeBytes(value.unknownFields)
+      }
+
+      public override fun encode(writer: ReverseProtoWriter, `value`: TokenUpdate): Unit {
+        writer.writeBytes(value.unknownFields)
+        if (value.token != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 3, value.token)
+        if (value.token_set != null) ProtoAdapter.STRING_VALUE.encodeWithTag(writer, 2,
+            value.token_set)
+        if (value.service != "") ProtoAdapter.STRING.encodeWithTag(writer, 1, value.service)
       }
 
       public override fun decode(reader: ProtoReader): TokenUpdate {

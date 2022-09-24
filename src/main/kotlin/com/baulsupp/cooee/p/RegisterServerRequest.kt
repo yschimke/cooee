@@ -7,6 +7,7 @@ import com.squareup.wire.Message
 import com.squareup.wire.ProtoAdapter
 import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
+import com.squareup.wire.ReverseProtoWriter
 import com.squareup.wire.Syntax.PROTO_3
 import com.squareup.wire.WireField
 import com.squareup.wire.`internal`.checkElementsNotNull
@@ -24,12 +25,12 @@ import okio.ByteString
 
 public class RegisterServerRequest(
   commands: List<String> = emptyList(),
-  unknownFields: ByteString = ByteString.EMPTY
+  unknownFields: ByteString = ByteString.EMPTY,
 ) : Message<RegisterServerRequest, RegisterServerRequest.Builder>(ADAPTER, unknownFields) {
   @field:WireField(
     tag = 1,
     adapter = "com.squareup.wire.ProtoAdapter#STRING",
-    label = WireField.Label.REPEATED
+    label = WireField.Label.REPEATED,
   )
   @JvmField
   public val commands: List<String> = immutableCopyOf("commands", commands)
@@ -92,7 +93,8 @@ public class RegisterServerRequest(
       RegisterServerRequest::class, 
       "type.googleapis.com/com.baulsupp.cooee.p.RegisterServerRequest", 
       PROTO_3, 
-      null
+      null, 
+      "api.proto"
     ) {
       public override fun encodedSize(`value`: RegisterServerRequest): Int {
         var size = value.unknownFields.size
@@ -103,6 +105,11 @@ public class RegisterServerRequest(
       public override fun encode(writer: ProtoWriter, `value`: RegisterServerRequest): Unit {
         ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 1, value.commands)
         writer.writeBytes(value.unknownFields)
+      }
+
+      public override fun encode(writer: ReverseProtoWriter, `value`: RegisterServerRequest): Unit {
+        writer.writeBytes(value.unknownFields)
+        ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 1, value.commands)
       }
 
       public override fun decode(reader: ProtoReader): RegisterServerRequest {

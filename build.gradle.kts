@@ -1,14 +1,14 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("org.springframework.boot") version "2.5.3"
-	id("io.spring.dependency-management") version "1.0.11.RELEASE"
-	id("com.google.cloud.tools.jib") version "3.1.2"
-	kotlin("jvm") version "1.5.21"
-	kotlin("plugin.spring") version "1.5.21"
-	id("com.squareup.wire") version "4.0.0-alpha.3"
-	id("com.diffplug.spotless") version "5.1.0"
-	id("com.apollographql.apollo").version("2.5.5")
+	id("org.springframework.boot") version "2.7.4"
+	id("io.spring.dependency-management") version "1.0.14.RELEASE"
+	id("com.google.cloud.tools.jib") version "3.2.0"
+	kotlin("jvm") version "1.7.10"
+	kotlin("plugin.spring") version "1.7.10"
+	id("com.squareup.wire") version "4.4.1"
+	id("com.diffplug.spotless") version "6.11.0"
+	id("com.apollographql.apollo").version("2.5.13")
 }
 
 group = "com.baulsupp.cooee"
@@ -16,7 +16,7 @@ version = "0.0.1-SNAPSHOT"
 
 java {
 	toolchain {
-		languageVersion.set(JavaLanguageVersion.of(11))
+		languageVersion.set(JavaLanguageVersion.of(17))
 	}
 }
 
@@ -27,9 +27,9 @@ repositories {
 	}
 }
 
-extra["springCloudGcpVersion"] = "2.0.3"
-extra["springCloudVersion"] = "2020.0.3"
-extra["testcontainersVersion"] = "1.15.3"
+extra["springCloudGcpVersion"] = "3.3.0"
+extra["springCloudVersion"] = "2021.0.4"
+extra["testcontainersVersion"] = "1.17.3"
 
 dependencyManagement {
 	imports {
@@ -56,7 +56,7 @@ apollo {
 }
 
 jib {
-	from.image = "gcr.io/distroless/java:11"
+	from.image = "gcr.io/distroless/java:17"
 
 	to {
 		image = "gcr.io/coo-ee/app"
@@ -98,28 +98,27 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
 	// The core runtime dependencies
-	implementation("com.apollographql.apollo:apollo-runtime:2.5.5")
+	implementation("com.apollographql.apollo:apollo-runtime:2.5.13")
 	// Coroutines extensions for easier asynchronicity handling
-	implementation("com.apollographql.apollo:apollo-coroutines-support:2.5.5")
+	implementation("com.apollographql.apollo:apollo-coroutines-support:2.5.13")
 
-	implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
-	implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
-	implementation("com.github.yschimke:oksocial-output:6.2")
-	implementation("com.github.yschimke:okurl:2.31") {
+	implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.10")
+	implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.10")
+	implementation("com.github.yschimke.schoutput:schoutput:0.9.2")
+	implementation("com.github.yschimke:okurl:v4.3.0") {
 		isTransitive = false
 	}
 
-	implementation("com.squareup.wire:wire-runtime:3.7.0")
-	implementation("com.squareup.wire:wire-moshi-adapter:3.7.0")
-	implementation("com.squareup.wire:wire-grpc-client:3.7.0") {
+	implementation("com.squareup.wire:wire-runtime:4.4.1")
+	implementation("com.squareup.wire:wire-moshi-adapter:4.4.1")
+	implementation("com.squareup.wire:wire-grpc-client:4.4.1") {
 		exclude(group = "com.squareup.okhttp3")
 	}
-	implementation("com.squareup.wire:wire-moshi-adapter:3.7.0")
+	implementation("com.squareup.wire:wire-moshi-adapter:4.4.1")
 
-	implementation("com.squareup.moshi:moshi:1.12.0")
-	implementation("com.squareup.moshi:moshi-adapters:1.12.0")
-
-	implementation("com.google.code.gson:gson:2.8.6")
+	implementation("com.squareup.moshi:moshi:1.14.0")
+	implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
+	implementation("com.squareup.moshi:moshi-adapters:1.14.0")
 
 	testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
@@ -142,7 +141,7 @@ tasks.withType<Test> {
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf("-Xjsr305=strict -Xopt-in=kotlin.RequiresOptIn")
-		jvmTarget = "11"
+		jvmTarget = "17"
 	}
 }
 

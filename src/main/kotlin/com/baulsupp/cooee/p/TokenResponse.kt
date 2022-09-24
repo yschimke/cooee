@@ -7,6 +7,7 @@ import com.squareup.wire.Message
 import com.squareup.wire.ProtoAdapter
 import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
+import com.squareup.wire.ReverseProtoWriter
 import com.squareup.wire.Syntax.PROTO_3
 import com.squareup.wire.WireField
 import kotlin.Any
@@ -22,7 +23,7 @@ public class TokenResponse(
   @field:WireField(
     tag = 1,
     adapter = "com.baulsupp.cooee.p.TokenUpdate#ADAPTER",
-    label = WireField.Label.OMIT_IDENTITY
+    label = WireField.Label.OMIT_IDENTITY,
   )
   @JvmField
   public val token: TokenUpdate? = null,
@@ -30,11 +31,11 @@ public class TokenResponse(
     tag = 2,
     adapter = "com.squareup.wire.ProtoAdapter#BOOL",
     label = WireField.Label.OMIT_IDENTITY,
-    jsonName = "loginAttempted"
+    jsonName = "loginAttempted",
   )
   @JvmField
   public val login_attempted: Boolean = false,
-  unknownFields: ByteString = ByteString.EMPTY
+  unknownFields: ByteString = ByteString.EMPTY,
 ) : Message<TokenResponse, TokenResponse.Builder>(ADAPTER, unknownFields) {
   public override fun newBuilder(): Builder {
     val builder = Builder()
@@ -58,7 +59,7 @@ public class TokenResponse(
     if (result == 0) {
       result = unknownFields.hashCode()
       result = result * 37 + (token?.hashCode() ?: 0)
-      result = result * 37 + (login_attempted?.hashCode() ?: 0)
+      result = result * 37 + login_attempted.hashCode()
       super.hashCode = result
     }
     return result
@@ -74,7 +75,7 @@ public class TokenResponse(
   public fun copy(
     token: TokenUpdate? = this.token,
     login_attempted: Boolean = this.login_attempted,
-    unknownFields: ByteString = this.unknownFields
+    unknownFields: ByteString = this.unknownFields,
   ): TokenResponse = TokenResponse(token, login_attempted, unknownFields)
 
   public class Builder : Message.Builder<TokenResponse, Builder>() {
@@ -108,7 +109,8 @@ public class TokenResponse(
       TokenResponse::class, 
       "type.googleapis.com/com.baulsupp.cooee.p.TokenResponse", 
       PROTO_3, 
-      null
+      null, 
+      "api.proto"
     ) {
       public override fun encodedSize(`value`: TokenResponse): Int {
         var size = value.unknownFields.size
@@ -123,6 +125,13 @@ public class TokenResponse(
         if (value.login_attempted != false) ProtoAdapter.BOOL.encodeWithTag(writer, 2,
             value.login_attempted)
         writer.writeBytes(value.unknownFields)
+      }
+
+      public override fun encode(writer: ReverseProtoWriter, `value`: TokenResponse): Unit {
+        writer.writeBytes(value.unknownFields)
+        if (value.login_attempted != false) ProtoAdapter.BOOL.encodeWithTag(writer, 2,
+            value.login_attempted)
+        if (value.token != null) TokenUpdate.ADAPTER.encodeWithTag(writer, 1, value.token)
       }
 
       public override fun decode(reader: ProtoReader): TokenResponse {
