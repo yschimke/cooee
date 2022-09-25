@@ -56,7 +56,7 @@ apollo {
 }
 
 jib {
-	from.image = "gcr.io/distroless/java:17"
+	from.image = "gcr.io/distroless/java17:nonroot"
 
 	to {
 		image = "gcr.io/coo-ee/app"

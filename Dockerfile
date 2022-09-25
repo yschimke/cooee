@@ -1,4 +1,4 @@
-FROM adoptopenjdk:14.0.1_7-jdk-hotspot
+FROM gcr.io/distroless/java17:nonroot
 WORKDIR /app
 #COPY . .
 #RUN ./gradlew --no-daemon build
